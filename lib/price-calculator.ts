@@ -183,7 +183,7 @@ export const MATERIAL_INFO: Record<string, MaterialConfig & {
   code: string;
   label: string;
   color: string;
-  properties: { name: string; value: string }[];
+  properties: ReadonlyArray<{ readonly name: string; readonly value: string }>;
   uses: string;
   basePricePerGram: number;
 }> = {

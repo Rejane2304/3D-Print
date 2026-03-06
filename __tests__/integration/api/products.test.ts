@@ -2,6 +2,7 @@
  * Integration tests for Products API
  * These tests require a test database connection (mockeado con Prisma)
  */
+export {};
 
 // Mock Prisma
 const mockProducts = [

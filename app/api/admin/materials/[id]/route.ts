@@ -4,10 +4,12 @@ import { authOptions } from '@/lib/auth-options';
 import prisma from '@/lib/db';
 import { updateAllProductPrices } from '@/lib/pricing-service';
 
+import type { Session } from 'next-auth';
+
 export const dynamic = 'force-dynamic';
 
-function isAdmin(session: Awaited<ReturnType<typeof getServerSession>>) {
-  return session?.user && (session.user as { role?: string }).role === 'admin';
+function isAdmin(session: Session | null): boolean {
+  return !!(session?.user && (session.user as { role?: string }).role === 'admin');
 }
 
 /** GET /api/admin/materials/[id] */

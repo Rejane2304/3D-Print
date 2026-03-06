@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import type { Session } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import prisma from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-function isAdmin(session: Awaited<ReturnType<typeof getServerSession>>) {
-  return session?.user && (session.user as { role?: string }).role === 'admin';
+function isAdmin(session: Session | null): boolean {
+  return !!(session?.user && (session.user as { role?: string }).role === 'admin');
 }
 
 /** PUT /api/admin/coupons/[id] */

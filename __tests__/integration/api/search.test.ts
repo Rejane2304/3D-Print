@@ -1,6 +1,7 @@
 /**
  * Integration tests for Search API
  */
+export {};
 const mockProducts = [
   { id: '1', name: 'Soporte Auriculares', category: 'Accesorios', material: 'PLA', basePricePerGram: 0.05, images: [] },
   { id: '2', name: 'Maceta Geométrica', category: 'Decoracion', material: 'PETG', basePricePerGram: 0.07, images: [] },
