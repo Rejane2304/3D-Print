@@ -1,0 +1,48 @@
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+
+export async function GET(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const search = url.searchParams.get("search") ?? "";
+    const material = url.searchParams.get("material") ?? "";
+    const category = url.searchParams.get("category") ?? "";
+    const sort = url.searchParams.get("sort") ?? "newest";
+    const page = parseInt(url.searchParams.get("page") ?? "1", 10);
+    const limit = parseInt(url.searchParams.get("limit") ?? "12", 10);
+    const featured = url.searchParams.get("featured");
+
+    const where: Record<string, unknown> = {};
+    if (search) where.name = { contains: search, mode: "insensitive" };
+    if (material) where.material = material;
+    if (category) {
+      const map: Record<string, string[]> = {
+        Accesorio: ["Accesorio", "Accesorios"],
+        Decoracion: ["Decoracion"],
+        Figura: ["Figura", "Figuras"],
+        Funcional: ["Funcional", "Funcionales"],
+        Articulado: ["Articulado", "Articulados"],
+      };
+      const values = map[category] ?? [category];
+      where.category = { in: values };
+    }
+    if (featured === "true") where.featured = true;
+
+    const orderBy: Record<string, string> = {};
+    if (sort === "price_asc") orderBy.basePricePerGram = "asc";
+    else if (sort === "price_desc") orderBy.basePricePerGram = "desc";
+    else if (sort === "rating") orderBy.rating = "desc";
+    else orderBy.createdAt = "desc";
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({ where, orderBy, skip: (page - 1) * limit, take: limit }),
+      prisma.product.count({ where }),
+    ]);
+
+    return NextResponse.json({ products, total, page, totalPages: Math.ceil(total / limit) });
+  } catch (err: unknown) {
+    console.error("Products fetch error:", err);
+    return NextResponse.json({ error: "Error fetching products" }, { status: 500 });
+  }
+}
