@@ -7,6 +7,7 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+// ===== USUARIOS =====
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -65,38 +66,110 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Product {
-  id            String      @id @default(cuid())
-  name          String
-  description   String      @db.Text
-  category      String
-  material      String
-  basePricePerGram Float
-  density       Float
-  minDimX       Float       @default(10)
-  minDimY       Float       @default(10)
-  minDimZ       Float       @default(10)
-  maxDimX       Float       @default(300)
-  maxDimY       Float       @default(300)
-  maxDimZ       Float       @default(300)
-  defaultDimX   Float       @default(50)
-  defaultDimY   Float       @default(50)
-  defaultDimZ   Float       @default(50)
-  finishCost    Float       @default(2.50)
-  images        String[]
-  colors        String[]
-  featured      Boolean     @default(false)
-  stock         Int         @default(100)
-  rating        Float       @default(0)
-  reviewCount   Int         @default(0)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
-  reviews       Review[]
-  wishlist      Wishlist[]
+// ===== MATERIALES =====
+model Material {
+  id                String         @id @default(cuid())
+  name              String
+  code              String         @unique  // "PLA", "PETG", "ASA", "TPU"
+  pricePerKg        Float
+  maintenanceFactor Float                   // Factor desgaste USD/hora
+  density           Float                   // g/cm³
+  description       String?
+  color             String?
+  inStock           Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  productPrices     ProductPrice[]
+  inventory         Inventory?
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
 }
 
+// ===== PRODUCTOS =====
+model Product {
+  id               String         @id @default(cuid())
+  name             String
+  description      String         @db.Text
+  category         String
+  material         String                  // material por defecto (código)
+  basePricePerGram Float
+  density          Float
+  printTimeMinutes Int            @default(60)
+  minDimX          Float          @default(10)
+  minDimY          Float          @default(10)
+  minDimZ          Float          @default(10)
+  maxDimX          Float          @default(300)
+  maxDimY          Float          @default(300)
+  maxDimZ          Float          @default(300)
+  defaultDimX      Float          @default(50)
+  defaultDimY      Float          @default(50)
+  defaultDimZ      Float          @default(50)
+  finishCost       Float          @default(2.50)
+  images           String[]
+  colors           String[]
+  featured         Boolean        @default(false)
+  stock            Int            @default(100)
+  rating           Float          @default(0)
+  reviewCount      Int            @default(0)
+  isActive         Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  reviews          Review[]
+  wishlist         Wishlist[]
+  prices           ProductPrice[]
+}
+
+// ===== PRECIOS CALCULADOS (caché por producto × material) =====
+model ProductPrice {
+  id              String   @id @default(cuid())
+  productId       String
+  materialId      String
+  materialCost    Float
+  machineCost     Float
+  maintenanceCost Float
+  operationCost   Float
+  baseCost        Float
+  priceUnit       Float    // 1–4 uds. (margen 250%)
+  priceMedium     Float    // 5–9 uds. (margen 200%)
+  priceBulk       Float    // 10+ uds. (margen 150%)
+  calculatedAt    DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  material        Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  @@unique([productId, materialId])
+}
+
+// ===== INVENTARIO (stock por material) =====
+model Inventory {
+  id         String   @id @default(cuid())
+  materialId String   @unique
+  quantity   Float                    // gramos disponibles
+  minStock   Float    @default(500)   // umbral de alerta
+  location   String?
+  lastRefill DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+}
+
+// ===== CUPONES =====
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  discountType  String    // "percentage" | "fixed"
+  discountValue Float
+  minPurchase   Float?
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  validFrom     DateTime  @default(now())
+  validUntil    DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  orders        Order[]
+}
+
+// ===== CARRITO =====
 model Cart {
   id        String     @id @default(cuid())
   userId    String     @unique
@@ -107,31 +180,36 @@ model Cart {
 }
 
 model CartItem {
-  id        String  @id @default(cuid())
-  cartId    String
-  productId String
-  material  String
-  color     String
-  quantity  Int     @default(1)
-  dimX      Float
-  dimY      Float
-  dimZ      Float
-  unitPrice Float
-  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  cartId     String
+  productId  String
+  materialId String?
+  material   String
+  color      String
+  quantity   Int      @default(1)
+  dimX       Float
+  dimY       Float
+  dimZ       Float
+  unitPrice  Float
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  materialRef Material? @relation(fields: [materialId], references: [id])
 }
 
+// ===== PEDIDOS =====
 model Order {
-  id              String      @id @default(cuid())
+  id              String    @id @default(cuid())
   userId          String
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   items           OrderItem[]
   subtotal        Float
   tax             Float
   shipping        Float
+  discount        Float     @default(0)
   total           Float
-  status          String      @default("pending")
-  stripeSessionId String?     @unique
+  status          String    @default("pending")
+  stripeSessionId String?   @unique
+  couponId        String?
   shippingName    String?
   shippingEmail   String?
   shippingPhone   String?
@@ -140,26 +218,30 @@ model Order {
   shippingState   String?
   shippingZip     String?
   shippingCountry String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  coupon          Coupon?   @relation(fields: [couponId], references: [id])
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  productId String
-  name      String
-  material  String
-  color     String
-  quantity  Int
-  dimX      Float
-  dimY      Float
-  dimZ      Float
-  unitPrice Float
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  orderId    String
+  productId  String
+  materialId String?
+  name       String
+  material   String
+  color      String
+  quantity   Int
+  dimX       Float
+  dimY       Float
+  dimZ       Float
+  unitPrice  Float
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  materialRef Material? @relation(fields: [materialId], references: [id])
 }
 
+// ===== RESEÑAS =====
 model Review {
   id        String   @id @default(cuid())
   userId    String
@@ -169,8 +251,10 @@ model Review {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  @@unique([userId, productId])
 }
 
+// ===== OTROS =====
 model ContactMessage {
   id        String   @id @default(cuid())
   name      String

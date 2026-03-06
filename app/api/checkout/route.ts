@@ -11,18 +11,48 @@ export async function POST(req: NextRequest) {
     if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const userId = (session.user as Record<string, unknown>)?.id as string;
     const body = await req.json();
-    const { items, shipping, subtotal, tax, shippingCost, total } = body ?? {};
+    const { items, shipping, subtotal, tax, shippingCost, total, couponCode } = body ?? {};
 
     if (!items?.length) return NextResponse.json({ error: "No items" }, { status: 400 });
 
+    // ---- Validar cupón si se proporcionó ----
+    let couponId: string | null = null;
+    let discount = 0;
+
+    if (couponCode) {
+      const coupon = await prisma.coupon.findUnique({
+        where: { code: String(couponCode).toUpperCase() },
+      });
+      const now = new Date();
+      const isValid =
+        coupon &&
+        coupon.isActive &&
+        (!coupon.validUntil || coupon.validUntil >= now) &&
+        (coupon.maxUses === null || coupon.usedCount < coupon.maxUses) &&
+        (coupon.minPurchase === null || (subtotal ?? 0) >= coupon.minPurchase);
+      if (isValid && coupon) {
+        couponId = coupon.id;
+        discount =
+          coupon.discountType === "percentage"
+            ? ((subtotal ?? 0) * coupon.discountValue) / 100
+            : coupon.discountValue;
+        discount = Math.round(discount * 100) / 100;
+      }
+    }
+
+    const finalTotal = Math.max(0, (total ?? 0) - discount);
+
+    // ---- Crear orden ----
     const order = await prisma.order.create({
       data: {
         userId,
         subtotal: subtotal ?? 0,
         tax: tax ?? 0,
         shipping: shippingCost ?? 0,
-        total: total ?? 0,
+        discount,
+        total: finalTotal,
         status: "pending",
+        couponId,
         shippingName: shipping?.name ?? "",
         shippingEmail: shipping?.email ?? "",
         shippingPhone: shipping?.phone ?? "",
@@ -49,25 +79,45 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get("origin") ?? "http://localhost:3000";
 
+    // ---- Stripe line items ----
+    const lineItems = (items ?? []).map((i: Record<string, unknown>) => ({
+      price_data: {
+        currency: "eur",
+        product_data: {
+          name: `${(i?.name as string) ?? "Producto"} (${(i?.material as string) ?? ""} - ${(i?.color as string) ?? ""})`,
+        },
+        unit_amount: Math.round(((i?.unitPrice as number) ?? 0) * 100),
+      },
+      quantity: (i?.quantity as number) ?? 1,
+    }));
+
+    // Añadir descuento como ítem negativo en Stripe si aplica
+    if (discount > 0) {
+      lineItems.push({
+        price_data: {
+          currency: "eur",
+          product_data: { name: `Descuento (${couponCode})` },
+          unit_amount: -Math.round(discount * 100),
+        },
+        quantity: 1,
+      });
+    }
+
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
-      line_items: (items ?? []).map((i: Record<string, unknown>) => ({
-        price_data: {
-          currency: "eur",
-          product_data: { name: `${(i?.name as string) ?? "Producto"} (${(i?.material as string) ?? ""} - ${(i?.color as string) ?? ""})` },
-          unit_amount: Math.round(((i?.unitPrice as number) ?? 0) * 100),
-        },
-        quantity: (i?.quantity as number) ?? 1,
-      })),
-      metadata: { orderId: order.id },
+      line_items: lineItems,
+      metadata: { orderId: order.id, couponId: couponId ?? "" },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/cart`,
     });
 
-    await prisma.order.update({ where: { id: order.id }, data: { stripeSessionId: stripeSession.id } });
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { stripeSessionId: stripeSession.id },
+    });
 
-    return NextResponse.json({ url: stripeSession.url, orderId: order.id });
+    return NextResponse.json({ url: stripeSession.url, orderId: order.id, discount });
   } catch (err: unknown) {
     console.error("Checkout error:", err);
     return NextResponse.json({ error: "Checkout failed" }, { status: 500 });

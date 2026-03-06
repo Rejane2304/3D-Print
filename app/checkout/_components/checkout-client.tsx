@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { MapPin, Package, CreditCard, CheckCircle, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { MapPin, Package, CreditCard, AlertCircle, ArrowLeft, ArrowRight, Tag, X, CheckCircle } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useToast } from "@/components/toast-provider";
 import { useLanguage } from "@/lib/language-store";
@@ -31,6 +31,13 @@ export function CheckoutClient() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // ---- Cupón ----
+  const [couponInput, setCouponInput] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponValidating, setCouponValidating] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponError, setCouponError] = useState("");
+
   const [shipping, setShipping] = useState({
     name: "", email: "", phone: "", address: "", city: "", state: "", zip: "", country: "España",
   });
@@ -52,7 +59,7 @@ export function CheckoutClient() {
   const subtotal = getSubtotal?.() ?? 0;
   const tax = subtotal * 0.21;
   const shippingCost = subtotal > 50 ? 0 : 5.99;
-  const total = subtotal + tax + shippingCost;
+  const total = subtotal + tax + shippingCost - couponDiscount;
 
   const t = {
     es: {
@@ -85,7 +92,13 @@ export function CheckoutClient() {
       taxLabel: "IVA (21%)",
       shippingLabel: "Envío",
       shippingFree: "Gratis",
+      discountLabel: "Descuento",
       totalLabel: "Total",
+      couponLabel: "¿Tienes un cupón?",
+      couponPlaceholder: "CÓDIGO",
+      couponApply: "Aplicar",
+      couponApplied: "Cupón aplicado",
+      couponRemove: "Quitar",
       shippingAddressTitle: "Dirección de envío:",
       paymentTitle: "Método de Pago",
       paymentInfo: "Serás redirigido a Stripe para completar el pago de forma segura.",
@@ -126,7 +139,13 @@ export function CheckoutClient() {
       taxLabel: "VAT (21%)",
       shippingLabel: "Shipping",
       shippingFree: "Free",
+      discountLabel: "Discount",
       totalLabel: "Total",
+      couponLabel: "Have a coupon?",
+      couponPlaceholder: "CODE",
+      couponApply: "Apply",
+      couponApplied: "Coupon applied",
+      couponRemove: "Remove",
       shippingAddressTitle: "Shipping address:",
       paymentTitle: "Payment Method",
       paymentInfo: "You will be redirected to Stripe to complete your payment securely.",
@@ -138,6 +157,38 @@ export function CheckoutClient() {
       connectionError: "Connection error",
     },
   }[language];
+
+  const handleApplyCoupon = useCallback(async () => {
+    if (!couponInput.trim()) return;
+    setCouponValidating(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponInput, subtotal }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setCouponCode(couponInput.toUpperCase());
+        setCouponDiscount(data.discount);
+        setCouponError("");
+      } else {
+        setCouponError(data.error ?? "Cupón no válido");
+      }
+    } catch {
+      setCouponError("Error al validar el cupón");
+    } finally {
+      setCouponValidating(false);
+    }
+  }, [couponInput, subtotal]);
+
+  const handleRemoveCoupon = () => {
+    setCouponCode("");
+    setCouponInput("");
+    setCouponDiscount(0);
+    setCouponError("");
+  };
 
   const validateShipping = (): boolean => {
     const errs: Record<string, string> = {};
@@ -168,6 +219,7 @@ export function CheckoutClient() {
             dimY: i?.dimY, dimZ: i?.dimZ, unitPrice: i?.unitPrice,
           })),
           shipping, subtotal, tax, shippingCost, total,
+          couponCode: couponCode || undefined,
         }),
       });
       const data = await res?.json();
@@ -220,81 +272,39 @@ export function CheckoutClient() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.fullName}</label>
-                <input
-                  type="text"
-                  value={shipping.name}
-                  onChange={e => setShipping({ ...shipping, name: e?.target?.value ?? "" })}
-                  placeholder={t.fullNamePlaceholder}
-                  className={fieldClass("name")}
-                />
+                <input type="text" value={shipping.name} onChange={e => setShipping({ ...shipping, name: e.target.value })} placeholder={t.fullNamePlaceholder} className={fieldClass("name")} />
                 {errors?.name && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.name}</p>}
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.email}</label>
-                <input
-                  type="email"
-                  value={shipping.email}
-                  onChange={e => setShipping({ ...shipping, email: e?.target?.value ?? "" })}
-                  placeholder={t.emailPlaceholder}
-                  className={fieldClass("email")}
-                />
+                <input type="email" value={shipping.email} onChange={e => setShipping({ ...shipping, email: e.target.value })} placeholder={t.emailPlaceholder} className={fieldClass("email")} />
                 {errors?.email && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.email}</p>}
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.phone}</label>
-                <input
-                  type="tel"
-                  value={shipping.phone}
-                  onChange={e => setShipping({ ...shipping, phone: e?.target?.value ?? "" })}
-                  placeholder={t.phonePlaceholder}
-                  className={fieldClass("phone")}
-                />
+                <input type="tel" value={shipping.phone} onChange={e => setShipping({ ...shipping, phone: e.target.value })} placeholder={t.phonePlaceholder} className={fieldClass("phone")} />
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.country}</label>
-                <input type="text" value={shipping.country} onChange={e => setShipping({ ...shipping, country: e?.target?.value ?? "" })} className={fieldClass("country")} />
+                <input type="text" value={shipping.country} onChange={e => setShipping({ ...shipping, country: e.target.value })} className={fieldClass("country")} />
               </div>
               <div className="md:col-span-2">
                 <label className="text-sm text-zinc-400 mb-1 block">{t.address}</label>
-                <input
-                  type="text"
-                  value={shipping.address}
-                  onChange={e => setShipping({ ...shipping, address: e?.target?.value ?? "" })}
-                  placeholder={t.addressPlaceholder}
-                  className={fieldClass("address")}
-                />
+                <input type="text" value={shipping.address} onChange={e => setShipping({ ...shipping, address: e.target.value })} placeholder={t.addressPlaceholder} className={fieldClass("address")} />
                 {errors?.address && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.address}</p>}
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.city}</label>
-                <input
-                  type="text"
-                  value={shipping.city}
-                  onChange={e => setShipping({ ...shipping, city: e?.target?.value ?? "" })}
-                  placeholder={t.cityPlaceholder}
-                  className={fieldClass("city")}
-                />
+                <input type="text" value={shipping.city} onChange={e => setShipping({ ...shipping, city: e.target.value })} placeholder={t.cityPlaceholder} className={fieldClass("city")} />
                 {errors?.city && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.city}</p>}
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.state}</label>
-                <input
-                  type="text"
-                  value={shipping.state}
-                  onChange={e => setShipping({ ...shipping, state: e?.target?.value ?? "" })}
-                  placeholder={t.statePlaceholder}
-                  className={fieldClass("state")}
-                />
+                <input type="text" value={shipping.state} onChange={e => setShipping({ ...shipping, state: e.target.value })} placeholder={t.statePlaceholder} className={fieldClass("state")} />
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.zip}</label>
-                <input
-                  type="text"
-                  value={shipping.zip}
-                  onChange={e => setShipping({ ...shipping, zip: e?.target?.value ?? "" })}
-                  placeholder={t.zipPlaceholder}
-                  className={fieldClass("zip")}
-                />
+                <input type="text" value={shipping.zip} onChange={e => setShipping({ ...shipping, zip: e.target.value })} placeholder={t.zipPlaceholder} className={fieldClass("zip")} />
                 {errors?.zip && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.zip}</p>}
               </div>
             </div>
@@ -318,6 +328,31 @@ export function CheckoutClient() {
                 </div>
               ))}
             </div>
+
+            {/* Coupon input */}
+            <div className="mb-4">
+              <label className="text-sm text-zinc-400 mb-2 flex items-center gap-1"><Tag className="w-3.5 h-3.5" />{t.couponLabel}</label>
+              {couponCode ? (
+                <div className="flex items-center gap-2 p-2.5 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                  <span className="text-sm font-mono font-semibold text-green-400 flex-1">{couponCode}</span>
+                  <span className="text-sm text-green-400">-€{couponDiscount.toFixed(2)}</span>
+                  <button onClick={handleRemoveCoupon} className="p-0.5 hover:text-red-400 transition text-zinc-400"><X className="w-4 h-4" /></button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input type="text" value={couponInput} onChange={e => setCouponInput(e.target.value.toUpperCase())}
+                    onKeyDown={e => e.key === "Enter" && handleApplyCoupon()}
+                    placeholder={t.couponPlaceholder}
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono uppercase outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-600" />
+                  <button onClick={handleApplyCoupon} disabled={couponValidating || !couponInput.trim()} className="px-4 py-2 bg-white/10 rounded-lg text-sm hover:bg-white/15 transition disabled:opacity-50">
+                    {couponValidating ? "..." : t.couponApply}
+                  </button>
+                </div>
+              )}
+              {couponError && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{couponError}</p>}
+            </div>
+
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-zinc-400">{t.subtotalLabel}</span>
@@ -329,13 +364,17 @@ export function CheckoutClient() {
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">{t.shippingLabel}</span>
-                <span className="font-mono">
-                  {shippingCost === 0 ? t.shippingFree : `€${shippingCost.toFixed(2)}`}
-                </span>
+                <span className="font-mono">{shippingCost === 0 ? t.shippingFree : `€${shippingCost.toFixed(2)}`}</span>
               </div>
+              {couponDiscount > 0 && (
+                <div className="flex justify-between text-green-400">
+                  <span className="flex items-center gap-1"><Tag className="w-3 h-3" />{t.discountLabel} ({couponCode})</span>
+                  <span className="font-mono">-€{couponDiscount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="border-t border-white/10 pt-2 flex justify-between font-semibold text-base">
                 <span>{t.totalLabel}</span>
-                <span className="font-mono text-cyan">€{total.toFixed(2)}</span>
+                <span className="font-mono text-cyan">€{Math.max(0, total).toFixed(2)}</span>
               </div>
             </div>
             <div className="mt-6 p-4 bg-white/5 rounded-lg text-sm">
@@ -354,7 +393,12 @@ export function CheckoutClient() {
             <div className="p-6 bg-white/5 rounded-lg text-center">
               <CreditCard className="w-12 h-12 text-cyan mx-auto mb-3" />
               <p className="text-sm text-zinc-400 mb-4">{t.paymentInfo}</p>
-              <p className="font-mono text-2xl font-bold text-cyan mb-6">€{total.toFixed(2)}</p>
+              {couponDiscount > 0 && (
+                <p className="text-sm text-green-400 mb-2 flex items-center justify-center gap-1">
+                  <Tag className="w-3.5 h-3.5" /> {t.discountLabel}: -€{couponDiscount.toFixed(2)}
+                </p>
+              )}
+              <p className="font-mono text-2xl font-bold text-cyan mb-6">€{Math.max(0, total).toFixed(2)}</p>
               <button onClick={handlePayment} disabled={loading} className="px-8 py-3 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition disabled:opacity-50 text-sm">
                 {loading ? t.processing : t.payButton}
               </button>

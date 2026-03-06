@@ -16,14 +16,18 @@ import {
   Boxes,
   Printer,
   CreditCard,
+  Layers,
+  Tag,
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/admin', label: 'Panel', icon: LayoutDashboard },
   { href: '/admin/products', label: 'Productos', icon: Package },
+  { href: '/admin/materials', label: 'Materiales', icon: Layers },
   { href: '/admin/users', label: 'Clientes', icon: Users },
   { href: '/admin/orders', label: 'Pedidos', icon: ShoppingCart },
   { href: '/admin/inventory', label: 'Inventario', icon: Boxes },
+  { href: '/admin/coupons', label: 'Cupones', icon: Tag },
   { href: '/admin/print-queue', label: 'Cola de impresión', icon: Printer },
   { href: '/admin/payments', label: 'Pagos', icon: CreditCard },
   { href: '/admin/settings', label: 'Configuración', icon: Settings },

@@ -1,3 +1,9 @@
+// =============================================================
+// Tipos compartidos — ecommerce_3d_print
+// =============================================================
+
+// ---- Entidades existentes -----------------------------------
+
 export interface ProductType {
   id: string;
   name: string;
@@ -6,6 +12,7 @@ export interface ProductType {
   material: string;
   basePricePerGram: number;
   density: number;
+  printTimeMinutes: number;
   minDimX: number;
   minDimY: number;
   minDimZ: number;
@@ -22,12 +29,15 @@ export interface ProductType {
   stock: number;
   rating: number;
   reviewCount: number;
+  isActive: boolean;
   createdAt: string;
+  prices?: ProductPriceType[];
 }
 
 export interface CartItemType {
   id: string;
   productId: string;
+  materialId?: string | null;
   material: string;
   color: string;
   quantity: number;
@@ -53,8 +63,11 @@ export interface OrderType {
   subtotal: number;
   tax: number;
   shipping: number;
+  discount: number;
   total: number;
   status: string;
+  couponId?: string | null;
+  stripeSessionId?: string | null;
   shippingName: string | null;
   shippingEmail: string | null;
   shippingPhone?: string | null;
@@ -66,11 +79,13 @@ export interface OrderType {
   createdAt: string;
   items: OrderItemType[];
   user?: { name: string | null; email: string };
+  coupon?: CouponType | null;
 }
 
 export interface OrderItemType {
   id: string;
   name: string;
+  materialId?: string | null;
   material: string;
   color: string;
   quantity: number;
@@ -124,3 +139,94 @@ export interface DashboardStatsType {
   costByMaterial?: { material: string; averageUnitPrice: number; pieces: number; percentage: number }[];
   sizeDistribution?: { bucket: string; count: number }[];
 }
+
+// ---- Nuevas entidades (motor de precios avanzado) -----------
+
+export interface MaterialType {
+  id: string;
+  name: string;
+  code: string;
+  pricePerKg: number;
+  maintenanceFactor: number;
+  density: number;
+  description: string | null;
+  color: string | null;
+  inStock: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductPriceType {
+  id: string;
+  productId: string;
+  materialId: string;
+  materialCost: number;
+  machineCost: number;
+  maintenanceCost: number;
+  operationCost: number;
+  baseCost: number;
+  priceUnit: number;
+  priceMedium: number;
+  priceBulk: number;
+  calculatedAt: string;
+  updatedAt: string;
+  material?: MaterialType;
+}
+
+export interface InventoryType {
+  id: string;
+  materialId: string;
+  quantity: number;
+  minStock: number;
+  location: string | null;
+  lastRefill: string;
+  updatedAt: string;
+  material?: MaterialType;
+}
+
+export interface CouponType {
+  id: string;
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minPurchase: number | null;
+  maxUses: number | null;
+  usedCount: number;
+  validFrom: string;
+  validUntil: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+// ---- Web Worker (pricing worker) ----------------------------
+
+export type WorkerMessageType = 'CALCULATE_PRICES';
+export type WorkerResponseType = 'PROGRESS' | 'RESULT' | 'ERROR';
+
+export interface WorkerInput {
+  type: WorkerMessageType;
+  products: ProductType[];
+  materials: MaterialType[];
+}
+
+export interface WorkerProgressMessage {
+  type: 'PROGRESS';
+  current: number;
+  total: number;
+  percentage: number;
+}
+
+export interface WorkerResultMessage {
+  type: 'RESULT';
+  prices: Record<string, Record<string, ProductPriceType>>;
+}
+
+export interface WorkerErrorMessage {
+  type: 'ERROR';
+  message: string;
+}
+
+export type WorkerMessage =
+  | WorkerProgressMessage
+  | WorkerResultMessage
+  | WorkerErrorMessage;
