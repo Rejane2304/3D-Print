@@ -23,6 +23,7 @@ export interface ProductType {
   defaultDimY: number;
   defaultDimZ: number;
   finishCost: number;
+  modelFillFactor: number;
   images: string[];
   colors: string[];
   featured: boolean;

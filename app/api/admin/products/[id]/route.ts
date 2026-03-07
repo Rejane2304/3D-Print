@@ -63,6 +63,8 @@ export async function PUT(
         defaultDimY: parseFloat(data.defaultDimY),
         defaultDimZ: parseFloat(data.defaultDimZ),
         finishCost: parseFloat(data.finishCost),
+        printTimeMinutes: parseInt(data.printTimeMinutes || '60'),
+        modelFillFactor: parseFloat(data.modelFillFactor || '0.15'),
         images: data.images,
         colors: data.colors,
         featured: data.featured,

@@ -75,6 +75,8 @@ export async function POST(request: NextRequest) {
         defaultDimY: parseFloat(data.defaultDimY || '50'),
         defaultDimZ: parseFloat(data.defaultDimZ || '50'),
         finishCost: parseFloat(data.finishCost || '2.50'),
+        printTimeMinutes: parseInt(data.printTimeMinutes || '60'),
+        modelFillFactor: parseFloat(data.modelFillFactor || '0.15'),
         images: data.images || [],
         colors: data.colors || ['#FFFFFF'],
         featured: data.featured || false,

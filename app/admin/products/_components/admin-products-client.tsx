@@ -23,6 +23,8 @@ interface ProductFormData {
   defaultDimX: string;
   defaultDimY: string;
   defaultDimZ: string;
+  printTimeMinutes: string;
+  modelFillFactor: string;
   finishCost: string;
   images: string[];
   colors: string[];
@@ -46,6 +48,8 @@ const initialFormData: ProductFormData = {
   defaultDimX: '50',
   defaultDimY: '50',
   defaultDimZ: '50',
+  printTimeMinutes: '60',
+  modelFillFactor: '0.15',
   finishCost: '2.50',
   images: [],
   colors: ['#FFFFFF', '#000000'],
@@ -105,6 +109,8 @@ export default function AdminProductsClient() {
       defaultDimX: String(product.defaultDimX),
       defaultDimY: String(product.defaultDimY),
       defaultDimZ: String(product.defaultDimZ),
+      printTimeMinutes: String(product.printTimeMinutes ?? 60),
+      modelFillFactor: String(product.modelFillFactor ?? 0.15),
       finishCost: String(product.finishCost),
       images: product.images,
       colors: product.colors,
@@ -435,6 +441,47 @@ export default function AdminProductsClient() {
                       onChange={(e) => setFormData({ ...formData, finishCost: e.target.value })}
                       className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                     />
+                  </div>
+
+                  {/* Calibración desde Bambu Slicer */}
+                  <div className="sm:col-span-2">
+                    <p className="text-xs font-semibold text-amber uppercase tracking-wide mb-3">Calibración desde Bambu Slicer</p>
+                    <p className="text-xs text-muted mb-3">Introduce el tamaño y resultados del laminador para el modelo tal como está diseñado (dimensiones de referencia). La fórmula de precios escalará a partir de estos valores.</p>
+                    <div className="grid grid-cols-3 gap-3 mb-3">
+                      <div>
+                        <label htmlFor="admin-defX" className="block text-xs text-muted mb-1">Ref. X (mm)</label>
+                        <input id="admin-defX" type="number" step="1" min="1" required value={formData.defaultDimX}
+                          onChange={(e) => setFormData({ ...formData, defaultDimX: e.target.value })}
+                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm" />
+                      </div>
+                      <div>
+                        <label htmlFor="admin-defY" className="block text-xs text-muted mb-1">Ref. Y (mm)</label>
+                        <input id="admin-defY" type="number" step="1" min="1" required value={formData.defaultDimY}
+                          onChange={(e) => setFormData({ ...formData, defaultDimY: e.target.value })}
+                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm" />
+                      </div>
+                      <div>
+                        <label htmlFor="admin-defZ" className="block text-xs text-muted mb-1">Ref. Z (mm)</label>
+                        <input id="admin-defZ" type="number" step="1" min="1" required value={formData.defaultDimZ}
+                          onChange={(e) => setFormData({ ...formData, defaultDimZ: e.target.value })}
+                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label htmlFor="admin-printtime" className="block text-xs text-muted mb-1">Tiempo impresión (min)</label>
+                        <input id="admin-printtime" type="number" step="1" min="1" required value={formData.printTimeMinutes}
+                          onChange={(e) => setFormData({ ...formData, printTimeMinutes: e.target.value })}
+                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm" />
+                      </div>
+                      <div>
+                        <label htmlFor="admin-fillfactor" className="block text-xs text-muted mb-1">Factor de relleno</label>
+                        <input id="admin-fillfactor" type="number" step="0.001" min="0.01" max="1" required value={formData.modelFillFactor}
+                          onChange={(e) => setFormData({ ...formData, modelFillFactor: e.target.value })}
+                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm" />
+                        <p className="text-xs text-muted mt-1">peso_g ÷ (X×Y×Z/1000 × dens.)</p>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="sm:col-span-2">

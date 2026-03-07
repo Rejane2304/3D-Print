@@ -104,7 +104,10 @@ export function scalePrintTime(
   const refVol = refDimX * refDimY * refDimZ;
   if (refVol <= 0) return basePrintTimeMinutes;
   const volumeRatio = (dimX * dimY * dimZ) / refVol;
-  return Math.max(1, basePrintTimeMinutes * volumeRatio);
+  // Escala lineal: la raíz cúbica del ratio de volúmenes equivale
+  // al factor dimensional (ej. doble de lado → doble de tiempo, no 8×).
+  const linearScale = Math.cbrt(volumeRatio);
+  return Math.max(1, basePrintTimeMinutes * linearScale);
 }
 
 /**
