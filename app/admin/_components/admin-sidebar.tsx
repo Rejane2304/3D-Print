@@ -18,12 +18,14 @@ import {
   CreditCard,
   Layers,
   Tag,
+  DollarSign,
 } from 'lucide-react';
 
 const menuItems = [
   { href: '/admin', label: 'Panel', icon: LayoutDashboard },
   { href: '/admin/products', label: 'Productos', icon: Package },
   { href: '/admin/materials', label: 'Materiales', icon: Layers },
+  { href: '/admin/pricing', label: 'Precios', icon: DollarSign },
   { href: '/admin/users', label: 'Clientes', icon: Users },
   { href: '/admin/orders', label: 'Pedidos', icon: ShoppingCart },
   { href: '/admin/inventory', label: 'Inventario', icon: Boxes },

@@ -5,10 +5,41 @@
 // =============================================================
 
 import { prisma } from '@/lib/db';
-import { calculateAdvancedPrice } from '@/lib/price-calculator';
-import type { PriceCalculation } from '@/lib/price-calculator';
+import { calculateAdvancedPrice, PRICING_CONFIG } from '@/lib/price-calculator';
+export type { PriceCalculation } from '@/lib/price-calculator';
 
-export type { PriceCalculation };
+// ---- Leer configuración de precios desde BD (con fallback a constantes)
+
+export async function getPricingConfig(): Promise<{
+  machineAmortizationPerHour: number;
+  operationCostPerHour: number;
+  consumablesCostPerHour: number;
+  margins: { unit: number; medium: number; bulk: number };
+}> {
+  const dbConfig = await prisma.pricingConfig.findFirst();
+  if (dbConfig) {
+    return {
+      machineAmortizationPerHour: dbConfig.machineAmortizationPerHour,
+      operationCostPerHour: dbConfig.operationCostPerHour,
+      consumablesCostPerHour: dbConfig.consumablesCostPerHour,
+      margins: {
+        unit: dbConfig.marginUnit,
+        medium: dbConfig.marginMedium,
+        bulk: dbConfig.marginBulk,
+      },
+    };
+  }
+  return {
+    machineAmortizationPerHour: PRICING_CONFIG.machineAmortizationPerHour,
+    operationCostPerHour: PRICING_CONFIG.operationCostPerHour,
+    consumablesCostPerHour: PRICING_CONFIG.consumablesCostPerHour,
+    margins: {
+      unit: PRICING_CONFIG.margins.unit,
+      medium: PRICING_CONFIG.margins.medium,
+      bulk: PRICING_CONFIG.margins.bulk,
+    },
+  };
+}
 
 // ---- Actualizar precios de un producto para todos los materiales
 
@@ -17,6 +48,7 @@ export async function updateProductPrices(productId: string): Promise<void> {
   if (!product) throw new Error(`Product not found: ${productId}`);
 
   const materials = await prisma.material.findMany({ where: { inStock: true } });
+  const config = await getPricingConfig();
 
   for (const mat of materials) {
     const calc = calculateAdvancedPrice(
@@ -27,7 +59,9 @@ export async function updateProductPrices(productId: string): Promise<void> {
         pricePerKg: mat.pricePerKg,
         density: mat.density,
         maintenanceFactor: mat.maintenanceFactor,
-      }
+      },
+      1,
+      config
     );
 
     await prisma.productPrice.upsert({
@@ -87,12 +121,12 @@ export async function getProductPrices(productId: string) {
  * Calcula el peso en gramos a partir de las dimensiones por defecto del producto.
  * Usa el mismo factor de infill del motor (20 %).
  */
-function getDefaultWeight(product: {
+function getDefaultWeight(product: Readonly<{
   defaultDimX: number;
   defaultDimY: number;
   defaultDimZ: number;
   density: number;
-}): number {
+}>): number {
   const volumeCm3 = (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
   return volumeCm3 * product.density * 0.2;
 }

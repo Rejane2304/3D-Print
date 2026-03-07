@@ -8,15 +8,17 @@
 // ---- Configuración del motor --------------------------------
 
 export const PRICING_CONFIG = {
-  /** Amortización: $1500 P2S / 6000 h de vida útil */
-  machineAmortizationPerHour: 0.25,
-  /** Electricidad: ~0.15 kW × $0.30/kWh */
-  operationCostPerHour: 0.05,
+  /** Amortización: P2S ~€750 / 6000 h vida útil (mercado ES, 2025) */
+  machineAmortizationPerHour: 0.12,
+  /** Electricidad: 150 W × €0.27/kWh (tarifa media ES, 2025) */
+  operationCostPerHour: 0.04,
+  /** Consumibles: boquilla E6 / ~300h + lubricación ≈ €0.02/h */
+  consumablesCostPerHour: 0.02,
   /** Factor de relleno estándar: 20 % infill */
   infillFactor: 0.2,
   margins: {
     unit: 2.5,   // ×250% para 1–4 uds.
-    medium: 2.0, // ×200% para 5–9 uds.
+    medium: 2,   // ×200% para 5–9 uds.
     bulk: 1.5,   // ×150% para 10+ uds.
   },
 } as const;
@@ -35,6 +37,7 @@ export interface PriceCalculation {
   machineCost: number;
   maintenanceCost: number;
   operationCost: number;
+  consumablesCost: number;
   baseCost: number;
   priceUnit: number;    // precio 1–4 uds.
   priceMedium: number;  // precio 5–9 uds.
@@ -78,20 +81,35 @@ export function calculateAdvancedPrice(
   weightGrams: number,
   printTimeMinutes: number,
   material: MaterialConfig,
-  quantity: number = 1
+  quantity: number = 1,
+  config?: Readonly<{
+    machineAmortizationPerHour?: number;
+    operationCostPerHour?: number;
+    consumablesCostPerHour?: number;
+    margins?: Readonly<{ unit: number; medium: number; bulk: number }>;
+  }>
 ): PriceCalculation {
   const printTimeHours = printTimeMinutes / 60;
   const weightKg = weightGrams / 1000;
 
-  const materialCost = weightKg * material.pricePerKg;
-  const machineCost = printTimeHours * PRICING_CONFIG.machineAmortizationPerHour;
-  const maintenanceCost = printTimeHours * material.maintenanceFactor;
-  const operationCost = printTimeHours * PRICING_CONFIG.operationCostPerHour;
-  const baseCost = materialCost + machineCost + maintenanceCost + operationCost;
+  const machineAmortizationPerHour =
+    config?.machineAmortizationPerHour ?? PRICING_CONFIG.machineAmortizationPerHour;
+  const operationCostPerHour =
+    config?.operationCostPerHour ?? PRICING_CONFIG.operationCostPerHour;
+  const consumablesCostPerHour =
+    config?.consumablesCostPerHour ?? PRICING_CONFIG.consumablesCostPerHour;
+  const margins = config?.margins ?? PRICING_CONFIG.margins;
 
-  const priceUnit = baseCost * PRICING_CONFIG.margins.unit;
-  const priceMedium = baseCost * PRICING_CONFIG.margins.medium;
-  const priceBulk = baseCost * PRICING_CONFIG.margins.bulk;
+  const materialCost = weightKg * material.pricePerKg;
+  const machineCost = printTimeHours * machineAmortizationPerHour;
+  const maintenanceCost = printTimeHours * material.maintenanceFactor;
+  const operationCost = printTimeHours * operationCostPerHour;
+  const consumablesCost = printTimeHours * consumablesCostPerHour;
+  const baseCost = materialCost + machineCost + maintenanceCost + operationCost + consumablesCost;
+
+  const priceUnit = baseCost * margins.unit;
+  const priceMedium = baseCost * margins.medium;
+  const priceBulk = baseCost * margins.bulk;
 
   const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
 
@@ -101,6 +119,7 @@ export function calculateAdvancedPrice(
     machineCost: round(machineCost),
     maintenanceCost: round(maintenanceCost),
     operationCost: round(operationCost),
+    consumablesCost: round(consumablesCost),
     baseCost: round(baseCost),
     priceUnit: round(priceUnit),
     priceMedium: round(priceMedium),
@@ -191,8 +210,8 @@ export const MATERIAL_INFO: Record<string, MaterialConfig & {
     code: 'PLA',
     label: 'PLA Basic',
     density: 1.24,
-    pricePerKg: 20,
-    basePricePerGram: 0.02,
+    pricePerKg: 18,
+    basePricePerGram: 0.018,
     maintenanceFactor: 0.03,
     color: '#00FFFF',
     properties: [
@@ -208,8 +227,8 @@ export const MATERIAL_INFO: Record<string, MaterialConfig & {
     code: 'PETG',
     label: 'PETG Basic',
     density: 1.27,
-    pricePerKg: 25,
-    basePricePerGram: 0.025,
+    pricePerKg: 23,
+    basePricePerGram: 0.023,
     maintenanceFactor: 0.04,
     color: '#FFBF00',
     properties: [

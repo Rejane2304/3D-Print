@@ -291,3 +291,15 @@ model PointsTransaction {
   orderId     String?
   createdAt   DateTime @default(now())
 }
+
+// ===== CONFIGURACIÓN DE PRECIOS =====
+model PricingConfig {
+  id                         String   @id @default(cuid())
+  machineAmortizationPerHour Float    @default(0.12)
+  operationCostPerHour       Float    @default(0.04)
+  consumablesCostPerHour     Float    @default(0.02)
+  marginUnit                 Float    @default(2.5)
+  marginMedium               Float    @default(2.0)
+  marginBulk                 Float    @default(1.5)
+  updatedAt                  DateTime @updatedAt
+}
