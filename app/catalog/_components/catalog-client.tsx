@@ -1,15 +1,14 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Search, Filter, Star, ChevronLeft, ChevronRight, SlidersHorizontal, X as XIcon } from "lucide-react";
 import { ProductType } from "@/lib/types";
-import { calculatePrice, MATERIAL_INFO } from "@/lib/price-calculator";
 import { useLanguage } from "@/lib/language-store";
 
-const CATEGORIES = ["Todos", "Accesorio", "Decoracion", "Figura", "Funcional", "Articulado"] as const;
+const CATEGORIES = ["Todos", "Accesorios", "Decoracion", "Figuras", "Funcional", "Articulados"] as const;
 
 // Map color names to hex values for display
 const COLOR_MAP: Record<string, string> = {
@@ -32,6 +31,12 @@ function getColorHex(colorName: string): string {
   return COLOR_MAP[colorName] || "#6B7280";
 }
 
+const MATERIAL_ACTIVE_CLASSES: Record<string, string> = {
+  PLA: "bg-cyan/20 text-cyan border border-cyan/30",
+  PETG: "bg-amber/20 text-amber border border-amber/30",
+  "": "bg-white/10 text-white border border-white/20",
+};
+
 const SORTS: Record<"es" | "en", { value: string; label: string }[]> = {
   es: [
     { value: "newest", label: "Más recientes" },
@@ -50,19 +55,19 @@ const SORTS: Record<"es" | "en", { value: string; label: string }[]> = {
 const CATEGORY_LABELS: Record<"es" | "en", Record<(typeof CATEGORIES)[number], string>> = {
   es: {
     Todos: "Todos",
-    Accesorio: "Accesorio",
+    Accesorios: "Accesorios",
     Decoracion: "Decoracion",
-    Figura: "Figura",
+    Figuras: "Figuras",
     Funcional: "Funcional",
-    Articulado: "Articulado",
+    Articulados: "Articulados",
   },
   en: {
     Todos: "All",
-    Accesorio: "Accessory",
+    Accesorios: "Accessories",
     Decoracion: "Decoration",
-    Figura: "Figure",
+    Figuras: "Figures",
     Funcional: "Functional",
-    Articulado: "Articulated",
+    Articulados: "Articulated",
   },
 };
 
@@ -81,7 +86,7 @@ export function CatalogClient() {
       activeFiltersMaterial: (m: string) => m,
       activeFiltersCategory: (c: string) => CATEGORY_LABELS.es[c as (typeof CATEGORIES)[number]] ?? c,
       results: (total: number) =>
-        `${total} producto${total !== 1 ? "s" : ""} encontrado${total !== 1 ? "s" : ""}`,
+        `${total} producto${total === 1 ? "" : "s"} encontrado${total === 1 ? "" : "s"}`,
       noProducts: "No se encontraron productos",
       clearFiltersButton: "Limpiar filtros",
       from: "Desde",
@@ -100,7 +105,7 @@ export function CatalogClient() {
       activeFiltersMaterial: (m: string) => m,
       activeFiltersCategory: (c: string) => CATEGORY_LABELS.en[c as (typeof CATEGORIES)[number]] ?? c,
       results: (total: number) =>
-        `${total} product${total !== 1 ? "s" : ""} found`,
+        `${total} product${total === 1 ? "" : "s"} found`,
       noProducts: "No products found",
       clearFiltersButton: "Clear filters",
       from: "From",
@@ -110,7 +115,6 @@ export function CatalogClient() {
   }[language];
 
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -121,7 +125,7 @@ export function CatalogClient() {
   const [material, setMaterial] = useState(searchParams?.get("material") ?? "");
   const [category, setCategory] = useState(searchParams?.get("category") ?? "");
   const [sort, setSort] = useState(searchParams?.get("sort") ?? "newest");
-  const [page, setPage] = useState(parseInt(searchParams?.get("page") ?? "1", 10));
+  const [page, setPage] = useState(Number.parseInt(searchParams?.get("page") ?? "1", 10));
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -210,7 +214,7 @@ export function CatalogClient() {
                   {["", "PLA", "PETG"].map(m => (
                     <button key={m} onClick={() => { setMaterial(m); setPage(1); }}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                        material === m ? (m === "PLA" ? "bg-cyan/20 text-cyan border border-cyan/30" : m === "PETG" ? "bg-amber/20 text-amber border border-amber/30" : "bg-white/10 text-white border border-white/20") : "bg-white/5 text-zinc-400 border border-transparent hover:bg-white/10"
+                        material === m ? MATERIAL_ACTIVE_CLASSES[m] : "bg-white/5 text-zinc-400 border border-transparent hover:bg-white/10"
                       }`}>{m || (language === "es" ? "Todos" : "All")}</button>
                   ))}
                 </div>
@@ -250,16 +254,17 @@ export function CatalogClient() {
         <p className="text-sm text-zinc-500 mb-6">{t.results(total)}</p>
 
         {/* Products Grid */}
-        {loading ? (
+        {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-bg-card rounded-lg overflow-hidden animate-pulse">
+            {(['sk-0','sk-1','sk-2','sk-3','sk-4','sk-5']).map((sk) => (
+              <div key={sk} className="bg-bg-card rounded-lg overflow-hidden animate-pulse">
                 <div className="aspect-video bg-zinc-800" />
                 <div className="p-4 space-y-2"><div className="h-4 bg-zinc-800 rounded w-3/4" /><div className="h-3 bg-zinc-800 rounded w-1/2" /></div>
               </div>
             ))}
           </div>
-        ) : (products?.length ?? 0) === 0 ? (
+        )}
+        {!loading && (products?.length ?? 0) === 0 && (
           <div className="text-center py-20">
             <p className="text-zinc-400 mb-4">{t.noProducts}</p>
             <button
@@ -269,7 +274,8 @@ export function CatalogClient() {
               {t.clearFiltersButton}
             </button>
           </div>
-        ) : (
+        )}
+        {!loading && (products?.length ?? 0) > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {(products ?? []).map((p, i) => (
               <motion.div key={p?.id ?? i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
@@ -288,8 +294,8 @@ export function CatalogClient() {
                       {/* Color swatches */}
                       {(p?.colors?.length ?? 0) > 0 && (
                         <div className="flex items-center gap-1 mb-2">
-                          {(p?.colors ?? []).slice(0, 3).map((color: string, idx: number) => (
-                            <span key={idx} className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: getColorHex(color) }} title={color} />
+                          {(p?.colors ?? []).slice(0, 3).map((color: string) => (
+                            <span key={color} className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: getColorHex(color) }} title={color} />
                           ))}
                           {(p?.colors?.length ?? 0) > 3 && (
                             <span className="text-xs text-zinc-500">
@@ -301,17 +307,12 @@ export function CatalogClient() {
                       <p className="font-mono text-sm text-cyan">
                         {t.from} €{
                           (() => {
-                            const price = calculatePrice({
-                              material: p?.material ?? "PLA",
-                              dimX: p?.defaultDimX ?? 50,
-                              dimY: p?.defaultDimY ?? 50,
-                              dimZ: p?.defaultDimZ ?? 50,
-                              quantity: 1,
-                              basePricePerGram: p?.basePricePerGram ?? 0,
-                              density: p?.density ?? (p?.material === "PETG" ? MATERIAL_INFO.PETG.density : MATERIAL_INFO.PLA.density),
-                              finishCost: p?.finishCost ?? 0,
-                            });
-                            return price.total.toFixed(2);
+                            const mat = p?.material ?? "PLA";
+                            const bppg = p?.basePricePerGram ?? 0;
+                            const den = p?.density ?? (mat === "PETG" ? 1.27 : 1.24);
+                            const vol = ((p?.defaultDimX ?? 50) * (p?.defaultDimY ?? 50) * (p?.defaultDimZ ?? 50)) / 1000;
+                            const wt = vol * den * 0.2;
+                            return (bppg * wt + (p?.finishCost ?? 0)).toFixed(2);
                           })()
                         }
                       </p>
@@ -335,7 +336,7 @@ export function CatalogClient() {
               <ChevronLeft className="w-4 h-4" />
             </button>
             {Array.from({ length: totalPages }).map((_, i) => (
-              <button key={i} onClick={() => setPage(i + 1)} className={`w-9 h-9 rounded-lg text-sm font-medium transition ${page === i + 1 ? "bg-cyan text-black" : "bg-bg-card border border-white/5 hover:bg-bg-hover"}`}>{i + 1}</button>
+              <button key={i + 1} onClick={() => setPage(i + 1)} className={`w-9 h-9 rounded-lg text-sm font-medium transition ${page === i + 1 ? "bg-cyan text-black" : "bg-bg-card border border-white/5 hover:bg-bg-hover"}`}>{i + 1}</button>
             ))}
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}

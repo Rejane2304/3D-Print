@@ -18,12 +18,14 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/toast-provider';
+import { useLanguage } from '@/lib/language-store';
 import type { UserType, PointsTransactionType } from '@/lib/types';
 
 export default function ProfileClient() {
   const { data: session, status } = useSession() || {};
   const router = useRouter();
   const { showToast } = useToast();
+  const { language } = useLanguage();
 
   const [profile, setProfile] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,75 @@ export default function ProfileClient() {
     confirmPassword: '',
   });
 
+  const t = {
+    es: {
+      title: "Mi Perfil",
+      subtitle: "Gestiona tu información personal",
+      myOrders: "Ver Mis Pedidos",
+      personalInfo: "Información Personal",
+      name: "Nombre",
+      email: "Email",
+      phone: "Teléfono",
+      country: "País",
+      address: "Dirección",
+      city: "Ciudad",
+      state: "Provincia",
+      zipCode: "Código Postal",
+      saveChanges: "Guardar Cambios",
+      saving: "Guardando...",
+      loyaltyPoints: "Puntos de Fidelidad",
+      loyaltyEarn: "Gana 1 punto por cada €1 gastado",
+      loyaltyRedeem: "100 puntos = €5 de descuento",
+      changeField: "Cambiar Contraseña",
+      currentField: "Contraseña Actual",
+      newField: "Nueva Contraseña",
+      confirmField: "Confirmar Contraseña",
+      changing: "Cambiando...",
+      pointsHistory: "Historial de Puntos",
+      errorLoad: "Error al cargar perfil",
+      profileUpdated: "Perfil actualizado",
+      errorSave: "Error al guardar perfil",
+      fieldMismatch: "Las contraseñas no coinciden",
+      fieldMinLen: "La contraseña debe tener al menos 6 caracteres",
+      fieldChanged: "Contraseña cambiada",
+      errorField: "Error al cambiar contraseña",
+      locale: "es-ES",
+    },
+    en: {
+      title: "My Profile",
+      subtitle: "Manage your personal information",
+      myOrders: "View My Orders",
+      personalInfo: "Personal Information",
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      country: "Country",
+      address: "Address",
+      city: "City",
+      state: "State / Province",
+      zipCode: "Postal Code",
+      saveChanges: "Save Changes",
+      saving: "Saving...",
+      loyaltyPoints: "Loyalty Points",
+      loyaltyEarn: "Earn 1 point for every €1 spent",
+      loyaltyRedeem: "100 points = €5 discount",
+      changeField: "Change Password",
+      currentField: "Current Password",
+      newField: "New Password",
+      confirmField: "Confirm Password",
+      changing: "Changing...",
+      pointsHistory: "Points History",
+      errorLoad: "Error loading profile",
+      profileUpdated: "Profile updated",
+      errorSave: "Error saving profile",
+      fieldMismatch: "Passwords do not match",
+      fieldMinLen: "Password must be at least 6 characters",
+      fieldChanged: "Password changed",
+      errorField: "Error changing password",
+      locale: "en-GB",
+    },
+  }[language];
+
   const fetchProfile = useCallback(async () => {
     try {
       const res = await fetch('/api/profile');
@@ -64,10 +135,10 @@ export default function ProfileClient() {
         country: data.country || '',
       });
     } catch {
-      showToast('error', 'Error al cargar perfil');
+      showToast('error', t.errorLoad);
     }
     setLoading(false);
-  }, [showToast]);
+  }, [showToast, t.errorLoad]);
 
   const fetchPoints = useCallback(async () => {
     try {
@@ -84,11 +155,10 @@ export default function ProfileClient() {
       router.push('/login');
     } else if (status === 'authenticated') {
       fetchProfile().then(() => {
-        // Solo los clientes pueden acumular puntos y ver su historial
-        if ((session?.user as { role?: string })?.role !== 'admin') {
-          fetchPoints();
-        } else {
+        if ((session?.user as { role?: string })?.role === 'admin') {
           setPointsHistory([]);
+        } else {
+          fetchPoints();
         }
       });
     }
@@ -106,12 +176,12 @@ export default function ProfileClient() {
       if (res.ok) {
         const data = await res.json();
         setProfile(data);
-        showToast('success', 'Perfil actualizado');
+        showToast('success', t.profileUpdated);
       } else {
-        throw new Error();
+        throw new Error("Error al guardar perfil");
       }
     } catch {
-      showToast('error', 'Error al guardar perfil');
+      showToast('error', t.errorSave);
     }
     setSaving(false);
   };
@@ -119,11 +189,11 @@ export default function ProfileClient() {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      showToast('error', 'Las contraseñas no coinciden');
+      showToast('error', t.fieldMismatch);
       return;
     }
     if (passwordData.newPassword.length < 6) {
-      showToast('error', 'La contraseña debe tener al menos 6 caracteres');
+      showToast('error', t.fieldMinLen);
       return;
     }
 
@@ -138,15 +208,15 @@ export default function ProfileClient() {
         }),
       });
       if (res.ok) {
-        showToast('success', 'Contraseña cambiada');
+        showToast('success', t.fieldChanged);
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         setShowPasswordForm(false);
       } else {
         const data = await res.json();
-        showToast('error', data.error || 'Error al cambiar contraseña');
+        showToast('error', data.error || t.errorField);
       }
     } catch {
-      showToast('error', 'Error al cambiar contraseña');
+      showToast('error', t.errorField);
     }
     setSaving(false);
   };
@@ -166,22 +236,24 @@ export default function ProfileClient() {
     expired: 'text-muted',
   };
 
+  const isCustomer = profile?.role !== 'admin';
+
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Mi Perfil</h1>
-            <p className="text-muted">Gestiona tu información personal</p>
+            <h1 className="text-3xl font-bold mb-2">{t.title}</h1>
+            <p className="text-muted">{t.subtitle}</p>
           </div>
-          {(profile?.role !== 'admin') && (
+          {(isCustomer) && (
             <Link
               href="/orders"
               className="flex items-center gap-2 px-4 py-2 bg-bg-secondary border border-border rounded-lg hover:border-cyan transition-colors"
             >
               <History className="w-5 h-5" />
-              Ver Mis Pedidos
+              {t.myOrders}
             </Link>
           )}
         </div>
@@ -195,13 +267,13 @@ export default function ProfileClient() {
           >
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               <User className="w-5 h-5 text-cyan" />
-              Información Personal
+              {t.personalInfo}
             </h2>
 
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Nombre</label>
+                  <label className="block text-sm font-medium mb-1">{t.name}</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -210,14 +282,14 @@ export default function ProfileClient() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <label className="block text-sm font-medium mb-1">{t.email}</label>
                   <div className="flex items-center gap-2 px-4 py-2 bg-bg-tertiary border border-border rounded-lg text-muted">
                     <Mail className="w-4 h-4" />
                     {profile?.email}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Teléfono</label>
+                  <label className="block text-sm font-medium mb-1">{t.phone}</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                     <input
@@ -229,7 +301,7 @@ export default function ProfileClient() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">País</label>
+                  <label className="block text-sm font-medium mb-1">{t.country}</label>
                   <input
                     type="text"
                     value={formData.country}
@@ -240,7 +312,7 @@ export default function ProfileClient() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Dirección</label>
+                <label className="block text-sm font-medium mb-1">{t.address}</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted" />
                   <input
@@ -254,7 +326,7 @@ export default function ProfileClient() {
 
               <div className="grid sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Ciudad</label>
+                  <label className="block text-sm font-medium mb-1">{t.city}</label>
                   <input
                     type="text"
                     value={formData.city}
@@ -263,7 +335,7 @@ export default function ProfileClient() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Provincia</label>
+                  <label className="block text-sm font-medium mb-1">{t.state}</label>
                   <input
                     type="text"
                     value={formData.state}
@@ -272,7 +344,7 @@ export default function ProfileClient() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Código Postal</label>
+                  <label className="block text-sm font-medium mb-1">{t.zipCode}</label>
                   <input
                     type="text"
                     value={formData.zipCode}
@@ -293,7 +365,7 @@ export default function ProfileClient() {
                   ) : (
                     <Save className="w-5 h-5" />
                   )}
-                  Guardar Cambios
+                  {saving ? t.saving : t.saveChanges}
                 </button>
               </div>
             </form>
@@ -301,8 +373,8 @@ export default function ProfileClient() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Loyalty Points (solo clientes) */}
-            {(profile?.role !== 'admin') && (
+            {/* Loyalty Points */}
+            {(isCustomer) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -312,13 +384,13 @@ export default function ProfileClient() {
               <div className="flex items-center gap-3 mb-4">
                 <Star className="w-8 h-8 text-amber" />
                 <div>
-                  <div className="text-sm text-muted">Puntos de Fidelidad</div>
+                  <div className="text-sm text-muted">{t.loyaltyPoints}</div>
                   <div className="text-3xl font-bold">{profile?.loyaltyPoints || 0}</div>
                 </div>
               </div>
               <div className="text-sm text-muted">
-                <p>Gana 1 punto por cada €1 gastado</p>
-                <p>100 puntos = €5 de descuento</p>
+                <p>{t.loyaltyEarn}</p>
+                <p>{t.loyaltyRedeem}</p>
               </div>
             </motion.div>
             )}
@@ -335,13 +407,13 @@ export default function ProfileClient() {
                 className="flex items-center gap-2 w-full text-left font-bold"
               >
                 <Lock className="w-5 h-5 text-cyan" />
-                Cambiar Contraseña
+                {t.changeField}
               </button>
 
               {showPasswordForm && (
                 <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
                   <div>
-                    <label className="block text-sm mb-1">Contraseña Actual</label>
+                    <label className="block text-sm mb-1">{t.currentField}</label>
                     <div className="relative">
                       <input
                         type={showCurrentPassword ? 'text' : 'password'}
@@ -359,7 +431,7 @@ export default function ProfileClient() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm mb-1">Nueva Contraseña</label>
+                    <label className="block text-sm mb-1">{t.newField}</label>
                     <div className="relative">
                       <input
                         type={showNewPassword ? 'text' : 'password'}
@@ -377,7 +449,7 @@ export default function ProfileClient() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm mb-1">Confirmar Contraseña</label>
+                    <label className="block text-sm mb-1">{t.confirmField}</label>
                     <input
                       type="password"
                       value={passwordData.confirmPassword}
@@ -390,7 +462,7 @@ export default function ProfileClient() {
                     disabled={saving}
                     className="w-full py-2 bg-cyan text-black font-medium rounded-lg hover:bg-cyan-dark transition-colors disabled:opacity-50"
                   >
-                    {saving ? 'Cambiando...' : 'Cambiar Contraseña'}
+                    {saving ? t.changing : t.changeField}
                   </button>
                 </form>
               )}
@@ -398,22 +470,22 @@ export default function ProfileClient() {
           </div>
         </div>
 
-        {/* Points History (solo clientes) */}
-        {pointsHistory.length > 0 && (profile?.role !== 'admin') && (
+        {/* Points History */}
+        {pointsHistory.length > 0 && (isCustomer) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="bg-bg-secondary border border-border rounded-xl p-6"
           >
-            <h2 className="text-xl font-bold mb-4">Historial de Puntos</h2>
+            <h2 className="text-xl font-bold mb-4">{t.pointsHistory}</h2>
             <div className="space-y-3">
               {pointsHistory.slice(0, 10).map((tx) => (
                 <div key={tx.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div>
                     <div className="font-medium">{tx.description}</div>
                     <div className="text-sm text-muted">
-                      {new Date(tx.createdAt).toLocaleDateString('es-ES')}
+                      {new Date(tx.createdAt).toLocaleDateString(t.locale)}
                     </div>
                   </div>
                   <div className={`font-bold ${typeColors[tx.type] || ''}`}>

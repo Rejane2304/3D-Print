@@ -14,7 +14,7 @@ test.describe('Home Page', () => {
 
   test('should navigate to catalog from CTA', async ({ page }) => {
     await page.goto('/');
-    await page.click('text=Ver Catálogo');
+    await page.getByRole('link', { name: 'Explorar catálogo' }).first().click();
     await expect(page).toHaveURL(/\/catalog/);
   });
 

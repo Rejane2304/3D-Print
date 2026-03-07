@@ -108,6 +108,8 @@ export function CheckoutClient() {
       next: "Siguiente",
       paymentErrorFallback: "Error al procesar el pago",
       connectionError: "Error de conexión",
+      couponInvalid: "Cupón no válido",
+      couponValidationError: "Error al validar el cupón",
     },
     en: {
       emptyCart: "Your cart is empty",
@@ -155,6 +157,8 @@ export function CheckoutClient() {
       next: "Next",
       paymentErrorFallback: "Error processing payment",
       connectionError: "Connection error",
+      couponInvalid: "Invalid coupon",
+      couponValidationError: "Error validating coupon",
     },
   }[language];
 
@@ -174,10 +178,10 @@ export function CheckoutClient() {
         setCouponDiscount(data.discount);
         setCouponError("");
       } else {
-        setCouponError(data.error ?? "Cupón no válido");
+        setCouponError(data.error ?? t.couponInvalid);
       }
     } catch {
-      setCouponError("Error al validar el cupón");
+      setCouponError(t.couponValidationError);
     } finally {
       setCouponValidating(false);
     }
@@ -225,7 +229,7 @@ export function CheckoutClient() {
       const data = await res?.json();
       if (data?.url) {
         clearCart?.();
-        window.location.href = data.url;
+        globalThis.location.href = data.url;
       } else {
         showToast("error", data?.error ?? t.paymentErrorFallback);
       }
@@ -253,7 +257,7 @@ export function CheckoutClient() {
         {/* Progress */}
         <div className="flex items-center gap-4 mb-10">
           {STEPS[language].map((s, i) => (
-            <React.Fragment key={i}>
+            <React.Fragment key={s.label}>
               <div className={`flex items-center gap-2 ${i <= step ? "text-cyan" : "text-zinc-500"}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i <= step ? "bg-cyan text-black" : "bg-white/10"}`}>{i + 1}</div>
                 <span className="text-sm font-medium hidden sm:inline">{s.label}</span>

@@ -9,6 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useToast } from '@/components/toast-provider';
 import { useCartStore } from '@/lib/cart-store';
+import { useLanguage } from '@/lib/language-store';
 import type { WishlistItemType } from '@/lib/types';
 
 export default function WishlistClient() {
@@ -16,9 +17,39 @@ export default function WishlistClient() {
   const router = useRouter();
   const { showToast } = useToast();
   const { addItem } = useCartStore();
+  const { language } = useLanguage();
 
   const [wishlist, setWishlist] = useState<WishlistItemType[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const t = {
+    es: {
+      title: "Mi Lista de Deseos",
+      saved: (n: number) => `${n} producto${n === 1 ? "" : "s"} guardado${n === 1 ? "" : "s"}`,
+      emptyTitle: "Tu lista de deseos está vacía",
+      emptyDesc: "Guarda tus productos favoritos para comprarlos más tarde",
+      exploreCatalog: "Explorar Catálogo",
+      addToCart: "Carrito",
+      from: "desde",
+      errorLoad: "Error al cargar favoritos",
+      removed: "Eliminado de favoritos",
+      errorRemove: "Error al eliminar",
+      movedToCart: "Movido al carrito",
+    },
+    en: {
+      title: "My Wishlist",
+      saved: (n: number) => `${n} saved product${n === 1 ? "" : "s"}`,
+      emptyTitle: "Your wishlist is empty",
+      emptyDesc: "Save your favourite products to buy them later",
+      exploreCatalog: "Explore Catalog",
+      addToCart: "Add to Cart",
+      from: "from",
+      errorLoad: "Error loading wishlist",
+      removed: "Removed from wishlist",
+      errorRemove: "Error removing item",
+      movedToCart: "Moved to cart",
+    },
+  }[language];
 
   const fetchWishlist = useCallback(async () => {
     try {
@@ -26,10 +57,10 @@ export default function WishlistClient() {
       const data = await res.json();
       setWishlist(data);
     } catch {
-      showToast('error', 'Error al cargar favoritos');
+      showToast('error', t.errorLoad);
     }
     setLoading(false);
-  }, [showToast]);
+  }, [showToast, t.errorLoad]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -48,10 +79,10 @@ export default function WishlistClient() {
       });
       if (res.ok) {
         setWishlist(wishlist.filter((item) => item.productId !== productId));
-        showToast('success', 'Eliminado de favoritos');
+        showToast('success', t.removed);
       }
     } catch {
-      showToast('error', 'Error al eliminar');
+      showToast('error', t.errorRemove);
     }
   };
 
@@ -80,7 +111,7 @@ export default function WishlistClient() {
     });
 
     removeFromWishlist(item.productId);
-    showToast('success', 'Movido al carrito');
+    showToast('success', t.movedToCart);
   };
 
   if (status === 'loading' || loading) {
@@ -97,8 +128,8 @@ export default function WishlistClient() {
         <div className="flex items-center gap-3 mb-8">
           <Heart className="w-8 h-8 text-red-400 fill-red-400" />
           <div>
-            <h1 className="text-3xl font-bold">Mi Lista de Deseos</h1>
-            <p className="text-muted">{wishlist.length} productos guardados</p>
+            <h1 className="text-3xl font-bold">{t.title}</h1>
+            <p className="text-muted">{t.saved(wishlist.length)}</p>
           </div>
         </div>
 
@@ -109,13 +140,13 @@ export default function WishlistClient() {
             className="text-center py-16"
           >
             <Package className="w-16 h-16 text-muted mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Tu lista de deseos está vacía</h2>
-            <p className="text-muted mb-6">Guarda tus productos favoritos para comprarlos más tarde</p>
+            <h2 className="text-xl font-bold mb-2">{t.emptyTitle}</h2>
+            <p className="text-muted mb-6">{t.emptyDesc}</p>
             <Link
               href="/catalog"
               className="inline-flex items-center gap-2 px-6 py-3 bg-cyan text-black font-medium rounded-lg hover:bg-cyan-dark transition-colors"
             >
-              Explorar Catálogo
+              {t.exploreCatalog}
             </Link>
           </motion.div>
         ) : (
@@ -156,7 +187,7 @@ export default function WishlistClient() {
                     </Link>
                     <p className="text-sm text-muted mb-3">{item.product.category}</p>
                     <p className="text-lg font-bold text-cyan mb-4">
-                      desde €{
+                      {t.from} €{
                         (() => {
                           const product = item.product;
                           const material = product.material ?? "PLA";
@@ -177,7 +208,7 @@ export default function WishlistClient() {
                         className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-cyan text-black font-medium rounded-lg hover:bg-cyan-dark transition-colors"
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        Carrito
+                        {t.addToCart}
                       </button>
                       <button
                         onClick={() => removeFromWishlist(item.productId)}

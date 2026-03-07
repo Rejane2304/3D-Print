@@ -66,7 +66,7 @@ export default function AdminProductsClient() {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const categories = ['Accesorio', 'Decoracion', 'Figura', 'Funcional', 'Articulado'];
+  const categories = ['Accesorios', 'Decoracion', 'Figuras', 'Funcional', 'Articulados'];
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -144,7 +144,7 @@ export default function AdminProductsClient() {
         setShowModal(false);
         fetchProducts();
       } else {
-        throw new Error();
+        throw new Error('Error al guardar producto');
       }
     } catch {
       showToast('error', 'Error al guardar producto');
@@ -159,7 +159,7 @@ export default function AdminProductsClient() {
         showToast('success', 'Producto eliminado');
         fetchProducts();
       } else {
-        throw new Error();
+        throw new Error('Error al eliminar producto');
       }
     } catch {
       showToast('error', 'Error al eliminar producto');
@@ -197,16 +197,18 @@ export default function AdminProductsClient() {
 
       {/* Products Table */}
       <div className="bg-bg-secondary border border-border rounded-xl overflow-hidden">
-        {loading ? (
+        {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : products.length === 0 ? (
+        )}
+        {!loading && products.length === 0 && (
           <div className="text-center py-12">
             <Package className="w-12 h-12 text-muted mx-auto mb-4" />
             <p className="text-muted">No se encontraron productos</p>
           </div>
-        ) : (
+        )}
+        {!loading && products.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-bg-tertiary">
@@ -326,8 +328,9 @@ export default function AdminProductsClient() {
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium mb-1">Nombre</label>
+                    <label htmlFor="admin-name" className="block text-sm font-medium mb-1">Nombre</label>
                     <input
+                      id="admin-name"
                       type="text"
                       required
                       value={formData.name}
@@ -337,8 +340,9 @@ export default function AdminProductsClient() {
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium mb-1">Descripción</label>
+                    <label htmlFor="admin-desc" className="block text-sm font-medium mb-1">Descripción</label>
                     <textarea
+                      id="admin-desc"
                       required
                       rows={3}
                       value={formData.description}
@@ -348,8 +352,9 @@ export default function AdminProductsClient() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Categoría</label>
+                    <label htmlFor="admin-category" className="block text-sm font-medium mb-1">Categoría</label>
                     <select
+                      id="admin-category"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
@@ -361,8 +366,9 @@ export default function AdminProductsClient() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Material</label>
+                    <label htmlFor="admin-material" className="block text-sm font-medium mb-1">Material</label>
                     <select
+                      id="admin-material"
                       value={formData.material}
                       onChange={(e) => {
                         const material = e.target.value;
@@ -381,8 +387,9 @@ export default function AdminProductsClient() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Precio por Gramo (€)</label>
+                    <label htmlFor="admin-price" className="block text-sm font-medium mb-1">Precio por Gramo (€)</label>
                     <input
+                      id="admin-price"
                       type="number"
                       step="0.001"
                       required
@@ -393,8 +400,9 @@ export default function AdminProductsClient() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Densidad (g/cm³)</label>
+                    <label htmlFor="admin-density" className="block text-sm font-medium mb-1">Densidad (g/cm³)</label>
                     <input
+                      id="admin-density"
                       type="number"
                       step="0.01"
                       required
@@ -405,8 +413,9 @@ export default function AdminProductsClient() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Stock</label>
+                    <label htmlFor="admin-stock" className="block text-sm font-medium mb-1">Stock</label>
                     <input
+                      id="admin-stock"
                       type="number"
                       required
                       value={formData.stock}
@@ -416,8 +425,9 @@ export default function AdminProductsClient() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Costo de Acabado (€)</label>
+                    <label htmlFor="admin-finish" className="block text-sm font-medium mb-1">Costo de Acabado (€)</label>
                     <input
+                      id="admin-finish"
                       type="number"
                       step="0.01"
                       required

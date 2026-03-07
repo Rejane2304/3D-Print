@@ -9,8 +9,8 @@ export async function GET(req: NextRequest) {
     const material = url.searchParams.get("material") ?? "";
     const category = url.searchParams.get("category") ?? "";
     const sort = url.searchParams.get("sort") ?? "newest";
-    const page = parseInt(url.searchParams.get("page") ?? "1", 10);
-    const limit = parseInt(url.searchParams.get("limit") ?? "12", 10);
+    const page = Number.parseInt(url.searchParams.get("page") ?? "1", 10);
+    const limit = Number.parseInt(url.searchParams.get("limit") ?? "12", 10);
     const featured = url.searchParams.get("featured");
 
     const where: Record<string, unknown> = {};
@@ -18,11 +18,11 @@ export async function GET(req: NextRequest) {
     if (material) where.material = material;
     if (category) {
       const map: Record<string, string[]> = {
-        Accesorio: ["Accesorio", "Accesorios"],
+        Accesorios: ["Accesorios", "Accesorio"],
         Decoracion: ["Decoracion"],
-        Figura: ["Figura", "Figuras"],
+        Figuras: ["Figuras", "Figura"],
         Funcional: ["Funcional", "Funcionales"],
-        Articulado: ["Articulado", "Articulados"],
+        Articulados: ["Articulados", "Articulado"],
       };
       const values = map[category] ?? [category];
       where.category = { in: values };

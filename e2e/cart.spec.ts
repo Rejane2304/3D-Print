@@ -9,7 +9,7 @@ test.describe('Shopping Cart', () => {
 
   test('should have link to catalog from empty cart', async ({ page }) => {
     await page.goto('/cart');
-    const catalogLink = page.locator('a[href="/catalog"]');
+    const catalogLink = page.getByRole('link', { name: 'Ir al Catálogo' });
     await expect(catalogLink).toBeVisible();
   });
 
