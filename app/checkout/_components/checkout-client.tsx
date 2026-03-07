@@ -39,7 +39,7 @@ export function CheckoutClient() {
   const [couponError, setCouponError] = useState("");
 
   const [shipping, setShipping] = useState({
-    name: "", email: "", phone: "", address: "", city: "", state: "", zip: "", country: "España",
+    name: "", email: "", phone: "", address: "", city: "", state: "", zip: "", country: language === "es" ? "España" : "Spain",
   });
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export function CheckoutClient() {
     } finally {
       setCouponValidating(false);
     }
-  }, [couponInput, subtotal]);
+  }, [couponInput, subtotal, t.couponInvalid, t.couponValidationError]);
 
   const handleRemoveCoupon = () => {
     setCouponCode("");

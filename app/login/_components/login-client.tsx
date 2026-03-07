@@ -45,6 +45,7 @@ export function LoginClient() {
       toLogin: "¿Ya tienes cuenta? Inicia sesión",
       emailRequired: "Email requerido",
       emailInvalid: "Email inválido",
+      emailPlaceholder: "tu@email.com",
       fieldRequired: "Contraseña requerida",
       fieldMinLen: "Mínimo 6 caracteres",
       nameRequired: "Nombre requerido",
@@ -69,6 +70,7 @@ export function LoginClient() {
       toLogin: "Already have an account? Sign in",
       emailRequired: "Email required",
       emailInvalid: "Invalid email",
+      emailPlaceholder: "you@email.com",
       fieldRequired: "Password required",
       fieldMinLen: "Minimum 6 characters",
       nameRequired: "Name required",
@@ -160,7 +162,7 @@ export function LoginClient() {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input type="email" value={email} onChange={e => { setEmail(e?.target?.value ?? ""); setErrors(prev => { const n = { ...prev }; delete n.email; return n; }); }}
-                  placeholder="tu@email.com" className={`w-full bg-white/5 rounded-lg pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-1 placeholder-zinc-500 ${getFieldState("email") === "error" ? "ring-1 ring-red-400" : "focus:ring-cyan"}`} />
+                  placeholder={t.emailPlaceholder} className={`w-full bg-white/5 rounded-lg pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-1 placeholder-zinc-500 ${getFieldState("email") === "error" ? "ring-1 ring-red-400" : "focus:ring-cyan"}`} />
               </div>
               {errors?.email && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.email}</p>}
             </div>

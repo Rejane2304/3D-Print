@@ -42,6 +42,7 @@ export function CartClient() {
       reduceQty: "Reducir",
       increaseQty: "Aumentar",
       removeItem: "Eliminar",
+      productAlt: "Producto",
     },
     en: {
       emptyTitle: "Your cart is empty",
@@ -63,6 +64,7 @@ export function CartClient() {
       reduceQty: "Reduce",
       increaseQty: "Increase",
       removeItem: "Remove",
+      productAlt: "Product",
     },
   }[language];
 
@@ -105,7 +107,7 @@ export function CartClient() {
               <motion.div key={item?.id ?? i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                 className="bg-bg-card rounded-xl p-4 border border-white/5 flex gap-4">
                 <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
-                  <Image src={item?.image ?? "/og-image.png"} alt={item?.name ?? "Producto"} fill className="object-cover" sizes="96px" />
+                  <Image src={item?.image ?? "/og-image.png"} alt={item?.name ?? t.productAlt} fill className="object-cover" sizes="96px" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-sm mb-1 truncate">{item?.name ?? ""}</h3>

@@ -90,6 +90,7 @@ export function CatalogClient() {
       noProducts: "No se encontraron productos",
       clearFiltersButton: "Limpiar filtros",
       from: "Desde",
+      productAlt: "Producto",
       prevPageAria: "Página anterior",
       nextPageAria: "Página siguiente",
     },
@@ -109,6 +110,7 @@ export function CatalogClient() {
       noProducts: "No products found",
       clearFiltersButton: "Clear filters",
       from: "From",
+      productAlt: "Product",
       prevPageAria: "Previous page",
       nextPageAria: "Next page",
     },
@@ -282,7 +284,7 @@ export function CatalogClient() {
                 <Link href={`/product/${p?.id}`} className="block group">
                   <div className="bg-bg-card rounded-lg overflow-hidden card-shadow card-shadow-hover transition-all duration-300 border border-white/5">
                     <div className="relative aspect-video bg-zinc-800">
-                      <Image src={p?.images?.[0] ?? "/og-image.png"} alt={p?.name ?? "Producto"} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                      <Image src={p?.images?.[0] ?? "/og-image.png"} alt={p?.name ?? t.productAlt} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     </div>
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2">

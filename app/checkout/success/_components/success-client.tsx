@@ -17,12 +17,14 @@ export function SuccessClient() {
     es: {
       title: "¡Pedido Confirmado!",
       subtitle: "Tu pago ha sido procesado correctamente.",
+      orderRef: "Ref. de pedido:",
       myOrders: "Mis Pedidos",
       keepShopping: "Seguir Comprando",
     },
     en: {
       title: "Order Confirmed!",
       subtitle: "Your payment has been processed successfully.",
+      orderRef: "Order ref:",
       myOrders: "My Orders",
       keepShopping: "Keep Shopping",
     },
@@ -38,7 +40,7 @@ export function SuccessClient() {
         </div>
         <h1 className="text-3xl font-bold mb-3">{t.title}</h1>
         <p className="text-zinc-400 mb-2">{t.subtitle}</p>
-        {sessionId && <p className="text-xs text-zinc-500 font-mono mb-8">Ref: {sessionId.slice(0, 20)}...</p>}
+        {sessionId && <p className="text-xs text-zinc-500 font-mono mb-8">{t.orderRef} {sessionId.slice(0, 20)}...</p>}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/orders" className="inline-flex items-center gap-2 px-6 py-3 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition text-sm">
             <Package className="w-4 h-4" /> {t.myOrders}

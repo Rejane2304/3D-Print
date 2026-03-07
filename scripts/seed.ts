@@ -667,11 +667,11 @@ async function main() {
       stock: 78, rating: 4.4, reviewCount: 56,
     },
 
-    // ARTE (3 productos)
+    // FIGURAS ARTÍSTICAS (3 productos)
     {
       name: "Busto Low-Poly Personaje",
       description: "Busto estilizado con estética low-poly. Disponible en varios personajes icónicos.",
-      category: "Arte",
+      category: "Figuras",
       material: "PLA",
       basePricePerGram: 0.048,
       density: 1.24,
@@ -688,7 +688,7 @@ async function main() {
     {
       name: "Litofanía Personalizada",
       description: "Placa que revela imagen al iluminarse por detrás. Envíanos tu foto y la convertimos en arte.",
-      category: "Arte",
+      category: "Decoracion",
       material: "PLA",
       basePricePerGram: 0.055,
       density: 1.24,
@@ -704,7 +704,7 @@ async function main() {
     {
       name: "Mapa Topográfico 3D Ciudad",
       description: "Relieve topográfico de tu ciudad favorita. Barcelona, Madrid, Valencia y más disponibles.",
-      category: "Arte",
+      category: "Decoracion",
       material: "PLA",
       basePricePerGram: 0.05,
       density: 1.24,

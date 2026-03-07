@@ -24,6 +24,7 @@ export function Footer() {
       subscribed: "¡Suscrito al newsletter!",
       errorSubscribe: "Error al suscribirse",
       errorConnection: "Error de conexión",
+      location: "Barcelona, España",
     },
     en: {
       about: "High-quality 3D printed products with PLA and PETG materials. Customize every piece to your needs.",
@@ -38,6 +39,7 @@ export function Footer() {
       subscribed: "Subscribed to newsletter!",
       errorSubscribe: "Error subscribing",
       errorConnection: "Connection error",
+      location: "Barcelona, Spain",
     },
   }[language];
 
@@ -68,7 +70,7 @@ export function Footer() {
             <div className="space-y-3 text-sm text-zinc-400">
               <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-cyan" /> info@3dprint.com</div>
               <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-cyan" /> +34 612 345 678</div>
-              <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-cyan" /> Barcelona, España</div>
+              <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-cyan" /> {t.location}</div>
             </div>
           </div>
 

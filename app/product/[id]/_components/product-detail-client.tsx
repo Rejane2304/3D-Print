@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Star, ChevronRight, Home, Minus, Plus, ChevronDown, ChevronUp, Layers, Info, TrendingDown } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useToast } from "@/components/toast-provider";
-import { calculatePriceFromDimensions, MATERIAL_INFO, getPriceByQuantity } from "@/lib/price-calculator";
+import { calculatePriceFromDimensions, MATERIAL_INFO } from "@/lib/price-calculator";
 import type { ReviewType, MaterialType } from "@/lib/types";
 import { useLanguage } from "@/lib/language-store";
 
@@ -34,7 +34,7 @@ const MAX_DIM_CM = 25;
 const mmToCm = (mm: number) => mm / 10;
 const cmToMm = (cm: number) => cm * 10;
 
-export function ProductDetailClient({ productId }: { productId: string }) {
+export function ProductDetailClient({ productId }: Readonly<{ productId: string }>) {
   const { data: session } = useSession() || {};
   const addItem = useCartStore(s => s?.addItem);
   const { showToast } = useToast();
@@ -73,6 +73,7 @@ export function ProductDetailClient({ productId }: { productId: string }) {
       starsAria: (n: number) => `${n} estrellas`,
       reviewPublished: "Reseña publicada", reviewError: "Error al publicar reseña",
       connectionError: "Error de conexión",
+      imageView: "vista",
     },
     en: {
       adminNoPurchase: "Administrators cannot make purchases",
@@ -105,6 +106,7 @@ export function ProductDetailClient({ productId }: { productId: string }) {
       starsAria: (n: number) => `${n} stars`,
       reviewPublished: "Review posted", reviewError: "Error while posting review",
       connectionError: "Connection error",
+      imageView: "view",
     },
   }[language];
 
@@ -270,8 +272,8 @@ export function ProductDetailClient({ productId }: { productId: string }) {
             {product.images?.length > 1 && (
               <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                 {product.images.map((img, i) => (
-                  <button key={i} onClick={() => setSelectedImage(i)} className={`relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition ${selectedImage === i ? "border-cyan" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                    <Image src={img ?? "/og-image.png"} alt={`${product.name} vista ${i + 1}`} fill className="object-cover" sizes="80px" />
+                  <button key={img} onClick={() => setSelectedImage(i)} className={`relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 border-2 transition ${selectedImage === i ? "border-cyan" : "border-transparent opacity-60 hover:opacity-100"}`}>
+                    <Image src={img ?? "/og-image.png"} alt={`${product.name} ${t.imageView} ${i + 1}`} fill className="object-cover" sizes="80px" />
                   </button>
                 ))}
               </div>
@@ -289,7 +291,7 @@ export function ProductDetailClient({ productId }: { productId: string }) {
 
             {product.reviewCount > 0 && (
               <div className="flex items-center gap-2 mb-6">
-                <div className="flex">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`w-4 h-4 ${i < Math.round(product.rating) ? "fill-amber text-amber" : "text-zinc-600"}`} />)}</div>
+                <div className="flex">{Array.from({ length: 5 }).map((_, i) => <Star key={"star-" + i} className={`w-4 h-4 ${i < Math.round(product.rating) ? "fill-amber text-amber" : "text-zinc-600"}`} />)}</div>
                 <span className="text-sm text-zinc-400">{product.rating.toFixed(1)} ({t.ratingLabel(product.reviewCount)})</span>
               </div>
             )}
@@ -304,9 +306,10 @@ export function ProductDetailClient({ productId }: { productId: string }) {
                     const info = MATERIAL_INFO[code as keyof typeof MATERIAL_INFO];
                     const matColor = info?.color ?? "#9ca3af";
                     const isSelected = selectedMaterial === code;
+                    const btnBorderClass = isSelected ? `border-[${matColor}] bg-[${matColor}]/10` : "border-white/10 hover:border-white/25";
                     return (
                       <button key={code} onClick={() => setSelectedMaterial(code)}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${isSelected ? `border-[${matColor}] bg-[${matColor}]/10` : "border-white/10 hover:border-white/25"}`}
+                        className={`p-3 rounded-lg border-2 transition-all text-left ${btnBorderClass}`}
                         style={isSelected ? { borderColor: matColor, backgroundColor: `${matColor}18` } : {}}>
                         <div className="flex items-center gap-2">
                           <Layers className="w-4 h-4" style={{ color: matColor }} />
@@ -350,11 +353,11 @@ export function ProductDetailClient({ productId }: { productId: string }) {
                       <input type="number" min={MIN_DIM_CM} max={MAX_DIM_CM} step={0.5}
                         value={Number.isFinite(d.value) ? mmToCm(d.value).toFixed(1) : ""}
                         onChange={e => {
-                          const raw = parseFloat(e.target.value);
+                          const raw = Number.parseFloat(e.target.value);
                           d.set(cmToMm(Number.isNaN(raw) ? MIN_DIM_CM : clampDim(raw, MIN_DIM_CM, MAX_DIM_CM)));
                         }}
                         onBlur={e => {
-                          const raw = parseFloat(e.target.value);
+                          const raw = Number.parseFloat(e.target.value);
                           d.set(cmToMm(clampDim(Number.isNaN(raw) ? MIN_DIM_CM : raw, MIN_DIM_CM, MAX_DIM_CM)));
                         }}
                         className="w-full bg-white/5 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan text-center" />
@@ -370,7 +373,7 @@ export function ProductDetailClient({ productId }: { productId: string }) {
                   <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition" aria-label={t.qtyDecreaseAria}>
                     <Minus className="w-4 h-4" />
                   </button>
-                  <input type="number" value={quantity} onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="w-16 text-center bg-white/5 rounded-lg py-2 font-mono text-sm outline-none focus:ring-1 focus:ring-cyan" />
+                  <input type="number" value={quantity} onChange={e => setQuantity(Math.max(1, Number.parseInt(e.target.value) || 1))} className="w-16 text-center bg-white/5 rounded-lg py-2 font-mono text-sm outline-none focus:ring-1 focus:ring-cyan" />
                   <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition" aria-label={t.qtyIncreaseAria}>
                     <Plus className="w-4 h-4" />
                   </button>
@@ -455,7 +458,7 @@ export function ProductDetailClient({ productId }: { productId: string }) {
           <h2 className="text-2xl font-bold mb-6">{t.faqTitle}</h2>
           <div className="space-y-3">
             {faqs.map((faq, i) => (
-              <div key={i} className="bg-bg-card rounded-xl border border-white/5 overflow-hidden">
+              <div key={faq.q} className="bg-bg-card rounded-xl border border-white/5 overflow-hidden">
                 <button onClick={() => setFaqOpen(faqOpen === i ? null : i)} className="w-full flex items-center justify-between p-4 text-sm font-medium text-left hover:bg-bg-hover transition">
                   {faq.q}
                   {faqOpen === i ? <ChevronUp className="w-4 h-4 text-zinc-400" /> : <ChevronDown className="w-4 h-4 text-zinc-400" />}
@@ -480,7 +483,7 @@ export function ProductDetailClient({ productId }: { productId: string }) {
               <h3 className="font-semibold mb-3 text-sm">{t.writeReviewTitle}</h3>
               <div className="flex gap-1 mb-3">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <button key={i} onClick={() => setReviewRating(i + 1)} aria-label={t.starsAria(i + 1)}>
+                  <button key={"wstar-" + i} onClick={() => setReviewRating(i + 1)} aria-label={t.starsAria(i + 1)}>
                     <Star className={`w-5 h-5 ${i < reviewRating ? "fill-amber text-amber" : "text-zinc-600"}`} />
                   </button>
                 ))}
@@ -501,7 +504,7 @@ export function ProductDetailClient({ productId }: { productId: string }) {
                   </div>
                   <div>
                     <p className="text-sm font-medium">{r?.user?.name ?? t.anonymous}</p>
-                    <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, j) => <Star key={j} className={`w-3 h-3 ${j < (r?.rating ?? 0) ? "fill-amber text-amber" : "text-zinc-600"}`} />)}</div>
+                    <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, j) => <Star key={"rstar-" + j} className={`w-3 h-3 ${j < (r?.rating ?? 0) ? "fill-amber text-amber" : "text-zinc-600"}`} />)}</div>
                   </div>
                 </div>
                 <p className="text-sm text-zinc-400">{r?.comment ?? ""}</p>

@@ -5,10 +5,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Layers, Zap, Shield, Palette, Star } from "lucide-react";
 import { ProductType } from "@/lib/types";
-import { MATERIAL_INFO, calculatePrice } from "@/lib/price-calculator";
+import { MATERIAL_INFO, calculatePriceFromDimensions } from "@/lib/price-calculator";
 import { useLanguage } from "@/lib/language-store";
 
-function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
+function CountUp({ target, suffix = "" }: Readonly<{ target: number; suffix?: string }>) {
   const [val, setVal] = useState(0);
   useEffect(() => {
     let frame: number;
@@ -55,11 +55,15 @@ export function HomeClient() {
       title: <>Productos <span className="text-gradient-cyan">Destacados</span></>,
       subtitle: "Nuestras piezas más populares, listas para personalizar",
       viewAll: "Ver todo el catálogo",
+      product: "Producto",
+      from: "Desde",
     },
     en: {
       title: <>Featured <span className="text-gradient-cyan">Products</span></>,
       subtitle: "Our most popular pieces, ready to be customized.",
       viewAll: "View full catalog",
+      product: "Product",
+      from: "From",
     },
   }[language];
 
@@ -74,6 +78,7 @@ export function HomeClient() {
       petgDesc:
         "Material más resistente y flexible, ideal para soportes, piezas sometidas a uso frecuente y exteriores.",
       seeProducts: (mat: string) => `Ver productos ${mat}`,
+      idealFor: "Ideal para",
     },
     en: {
       title: <>Premium <span className="text-gradient-amber">Materials</span></>,
@@ -85,6 +90,7 @@ export function HomeClient() {
       petgDesc:
         "Stronger and more flexible material, ideal for mounts, parts under frequent use and outdoor pieces.",
       seeProducts: (mat: string) => `View ${mat} products`,
+      idealFor: "Ideal for",
     },
   }[language];
 
@@ -168,11 +174,11 @@ export function HomeClient() {
       <section className="py-16 border-y border-white/5 bg-[#0d0d0d]">
         <div className="max-w-site mx-auto px-4 grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
           {[
-            { label: tStats.products, target: productCount || 0, suffix: "" },
-            { label: tStats.customers, target: customerCount || 0, suffix: "" },
-            { label: tStats.materials, target: materialCount || 0, suffix: "" },
-          ].map((s, i) => (
-            <div key={i}>
+            { key: "products", label: tStats.products, target: productCount || 0, suffix: "" },
+            { key: "customers", label: tStats.customers, target: customerCount || 0, suffix: "" },
+            { key: "materials", label: tStats.materials, target: materialCount || 0, suffix: "" },
+          ].map((s) => (
+            <div key={s.key}>
               <CountUp target={s.target} suffix={s.suffix} />
               <p className="text-sm text-zinc-400 mt-1">{s.label}</p>
             </div>
@@ -193,7 +199,7 @@ export function HomeClient() {
                 <Link href={`/product/${p?.id}`} className="block group">
                   <div className="bg-bg-card rounded-lg overflow-hidden card-shadow card-shadow-hover transition-all duration-300">
                     <div className="relative aspect-video bg-zinc-800">
-                      <Image src={p?.images?.[0] ?? "/og-image.png"} alt={p?.name ?? "Producto"} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+                      <Image src={p?.images?.[0] ?? "/og-image.png"} alt={p?.name ?? tFeatured.product} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                     </div>
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2">
@@ -202,19 +208,20 @@ export function HomeClient() {
                       </div>
                       <h3 className="font-semibold text-sm mb-1 group-hover:text-cyan transition-colors">{p?.name ?? ""}</h3>
                       <p className="font-mono text-sm text-cyan">
-                        Desde €{
+                        {tFeatured.from} €{
                           (() => {
-                            const price = calculatePrice({
-                              material: p?.material ?? "PLA",
-                              dimX: p?.defaultDimX ?? 50,
-                              dimY: p?.defaultDimY ?? 50,
-                              dimZ: p?.defaultDimZ ?? 50,
-                              quantity: 1,
-                              basePricePerGram: p?.basePricePerGram ?? 0,
-                              density: p?.density ?? (p?.material === "PETG" ? MATERIAL_INFO.PETG.density : MATERIAL_INFO.PLA.density),
-                              finishCost: p?.finishCost ?? 0,
-                            });
-                            return price.total.toFixed(2);
+                        const mat = p?.material ?? "PLA";
+                            const matInfo = MATERIAL_INFO[mat] ?? MATERIAL_INFO.PLA;
+                            const price = calculatePriceFromDimensions(
+                              p?.defaultDimX ?? 50,
+                              p?.defaultDimY ?? 50,
+                              p?.defaultDimZ ?? 50,
+                              p?.printTimeMinutes ?? 60,
+                              matInfo,
+                              1,
+                              p?.finishCost ?? 0,
+                            );
+                            return price.finalPrice.toFixed(2);
                           })()
                         }
                       </p>
@@ -252,7 +259,7 @@ export function HomeClient() {
                     <div>
                       <h3 className="text-xl font-bold" style={{ color: info.color }}>{info.label}</h3>
                       <p className="text-xs text-zinc-400">
-                        Ideal para{" "}
+                        {tMaterials.idealFor}{" "}
                         {mat === "PLA" ? tMaterials.plaUse : tMaterials.petgUse}
                       </p>
                     </div>
@@ -283,8 +290,8 @@ export function HomeClient() {
             </h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tBenefits.map((b, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+            {tBenefits.map((b) => (
+              <motion.div key={b.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: tBenefits.indexOf(b) * 0.1 }}
                 className="bg-bg-card rounded-xl p-6 card-shadow hover:shadow-lg transition-all duration-300 border border-white/5 text-center">
                 <div className="w-12 h-12 rounded-lg bg-cyan/10 flex items-center justify-center mx-auto mb-4">
                   <b.icon className="w-6 h-6 text-cyan" />
