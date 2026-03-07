@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { calculateWeight, calculatePriceFromDimensions, MATERIAL_INFO, PRICING_CONFIG } from '@/lib/price-calculator';
 
 describe('Price Calculator', () => {

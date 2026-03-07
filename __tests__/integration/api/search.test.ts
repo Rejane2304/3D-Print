@@ -1,7 +1,7 @@
+import { describe, it, expect, vi } from 'vitest';
 /**
  * Integration tests for Search API
  */
-export {};
 const mockProducts = [
   { id: '1', name: 'Soporte Auriculares', category: 'Accesorios', material: 'PLA', basePricePerGram: 0.05, images: [] },
   { id: '2', name: 'Maceta Geométrica', category: 'Decoracion', material: 'PETG', basePricePerGram: 0.07, images: [] },
@@ -9,11 +9,11 @@ const mockProducts = [
 ];
 
 // Esta ruta importa `prisma` como default, por eso se mockea `default`
-jest.mock('@/lib/db', () => ({
+vi.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     product: {
-      findMany: jest.fn((args) => {
+      findMany: vi.fn((args) => {
         if (args?.where?.OR) {
           const query = args.where.OR[0]?.name?.contains?.toLowerCase() || '';
           const filtered = mockProducts.filter(p => 

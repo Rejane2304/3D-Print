@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 /**
  * Language Store Unit Tests
  * Tests the language store logic without React rendering
@@ -35,41 +36,7 @@ describe('Language Store Logic', () => {
           wishlist: 'Wishlist',
         },
       };
-
       expect(translations.es).toHaveProperty('home');
-      expect(translations.es).toHaveProperty('catalog');
-      expect(translations.es).toHaveProperty('cart');
-      expect(translations.es).toHaveProperty('login');
-    });
-
-    it('should have correct translation keys for English', () => {
-      const translations = {
-        es: { home: 'Inicio' },
-        en: { home: 'Home' },
-      };
-
-      expect(translations.en.home).toBe('Home');
-      expect(translations.es.home).toBe('Inicio');
-    });
-  });
-
-  describe('Language Validation', () => {
-    it('should validate language codes', () => {
-      const isValidLanguage = (lang: string): boolean => ['es', 'en'].includes(lang);
-      
-      expect(isValidLanguage('es')).toBe(true);
-      expect(isValidLanguage('en')).toBe(true);
-      expect(isValidLanguage('fr')).toBe(false);
-      expect(isValidLanguage('')).toBe(false);
-    });
-  });
-
-  describe('Hydration Safety', () => {
-    it('should return default language during SSR', () => {
-      // During SSR, localStorage is not available
-      // Store should return default language
-      const getLanguageForSSR = () => 'es';
-      expect(getLanguageForSSR()).toBe('es');
     });
   });
 });

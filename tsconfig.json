@@ -23,9 +23,13 @@
         "name": "next"
       }
     ],
+     "types": ["node"],
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@prisma/client": [
+        "./node_modules/.prisma/client"
       ]
     }
   },

@@ -1,9 +1,8 @@
+import { describe, it, expect, vi } from 'vitest';
 /**
  * Integration tests for Products API
  * These tests require a test database connection (mockeado con Prisma)
  */
-export {};
-
 // Mock Prisma
 const mockProducts = [
   {
@@ -50,16 +49,16 @@ const mockProducts = [
   },
 ];
 
-jest.mock('@/lib/db', () => ({
+vi.mock('@/lib/db', () => ({
   __esModule: true,
   prisma: {
     product: {
-      findMany: jest.fn(() => Promise.resolve(mockProducts)),
-      findUnique: jest.fn((args) => {
+      findMany: vi.fn(() => Promise.resolve(mockProducts)),
+      findUnique: vi.fn((args) => {
         const product = mockProducts.find(p => p.id === args.where.id);
         return Promise.resolve(product ? { ...product, reviews: [] } : null);
       }),
-      count: jest.fn(() => Promise.resolve(mockProducts.length)),
+      count: vi.fn(() => Promise.resolve(mockProducts.length)),
     },
   },
 }));

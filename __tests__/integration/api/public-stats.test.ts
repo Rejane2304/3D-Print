@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from 'vitest';
 /**
  * Integration tests for public stats API
  * Garantiza que los contadores que ve el usuario
@@ -13,15 +14,15 @@ const mockCounts = {
   ],
 };
 
-jest.mock("@/lib/db", () => ({
+vi.mock("@/lib/db", () => ({
   __esModule: true,
   prisma: {
     product: {
-      count: jest.fn(async () => mockCounts.products),
-      groupBy: jest.fn(async () => mockCounts.materials),
+      count: vi.fn(async () => mockCounts.products),
+      groupBy: vi.fn(async () => mockCounts.materials),
     },
     user: {
-      count: jest.fn(async (args: any) => {
+      count: vi.fn(async (args: any) => {
         // Solo cuenta usuarios con rol "user" como clientes
         if (args?.where?.role === "user") return mockCounts.customers;
         return 0;

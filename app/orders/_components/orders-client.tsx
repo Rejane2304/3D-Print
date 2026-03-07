@@ -130,14 +130,19 @@ export function OrdersClient() {
                         const StepIcon = stepCfg.icon;
                         const isActive = order?.status === step;
                         const isDone = currentStepIdx > idx;
+                        let circleClass = 'bg-white/5 text-zinc-600';
+                        if (isActive) circleClass = 'bg-cyan text-black';
+                        else if (isDone) circleClass = 'bg-white/10 text-zinc-300';
+                        let textClass = 'text-zinc-600';
+                        if (isActive) textClass = 'text-cyan font-medium';
+                        else if (isDone) textClass = 'text-zinc-400';
                         return (
                           <React.Fragment key={step}>
                             <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                              <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors
-                                ${isActive ? "bg-cyan text-black" : isDone ? "bg-white/10 text-zinc-300" : "bg-white/5 text-zinc-600"}`}>
+                              <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${circleClass}`}>
                                 <StepIcon className="w-3.5 h-3.5" />
                               </div>
-                              <span className={`text-[10px] whitespace-nowrap ${isActive ? "text-cyan font-medium" : isDone ? "text-zinc-400" : "text-zinc-600"}`}>
+                              <span className={`text-[10px] whitespace-nowrap ${textClass}`}>
                                 {stepCfg.label}
                               </span>
                             </div>

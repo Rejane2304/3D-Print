@@ -23,6 +23,14 @@ const workflowNext: Record<string, { status: string; label: string }> = {
   shipped:    { status: 'delivered',  label: 'Marcar como Entregado' },
 };
 
+const WORKFLOW_STEPS = ['paid', 'processing', 'ready', 'shipped', 'delivered'] as const;
+
+function stepBadgeClass(isActive: boolean, isDone: boolean, activeColor: string): string {
+  if (isActive) return activeColor;
+  if (isDone) return 'bg-white/5 text-zinc-400';
+  return 'bg-white/5 text-zinc-600';
+}
+
 export default function AdminOrdersClient() {
   const { showToast } = useToast();
   const [orders, setOrders] = useState<OrderType[]>([]);
@@ -83,6 +91,77 @@ export default function AdminOrdersClient() {
     setAdvancing(false);
   };
 
+  // Extracted to avoid nested ternary in JSX (S3358)
+  let orderListContent: React.ReactNode;
+  if (loading) {
+    orderListContent = (
+      <div className="flex items-center justify-center py-12">
+        <div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  } else if (orders.length === 0) {
+    orderListContent = (
+      <div className="text-center py-12">
+        <ShoppingCart className="w-12 h-12 text-muted mx-auto mb-4" />
+        <p className="text-muted">No se encontraron pedidos</p>
+      </div>
+    );
+  } else {
+    orderListContent = (
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-bg-tertiary">
+            <tr>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Pedido</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Cliente</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Fecha</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Total</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Estado</th>
+              <th className="px-4 py-3 text-right text-sm font-medium text-muted">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => {
+              const config = statusConfig[order.status] || statusConfig.pending;
+              const StatusIcon = config.icon;
+              return (
+                <tr key={order.id} className="border-t border-border hover:bg-bg-tertiary/50">
+                  <td className="px-4 py-3">
+                    <span className="font-mono font-medium">#{order.id.slice(-8).toUpperCase()}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="font-medium">{order.shippingName || order.user?.name || 'N/A'}</div>
+                    <div className="text-sm text-muted">{order.shippingEmail || order.user?.email}</div>
+                  </td>
+                  <td className="px-4 py-3 text-muted">
+                    {new Date(order.createdAt).toLocaleDateString('es-ES')}
+                  </td>
+                  <td className="px-4 py-3 font-medium">€{order.total.toFixed(2)}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${config.color}`}>
+                      <StatusIcon className="w-3 h-3" />
+                      {config.label}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="p-2 hover:bg-cyan/20 rounded-lg transition-colors"
+                      >
+                        <Eye className="w-4 h-4 text-cyan" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -116,69 +195,7 @@ export default function AdminOrdersClient() {
 
       {/* Orders Table */}
       <div className="bg-bg-secondary border border-border rounded-xl overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="text-center py-12">
-            <ShoppingCart className="w-12 h-12 text-muted mx-auto mb-4" />
-            <p className="text-muted">No se encontraron pedidos</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-bg-tertiary">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Pedido</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Cliente</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Fecha</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Total</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Estado</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => {
-                  const config = statusConfig[order.status] || statusConfig.pending;
-                  const StatusIcon = config.icon;
-                  return (
-                    <tr key={order.id} className="border-t border-border hover:bg-bg-tertiary/50">
-                      <td className="px-4 py-3">
-                        <span className="font-mono font-medium">#{order.id.slice(-8).toUpperCase()}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="font-medium">{order.shippingName || order.user?.name || 'N/A'}</div>
-                        <div className="text-sm text-muted">{order.shippingEmail || order.user?.email}</div>
-                      </td>
-                      <td className="px-4 py-3 text-muted">
-                        {new Date(order.createdAt).toLocaleDateString('es-ES')}
-                      </td>
-                      <td className="px-4 py-3 font-medium">€{order.total.toFixed(2)}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${config.color}`}>
-                          <StatusIcon className="w-3 h-3" />
-                          {config.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setSelectedOrder(order)}
-                            className="p-2 hover:bg-cyan/20 rounded-lg transition-colors"
-                          >
-                            <Eye className="w-4 h-4 text-cyan" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
+        {orderListContent}
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 p-4 border-t border-border">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
@@ -226,16 +243,17 @@ export default function AdminOrdersClient() {
               <div className="p-6 space-y-6">
                 {/* Production Workflow */}
                 <div>
-                  <label className="block text-sm font-medium mb-3">Flujo de Producción</label>
+                  <p className="text-sm font-medium mb-3">Flujo de Producción</p>
                   <div className="flex items-center gap-1 flex-wrap mb-4">
-                    {(['paid', 'processing', 'ready', 'shipped', 'delivered'] as const).map((s, i, arr) => {
+                    {WORKFLOW_STEPS.map((s, i, arr) => {
                       const cfg = statusConfig[s];
                       const StepIcon = cfg.icon;
                       const isActive = selectedOrder.status === s;
                       const isDone = arr.indexOf(selectedOrder.status as typeof s) > i;
+                      const badgeClass = stepBadgeClass(isActive, isDone, cfg.color);
                       return (
                         <div key={s} className="flex items-center gap-1">
-                          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${isActive ? cfg.color : isDone ? 'bg-white/5 text-zinc-400' : 'bg-white/5 text-zinc-600'}`}>
+                          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${badgeClass}`}>
                             <StepIcon className="w-3 h-3" />
                             {cfg.label}
                           </div>
@@ -257,8 +275,9 @@ export default function AdminOrdersClient() {
 
                 {/* Status override */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Estado manual</label>
+                  <label htmlFor="status-select" className="block text-sm font-medium mb-2">Estado manual</label>
                   <select
+                    id="status-select"
                     value={selectedOrder.status}
                     onChange={(e) => updateStatus(selectedOrder.id, e.target.value)}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"

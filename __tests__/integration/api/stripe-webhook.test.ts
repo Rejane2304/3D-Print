@@ -1,17 +1,18 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 /**
  * Integration tests for Stripe webhook
  * Verifica que el backend actualiza pedidos y puntos
  * de forma coherente con el evento recibido.
  */
 
-const mockOrderUpdate = jest.fn(async () => ({
+const mockOrderUpdate = vi.fn(async () => ({
   id: "order_12345678",
   total: 25.9, // debería dar 25 puntos (floor)
   userId: "user_1",
 }));
 
-const mockUserUpdate = jest.fn(async () => ({}));
-const mockPointsCreate = jest.fn(async () => ({}));
+const mockUserUpdate = vi.fn(async () => ({}));
+const mockPointsCreate = vi.fn(async () => ({}));
 
 const mockPrisma = {
   order: {
@@ -25,7 +26,7 @@ const mockPrisma = {
   },
 };
 
-jest.mock("@/lib/db", () => ({
+vi.mock("@/lib/db", () => ({
   __esModule: true,
   prisma: mockPrisma,
   default: mockPrisma,
@@ -33,7 +34,7 @@ jest.mock("@/lib/db", () => ({
 
 describe("Stripe Webhook API Integration", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should mark order as paid and award loyalty points", async () => {
