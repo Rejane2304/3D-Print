@@ -98,26 +98,31 @@ export default function AdminPricingClient() {
           setConfig(configData);
         }
 
-        const materialsRaw: unknown = await materialsRes.json();
-        if (Array.isArray(materialsRaw)) {
-          const mats = materialsRaw as MaterialType[];
-          setMaterials(mats);
+        if (materialsRes.ok) {
+          const materialsRaw: unknown = await materialsRes.json();
+          if (Array.isArray(materialsRaw)) {
+            const mats = materialsRaw as MaterialType[];
+            setMaterials(mats);
 
-          const edits: Record<string, MaterialEditState> = {};
-          for (const m of mats) {
-            edits[m.id] = {
-              pricePerKg: String(m.pricePerKg),
-              maintenanceFactor: String(m.maintenanceFactor),
-              density: String(m.density),
-              saving: false,
-            };
-          }
-          setMatEdits(edits);
+            const edits: Record<string, MaterialEditState> = {};
+            for (const m of mats) {
+              edits[m.id] = {
+                pricePerKg: String(m.pricePerKg),
+                maintenanceFactor: String(m.maintenanceFactor),
+                density: String(m.density),
+                saving: false,
+              };
+            }
+            setMatEdits(edits);
 
-          if (mats.length > 0) {
-            setSimMaterialCode(mats[0].code);
+            if (mats.length > 0) {
+              setSimMaterialCode(mats[0].code);
+            }
           }
         }
+      } catch (err: unknown) {
+        console.error('Error loading pricing data:', err);
+        showToast('error', 'Error al cargar los datos de precios');
       } finally {
         setConfigLoading(false);
       }
