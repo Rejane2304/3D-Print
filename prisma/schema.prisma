@@ -105,6 +105,7 @@ model Product {
   defaultDimY      Float          @default(50)
   defaultDimZ      Float          @default(50)
   finishCost       Float          @default(2.50)
+  modelFillFactor  Float          @default(0.15)  // factor calibrado desde laminador (peso_real / vol_bbox / densidad)
   images           String[]
   colors           String[]
   featured         Boolean        @default(false)

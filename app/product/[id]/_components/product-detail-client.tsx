@@ -14,6 +14,7 @@ import { useLanguage } from "@/lib/language-store";
 interface ProductData {
   id: string; name: string; description: string; category: string; material: string;
   basePricePerGram: number; density: number; finishCost: number; printTimeMinutes: number;
+  modelFillFactor: number;
   minDimX: number; minDimY: number; minDimZ: number;
   maxDimX: number; maxDimY: number; maxDimZ: number;
   defaultDimX: number; defaultDimY: number; defaultDimZ: number;
@@ -28,11 +29,6 @@ const COLOR_MAP: Record<string, string> = {
   "Amarillo": "#EAB308", "Naranja": "#F97316", "Cyan": "#00FFFF",
   "Transparente": "#d4d4d8", "Ámbar": "#FFBF00",
 };
-
-const MIN_DIM_CM = 1;
-const MAX_DIM_CM = 25;
-const mmToCm = (mm: number) => mm / 10;
-const cmToMm = (cm: number) => cm * 10;
 
 export function ProductDetailClient({ productId }: Readonly<{ productId: string }>) {
   const { data: session } = useSession() || {};
@@ -51,14 +47,17 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
       ratingLabel: (count: number) => `${count} reseñas`,
       materialLabel: "Material",
       colorLabel: "Color",
-      dimensionsLabel: "Dimensiones (cm)",
-      dimXLabel: "X (Ancho)", dimYLabel: "Y (Profundidad)", dimZLabel: "Z (Altura)",
+      dimensionsLabel: "Dimensiones (mm)",
+      dimXLabel: "X (Ancho)", dimYLabel: "Y (Prof.)", dimZLabel: "Z (Alto)",
       quantityLabel: "Cantidad",
       qtyDecreaseAria: "Reducir cantidad", qtyIncreaseAria: "Aumentar cantidad",
       summaryQtyLabel: "Cantidad", totalLabel: "Total",
+      estimatedWeight: "Peso estimado",
+      printTimeLabel: "Tiempo impresión",
       costBreakdownTitle: "Desglose de costos",
       materialCost: "Material", machineCost: "Amortización máquina",
       maintenanceCost: "Mantenimiento", operationCost: "Electricidad",
+      consumablesCost: "Consumibles", finishCostLabel: "Acabado",
       baseCost: "Costo base",
       tieredTitle: "Precios por volumen",
       tieredUnit: "1–4 uds.", tieredMedium: "5–9 uds.", tieredBulk: "10+ uds.",
@@ -84,14 +83,17 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
       ratingLabel: (count: number) => `${count} reviews`,
       materialLabel: "Material",
       colorLabel: "Color",
-      dimensionsLabel: "Dimensions (cm)",
+      dimensionsLabel: "Dimensions (mm)",
       dimXLabel: "X (Width)", dimYLabel: "Y (Depth)", dimZLabel: "Z (Height)",
       quantityLabel: "Quantity",
       qtyDecreaseAria: "Decrease quantity", qtyIncreaseAria: "Increase quantity",
       summaryQtyLabel: "Quantity", totalLabel: "Total",
+      estimatedWeight: "Estimated weight",
+      printTimeLabel: "Print time",
       costBreakdownTitle: "Cost breakdown",
       materialCost: "Material", machineCost: "Machine amortization",
       maintenanceCost: "Maintenance", operationCost: "Electricity",
+      consumablesCost: "Consumables", finishCostLabel: "Finishing",
       baseCost: "Base cost",
       tieredTitle: "Volume pricing",
       tieredUnit: "1–4 units", tieredMedium: "5–9 units", tieredBulk: "10+ units",
@@ -138,9 +140,9 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
         setProduct(productData);
         setSelectedMaterial(productData.material ?? "PLA");
         setSelectedColor(productData.colors?.[0] ?? "Blanco");
-        setDimX(cmToMm(Math.max(MIN_DIM_CM, Math.min(MAX_DIM_CM, mmToCm(productData.defaultDimX ?? 50)))));
-        setDimY(cmToMm(Math.max(MIN_DIM_CM, Math.min(MAX_DIM_CM, mmToCm(productData.defaultDimY ?? 50)))));
-        setDimZ(cmToMm(Math.max(MIN_DIM_CM, Math.min(MAX_DIM_CM, mmToCm(productData.defaultDimZ ?? 50)))));
+        setDimX(clampDim(productData.defaultDimX ?? 50, productData.minDimX ?? 10, productData.maxDimX ?? 300));
+        setDimY(clampDim(productData.defaultDimY ?? 50, productData.minDimY ?? 10, productData.maxDimY ?? 300));
+        setDimZ(clampDim(productData.defaultDimZ ?? 50, productData.minDimZ ?? 10, productData.maxDimZ ?? 300));
       }
       if (Array.isArray(materialsData) && materialsData.length > 0) {
         setMaterials(materialsData);
@@ -164,7 +166,13 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
       product.printTimeMinutes ?? 60,
       matConfig,
       quantity,
-      product.finishCost ?? 2.5
+      product.finishCost ?? 2.5,
+      {
+        fillFactor: product.modelFillFactor ?? 0.15,
+        refDimX: product.defaultDimX,
+        refDimY: product.defaultDimY,
+        refDimZ: product.defaultDimZ,
+      }
     );
   }, [product, dimX, dimY, dimZ, quantity, matConfig]);
 
@@ -344,21 +352,21 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
                 <label className="text-sm font-medium text-zinc-300 mb-3 block">{t.dimensionsLabel}</label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: t.dimXLabel, value: dimX, set: setDimX },
-                    { label: t.dimYLabel, value: dimY, set: setDimY },
-                    { label: t.dimZLabel, value: dimZ, set: setDimZ },
+                    { label: t.dimXLabel, value: dimX, set: setDimX, min: product.minDimX ?? 10, max: product.maxDimX ?? 300 },
+                    { label: t.dimYLabel, value: dimY, set: setDimY, min: product.minDimY ?? 10, max: product.maxDimY ?? 300 },
+                    { label: t.dimZLabel, value: dimZ, set: setDimZ, min: product.minDimZ ?? 10, max: product.maxDimZ ?? 300 },
                   ].map(d => (
                     <div key={d.label}>
-                      <span className="text-xs text-zinc-500 mb-1 block">{d.label} ({MIN_DIM_CM}–{MAX_DIM_CM} cm)</span>
-                      <input type="number" min={MIN_DIM_CM} max={MAX_DIM_CM} step={0.5}
-                        value={Number.isFinite(d.value) ? mmToCm(d.value).toFixed(1) : ""}
+                      <span className="text-xs text-zinc-500 mb-1 block">{d.label} ({d.min}–{d.max})</span>
+                      <input type="number" min={d.min} max={d.max} step={1}
+                        value={Number.isFinite(d.value) ? d.value : ""}
                         onChange={e => {
                           const raw = Number.parseFloat(e.target.value);
-                          d.set(cmToMm(Number.isNaN(raw) ? MIN_DIM_CM : clampDim(raw, MIN_DIM_CM, MAX_DIM_CM)));
+                          d.set(Number.isNaN(raw) ? d.min : raw);
                         }}
                         onBlur={e => {
                           const raw = Number.parseFloat(e.target.value);
-                          d.set(cmToMm(clampDim(Number.isNaN(raw) ? MIN_DIM_CM : raw, MIN_DIM_CM, MAX_DIM_CM)));
+                          d.set(clampDim(Number.isNaN(raw) ? d.min : raw, d.min, d.max));
                         }}
                         className="w-full bg-white/5 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan text-center" />
                     </div>
@@ -401,6 +409,11 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
               {/* Price Summary */}
               {priceCalc && (
                 <div className="bg-white/5 rounded-lg p-4 space-y-2">
+                  {/* Peso estimado — visible a todos */}
+                  <div className="flex justify-between text-xs text-zinc-500">
+                    <span>{t.estimatedWeight}</span>
+                    <span className="font-mono">{priceCalc.weight.toFixed(1)} g</span>
+                  </div>
                   <div className="flex justify-between items-baseline font-semibold">
                     <span>{t.totalLabel}</span>
                     <span className="font-mono text-xl text-cyan">
@@ -411,35 +424,49 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
                     <p className="text-xs text-zinc-500 font-mono">€{priceCalc.finalPrice.toFixed(2)} × {quantity}</p>
                   )}
 
-                  {/* Desglose plegable */}
-                  <button onClick={() => setShowBreakdown(v => !v)} className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200 transition mt-1">
-                    <Info className="w-3.5 h-3.5" />
-                    {t.costBreakdownTitle}
-                    {showBreakdown ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                  </button>
-                  <AnimatePresence>
-                    {showBreakdown && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                        <div className="space-y-1 pt-2 border-t border-white/5">
-                          {[
-                            { label: t.materialCost, value: priceCalc.materialCost },
-                            { label: t.machineCost, value: priceCalc.machineCost },
-                            { label: t.maintenanceCost, value: priceCalc.maintenanceCost },
-                            { label: t.operationCost, value: priceCalc.operationCost },
-                          ].map(({ label, value }) => (
-                            <div key={label} className="flex justify-between text-xs">
-                              <span className="text-zinc-500">{label}</span>
-                              <span className="font-mono text-zinc-300">€{value.toFixed(3)}</span>
+                  {/* Desglose de costos — solo admin */}
+                  {isAdmin && (
+                    <>
+                      <button onClick={() => setShowBreakdown(v => !v)} className="flex items-center gap-1 text-xs text-amber hover:text-amber/80 transition mt-1">
+                        <Info className="w-3.5 h-3.5" />
+                        {t.costBreakdownTitle}
+                        {showBreakdown ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                      </button>
+                      <AnimatePresence>
+                        {showBreakdown && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                            <div className="space-y-1 pt-2 border-t border-white/5">
+                              <div className="flex justify-between text-xs">
+                                <span className="text-zinc-500">{t.estimatedWeight}</span>
+                                <span className="font-mono text-zinc-300">{priceCalc.weight.toFixed(2)} g</span>
+                              </div>
+                              <div className="flex justify-between text-xs">
+                                <span className="text-zinc-500">{t.printTimeLabel}</span>
+                                <span className="font-mono text-zinc-300">{Math.round(priceCalc.printTimeMinutes)} min</span>
+                              </div>
+                              {[
+                                { label: t.materialCost, value: priceCalc.materialCost },
+                                { label: t.machineCost, value: priceCalc.machineCost },
+                                { label: t.maintenanceCost, value: priceCalc.maintenanceCost },
+                                { label: t.operationCost, value: priceCalc.operationCost },
+                                { label: t.consumablesCost, value: priceCalc.consumablesCost },
+                                { label: t.finishCostLabel, value: priceCalc.finishCost },
+                              ].map(({ label, value }) => (
+                                <div key={label} className="flex justify-between text-xs">
+                                  <span className="text-zinc-500">{label}</span>
+                                  <span className="font-mono text-zinc-300">€{value.toFixed(3)}</span>
+                                </div>
+                              ))}
+                              <div className="flex justify-between text-xs font-semibold border-t border-white/5 pt-1">
+                                <span className="text-zinc-300">{t.baseCost}</span>
+                                <span className="font-mono text-zinc-100">€{priceCalc.baseCost.toFixed(3)}</span>
+                              </div>
                             </div>
-                          ))}
-                          <div className="flex justify-between text-xs font-semibold border-t border-white/5 pt-1">
-                            <span className="text-zinc-300">{t.baseCost}</span>
-                            <span className="font-mono text-zinc-100">€{priceCalc.baseCost.toFixed(3)}</span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  )}
 
                   <p className="text-[11px] text-zinc-400">{t.priceHint}</p>
                 </div>

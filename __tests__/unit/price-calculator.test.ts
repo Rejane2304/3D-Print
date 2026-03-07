@@ -1,18 +1,18 @@
-import { calculateWeight, calculatePrice, MATERIAL_INFO } from '@/lib/price-calculator';
+import { calculateWeight, calculatePrice, MATERIAL_INFO, PRICING_CONFIG } from '@/lib/price-calculator';
 
 describe('Price Calculator', () => {
   describe('calculateWeight', () => {
     it('should calculate weight for PLA material', () => {
       // Dimensions in mm, volume converted to cm³ internally
       const weight = calculateWeight(100, 100, 100, MATERIAL_INFO.PLA.density);
-      // Volume: 1000cm³ (100*100*100/1000), density: 1.24, infill: 0.2
-      expect(weight).toBeCloseTo(1000 * 1.24 * 0.2, 1);
+      // Volume: 1000cm³ (100*100*100/1000), density: 1.24, infill: PRICING_CONFIG.infillFactor
+      expect(weight).toBeCloseTo(1000 * 1.24 * PRICING_CONFIG.infillFactor, 1);
     });
 
     it('should calculate weight for PETG material', () => {
       const weight = calculateWeight(50, 50, 50, MATERIAL_INFO.PETG.density);
-      // Volume: 125cm³ (50*50*50/1000), density: 1.27, infill: 0.2
-      expect(weight).toBeCloseTo(125 * 1.27 * 0.2, 1);
+      // Volume: 125cm³ (50*50*50/1000), density: 1.27, infill: PRICING_CONFIG.infillFactor
+      expect(weight).toBeCloseTo(125 * 1.27 * PRICING_CONFIG.infillFactor, 1);
     });
 
     it('should handle zero dimensions', () => {

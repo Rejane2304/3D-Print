@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN "modelFillFactor" DOUBLE PRECISION NOT NULL DEFAULT 0.15;

@@ -14,8 +14,12 @@ export const PRICING_CONFIG = {
   operationCostPerHour: 0.04,
   /** Consumibles: boquilla E6 / ~300h + lubricación ≈ €0.02/h */
   consumablesCostPerHour: 0.02,
-  /** Factor de relleno estándar: 20 % infill */
-  infillFactor: 0.2,
+  /**
+   * Factor de relleno por defecto (15 %).
+   * Cada producto puede calibrar su propio valor desde el laminador:
+   * modelFillFactor = pesoLaminador_g / (X × Y × Z / 1000 × densidad)
+   */
+  infillFactor: 0.15,
   margins: {
     unit: 2.5,   // ×250% para 1–4 uds.
     medium: 2,   // ×200% para 5–9 uds.
@@ -32,17 +36,19 @@ export interface MaterialConfig {
 }
 
 export interface PriceCalculation {
-  weight: number;          // gramos
+  weight: number;               // gramos estimados
+  printTimeMinutes: number;     // tiempo de impresión escalado (min)
   materialCost: number;
   machineCost: number;
   maintenanceCost: number;
   operationCost: number;
   consumablesCost: number;
-  baseCost: number;
-  priceUnit: number;    // precio 1–4 uds.
-  priceMedium: number;  // precio 5–9 uds.
-  priceBulk: number;    // precio 10+ uds.
-  finalPrice: number;   // precio según quantity
+  finishCost: number;           // coste de acabado fijo
+  baseCost: number;             // suma de todos los costes
+  priceUnit: number;            // precio 1–4 uds. (×margen)
+  priceMedium: number;          // precio 5–9 uds.
+  priceBulk: number;            // precio 10+ uds.
+  finalPrice: number;           // precio según quantity
 }
 
 /** Configuración legacy para compatibilidad con código existente */
@@ -61,16 +67,44 @@ export interface PriceConfig {
 
 /**
  * Calcula el peso en gramos a partir de dimensiones en mm.
- * Usa infill del 20 % como estándar.
+ *
+ * @param fillFactor  Factor de relleno calibrado desde el laminador.
+ *   - Valor por defecto: PRICING_CONFIG.infillFactor (0.15)
+ *   - Fórmula de calibración: peso_laminador_g / (X*Y*Z/1000 * densidad)
+ *   - Ejemplo British Soldier (PLA, 56×56×140mm, 35.23 g):
+ *       35.23 / (440 * 1.24) ≈ 0.0646
  */
 export function calculateWeight(
   dimX: number,
   dimY: number,
   dimZ: number,
-  density: number
+  density: number,
+  fillFactor: number = PRICING_CONFIG.infillFactor
 ): number {
   const volumeCm3 = (dimX * dimY * dimZ) / 1000;
-  return volumeCm3 * density * PRICING_CONFIG.infillFactor;
+  return volumeCm3 * density * fillFactor;
+}
+
+/**
+ * Escala el tiempo de impresión linealmente con el volumen relativo
+ * respecto a las dimensiones de referencia del producto.
+ *
+ * Si no se proporcionan dimensiones de referencia, devuelve
+ * basePrintTimeMinutes sin modificar.
+ */
+export function scalePrintTime(
+  basePrintTimeMinutes: number,
+  dimX: number,
+  dimY: number,
+  dimZ: number,
+  refDimX: number,
+  refDimY: number,
+  refDimZ: number
+): number {
+  const refVol = refDimX * refDimY * refDimZ;
+  if (refVol <= 0) return basePrintTimeMinutes;
+  const volumeRatio = (dimX * dimY * dimZ) / refVol;
+  return Math.max(1, basePrintTimeMinutes * volumeRatio);
 }
 
 /**
@@ -115,11 +149,13 @@ export function calculateAdvancedPrice(
 
   return {
     weight: round(weightGrams),
+    printTimeMinutes: round(printTimeMinutes),
     materialCost: round(materialCost),
     machineCost: round(machineCost),
     maintenanceCost: round(maintenanceCost),
     operationCost: round(operationCost),
     consumablesCost: round(consumablesCost),
+    finishCost: 0,
     baseCost: round(baseCost),
     priceUnit: round(priceUnit),
     priceMedium: round(priceMedium),
@@ -130,28 +166,60 @@ export function calculateAdvancedPrice(
 
 /**
  * Calcula el precio a partir de dimensiones (mm) usando el motor avanzado.
- * Combina calculateWeight + calculateAdvancedPrice en una sola llamada.
+ *
+ * Incorpora:
+ * - fillFactor por producto (calibrado desde el laminador Bambu)
+ * - Escalado de tiempo de impresión con el volumen relativo
+ * - Desglose completo de costes (incluyendo finishCost)
+ *
+ * @param options.fillFactor      Factor de relleno del modelo (default 0.15)
+ * @param options.refDimX/Y/Z     Dimensiones de referencia en mm (para escalar printTime)
  */
 export function calculatePriceFromDimensions(
   dimX: number,
   dimY: number,
   dimZ: number,
-  printTimeMinutes: number,
+  basePrintTimeMinutes: number,
   material: MaterialConfig,
   quantity: number = 1,
-  finishCost: number = 0
+  finishCost: number = 0,
+  options?: Readonly<{
+    fillFactor?: number;
+    refDimX?: number;
+    refDimY?: number;
+    refDimZ?: number;
+  }>
 ): PriceCalculation {
-  const weightGrams = calculateWeight(dimX, dimY, dimZ, material.density);
+  const fillFactor = options?.fillFactor ?? PRICING_CONFIG.infillFactor;
+
+  // Escalar tiempo de impresión con el volumen relativo a las dims de referencia
+  const printTimeMinutes =
+    options?.refDimX !== undefined &&
+    options.refDimY !== undefined &&
+    options.refDimZ !== undefined
+      ? scalePrintTime(
+          basePrintTimeMinutes,
+          dimX, dimY, dimZ,
+          options.refDimX, options.refDimY, options.refDimZ
+        )
+      : basePrintTimeMinutes;
+
+  const weightGrams = calculateWeight(dimX, dimY, dimZ, material.density, fillFactor);
   const result = calculateAdvancedPrice(weightGrams, printTimeMinutes, material, quantity);
+
   // Añadir finishCost al baseCost y recalcular precios finales
   const adjustedBase = result.baseCost + finishCost;
-  const priceUnit = adjustedBase * PRICING_CONFIG.margins.unit;
-  const priceMedium = adjustedBase * PRICING_CONFIG.margins.medium;
-  const priceBulk = adjustedBase * PRICING_CONFIG.margins.bulk;
+  const margins = PRICING_CONFIG.margins;
+  const priceUnit = adjustedBase * margins.unit;
+  const priceMedium = adjustedBase * margins.medium;
+  const priceBulk = adjustedBase * margins.bulk;
   const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
+
   return {
     ...result,
     weight: round(weightGrams),
+    printTimeMinutes: round(printTimeMinutes),
+    finishCost: round(finishCost),
     baseCost: round(adjustedBase),
     priceUnit: round(priceUnit),
     priceMedium: round(priceMedium),

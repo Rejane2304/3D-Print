@@ -119,14 +119,16 @@ export async function getProductPrices(productId: string) {
 
 /**
  * Calcula el peso en gramos a partir de las dimensiones por defecto del producto.
- * Usa el mismo factor de infill del motor (20 %).
+ * Usa el modelFillFactor calibrado desde el laminador (fallback: 0.15).
  */
 function getDefaultWeight(product: Readonly<{
   defaultDimX: number;
   defaultDimY: number;
   defaultDimZ: number;
   density: number;
+  modelFillFactor?: number;
 }>): number {
   const volumeCm3 = (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
-  return volumeCm3 * product.density * 0.2;
+  const fillFactor = product.modelFillFactor ?? 0.15;
+  return volumeCm3 * product.density * fillFactor;
 }
