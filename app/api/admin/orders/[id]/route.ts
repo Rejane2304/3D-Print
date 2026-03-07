@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import prisma from '@/lib/db';
+import { sendEmail, tplReadyToShip, tplShipped } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,29 @@ export async function GET(
   }
 }
 
+async function maybeNotifyCustomer(order: {
+  id: string;
+  total: number;
+  shippingName: string | null;
+  shippingEmail: string | null;
+  shippingAddress: string | null;
+  shippingCity: string | null;
+  shippingState: string | null;
+  shippingZip: string | null;
+  shippingCountry: string | null;
+}, newStatus: string): Promise<void> {
+  const email = order.shippingEmail;
+  if (!email) return;
+  const name = order.shippingName || 'Cliente';
+  if (newStatus === 'ready') {
+    await sendEmail(email, '¡Tu pedido está listo para el envío!', tplReadyToShip(name, order.id, order.total));
+  } else if (newStatus === 'shipped') {
+    const address = [order.shippingAddress, order.shippingCity, order.shippingState, order.shippingZip, order.shippingCountry]
+      .filter((v): v is string => Boolean(v)).join(', ');
+    await sendEmail(email, '¡Tu pedido ha sido enviado!', tplShipped(name, order.id, address));
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -57,9 +81,14 @@ export async function PUT(
       },
     });
 
+    await maybeNotifyCustomer(order, status).catch(err =>
+      console.error('Email notification error:', err)
+    );
+
     return NextResponse.json(order);
   } catch (error) {
     console.error('Error updating order:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

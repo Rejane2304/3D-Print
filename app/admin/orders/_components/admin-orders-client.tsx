@@ -2,17 +2,25 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Eye, X, ShoppingCart, Package, Truck, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Search, Eye, X, ShoppingCart, Package, Truck, CheckCircle, XCircle, Clock, Star, ArrowRight } from 'lucide-react';
 import { useToast } from '@/components/toast-provider';
 import type { OrderType } from '@/lib/types';
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  pending: { label: 'Pendiente', color: 'bg-yellow-500/20 text-yellow-400', icon: Clock },
-  paid: { label: 'Pagado', color: 'bg-green-500/20 text-green-400', icon: CheckCircle },
-  processing: { label: 'Procesando', color: 'bg-blue-500/20 text-blue-400', icon: Package },
-  shipped: { label: 'Enviado', color: 'bg-purple-500/20 text-purple-400', icon: Truck },
-  delivered: { label: 'Entregado', color: 'bg-cyan/20 text-cyan', icon: CheckCircle },
-  cancelled: { label: 'Cancelado', color: 'bg-red-500/20 text-red-400', icon: XCircle },
+  pending:    { label: 'Pendiente',         color: 'bg-yellow-500/20 text-yellow-400',  icon: Clock },
+  paid:       { label: 'Pagado',            color: 'bg-green-500/20 text-green-400',    icon: CheckCircle },
+  processing: { label: 'En producción',     color: 'bg-blue-500/20 text-blue-400',      icon: Package },
+  ready:      { label: 'Listo para envío',  color: 'bg-amber-500/20 text-amber-400',    icon: Star },
+  shipped:    { label: 'Enviado',           color: 'bg-purple-500/20 text-purple-400',  icon: Truck },
+  delivered:  { label: 'Entregado',         color: 'bg-cyan/20 text-cyan',              icon: CheckCircle },
+  cancelled:  { label: 'Cancelado',         color: 'bg-red-500/20 text-red-400',        icon: XCircle },
+};
+
+const workflowNext: Record<string, { status: string; label: string }> = {
+  paid:       { status: 'processing', label: 'Iniciar Producción' },
+  processing: { status: 'ready',      label: 'Listo para Envío' },
+  ready:      { status: 'shipped',    label: 'Marcar como Enviado' },
+  shipped:    { status: 'delivered',  label: 'Marcar como Entregado' },
 };
 
 export default function AdminOrdersClient() {
@@ -24,6 +32,7 @@ export default function AdminOrdersClient() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
+  const [advancing, setAdvancing] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -63,6 +72,15 @@ export default function AdminOrdersClient() {
     } catch {
       showToast('error', 'Error al actualizar estado');
     }
+  };
+
+  const advanceWorkflow = async () => {
+    if (!selectedOrder) return;
+    const next = workflowNext[selectedOrder.status];
+    if (!next) return;
+    setAdvancing(true);
+    await updateStatus(selectedOrder.id, next.status);
+    setAdvancing(false);
   };
 
   return (
@@ -206,9 +224,40 @@ export default function AdminOrdersClient() {
               </div>
 
               <div className="p-6 space-y-6">
-                {/* Status */}
+                {/* Production Workflow */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Estado del Pedido</label>
+                  <label className="block text-sm font-medium mb-3">Flujo de Producción</label>
+                  <div className="flex items-center gap-1 flex-wrap mb-4">
+                    {(['paid', 'processing', 'ready', 'shipped', 'delivered'] as const).map((s, i, arr) => {
+                      const cfg = statusConfig[s];
+                      const StepIcon = cfg.icon;
+                      const isActive = selectedOrder.status === s;
+                      const isDone = arr.indexOf(selectedOrder.status as typeof s) > i;
+                      return (
+                        <div key={s} className="flex items-center gap-1">
+                          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors ${isActive ? cfg.color : isDone ? 'bg-white/5 text-zinc-400' : 'bg-white/5 text-zinc-600'}`}>
+                            <StepIcon className="w-3 h-3" />
+                            {cfg.label}
+                          </div>
+                          {i < arr.length - 1 && <ArrowRight className="w-3 h-3 text-zinc-600 flex-shrink-0" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {workflowNext[selectedOrder.status] && (
+                    <button
+                      onClick={advanceWorkflow}
+                      disabled={advancing}
+                      className="w-full py-2.5 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition text-sm disabled:opacity-50"
+                    >
+                      {advancing ? 'Actualizando...' : workflowNext[selectedOrder.status].label}
+                    </button>
+                  )}
+                </div>
+
+                {/* Status override */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Estado manual</label>
                   <select
                     value={selectedOrder.status}
                     onChange={(e) => updateStatus(selectedOrder.id, e.target.value)}
@@ -260,7 +309,7 @@ export default function AdminOrdersClient() {
                         <div>
                           <div className="font-medium">{item.name}</div>
                           <div className="text-sm text-muted">
-                            {item.material} • {item.color} • {item.dimX}×{item.dimY}×{item.dimZ}mm • x{item.quantity}
+                            {item.material} • {item.color} • {(item.dimX / 10).toFixed(1)}×{(item.dimY / 10).toFixed(1)}×{(item.dimZ / 10).toFixed(1)} cm • x{item.quantity}
                           </div>
                         </div>
                         <div className="font-medium">€{(item.unitPrice * item.quantity).toFixed(2)}</div>

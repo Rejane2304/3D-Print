@@ -92,7 +92,7 @@ export function CartClient() {
           </h1>
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push('/catalog')}
             className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-white/10 hover:bg-white/5 transition"
           >
             <ArrowLeft className="w-4 h-4" />
