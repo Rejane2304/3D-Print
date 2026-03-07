@@ -34,7 +34,7 @@ export default function AdminPrintQueueClient() {
         <div>
           <h1 className="text-2xl font-bold">Cola de impresión</h1>
           <p className="text-muted text-sm">
-            Pedidos en estado &quot;processing&quot; listos para planificar en impresoras.
+            Pedidos en estado &quot;procesando&quot; listos para planificar en impresoras.
           </p>
         </div>
         <button
@@ -87,7 +87,7 @@ export default function AdminPrintQueueClient() {
                       {o.user?.name || o.user?.email || "Cliente"}
                     </td>
                     <td className="px-4 py-2 text-muted">
-                      {new Date(o.createdAt).toLocaleDateString()}
+                      {new Date(o.createdAt).toLocaleDateString('es-ES')}
                     </td>
                     <td className="px-4 py-2 text-right">
                       {o.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0}

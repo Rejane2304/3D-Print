@@ -93,7 +93,7 @@ export default function AdminPaymentsClient() {
                       {o.user?.name || o.user?.email || "Cliente"}
                     </td>
                     <td className="px-4 py-2 text-muted">
-                      {new Date(o.createdAt).toLocaleDateString()}
+                      {new Date(o.createdAt).toLocaleDateString('es-ES')}
                     </td>
                     <td className="px-4 py-2 text-right font-mono">
                       €{o.total.toFixed(2)}

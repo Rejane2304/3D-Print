@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Package, Clock, CheckCircle, XCircle, CreditCard } from "lucide-react";
+import { Package, Clock, CheckCircle, XCircle, CreditCard, RefreshCw, Truck } from "lucide-react";
 import type { OrderType } from "@/lib/types";
 import { useLanguage } from "@/lib/language-store";
 
@@ -23,7 +23,9 @@ export function OrdersClient() {
       status: {
         pending: "Pendiente",
         paid: "Pagado",
+        processing: "En proceso",
         shipped: "Enviado",
+        delivered: "Entregado",
         cancelled: "Cancelado",
       },
       locale: "es-ES",
@@ -36,7 +38,9 @@ export function OrdersClient() {
       status: {
         pending: "Pending",
         paid: "Paid",
+        processing: "Processing",
         shipped: "Shipped",
+        delivered: "Delivered",
         cancelled: "Cancelled",
       },
       locale: "en-GB",
@@ -44,10 +48,12 @@ export function OrdersClient() {
   }[language];
 
   const statusConfig: Record<string, { icon: React.ElementType; color: string; label: string }> = {
-    pending:   { icon: Clock,         color: "text-amber",     label: t.status.pending   },
-    paid:      { icon: CheckCircle,   color: "text-green-400", label: t.status.paid      },
-    shipped:   { icon: Package,       color: "text-cyan",      label: t.status.shipped   },
-    cancelled: { icon: XCircle,       color: "text-red-400",   label: t.status.cancelled },
+    pending:    { icon: Clock,       color: "text-amber",       label: t.status.pending    },
+    paid:       { icon: CheckCircle, color: "text-green-400",   label: t.status.paid       },
+    processing: { icon: RefreshCw,  color: "text-blue-400",    label: t.status.processing },
+    shipped:    { icon: Package,     color: "text-cyan",        label: t.status.shipped    },
+    delivered:  { icon: Truck,       color: "text-emerald-400", label: t.status.delivered  },
+    cancelled:  { icon: XCircle,     color: "text-red-400",     label: t.status.cancelled  },
   };
 
   useEffect(() => {

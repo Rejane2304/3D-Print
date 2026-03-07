@@ -13,13 +13,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { useLanguage } from '@/lib/language-store';
 import type { DashboardStatsType } from '@/lib/types';
 
 export default function AdminDashboardClient() {
   const [stats, setStats] = useState<DashboardStatsType | null>(null);
   const [loading, setLoading] = useState(true);
-  const { language } = useLanguage();
 
   useEffect(() => {
     fetch('/api/admin/stats')
@@ -100,7 +98,7 @@ export default function AdminDashboardClient() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-2">Panel de control</h1>
         <p className="text-muted">Bienvenido al panel de administración de 3D Print</p>
       </div>
 
@@ -159,7 +157,7 @@ export default function AdminDashboardClient() {
                   <div className="text-right">
                     <div className="font-medium">€{order.total.toFixed(2)}</div>
                     <span className={`text-xs px-2 py-1 rounded-full ${statusColors[order.status] || 'bg-gray-500/20'}`}>
-                      {order.status}
+                      {statusLabels[order.status]?.es ?? order.status}
                     </span>
                   </div>
                 </div>
@@ -323,7 +321,7 @@ export default function AdminDashboardClient() {
               className="text-center p-4 bg-bg-tertiary rounded-lg"
             >
               <div className={`inline-block px-3 py-1 rounded-full text-sm mb-2 ${statusColors[item.status] || 'bg-gray-500/20'}`}>
-                {statusLabels[item.status]?.[language] ?? item.status}
+                {statusLabels[item.status]?.es ?? item.status}
               </div>
               <div className="text-2xl font-bold">{item.count}</div>
             </div>

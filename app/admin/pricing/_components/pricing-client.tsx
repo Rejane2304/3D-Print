@@ -129,7 +129,7 @@ export default function AdminPricingClient() {
     };
 
     loadData();
-  }, []);
+  }, [showToast]);
 
   // ---------------------------------------------------------------------------
   // Handlers

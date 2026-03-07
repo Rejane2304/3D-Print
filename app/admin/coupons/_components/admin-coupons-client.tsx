@@ -109,7 +109,7 @@ export default function AdminCouponsClient() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label className="text-xs text-zinc-400 block mb-1">Código</label>
-              <input type="text" placeholder="SUMMER20" disabled={!!editing}
+              <input type="text" placeholder="VERANO20" disabled={!!editing}
                 value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan disabled:opacity-40 uppercase" />
             </div>
