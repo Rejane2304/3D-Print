@@ -236,7 +236,8 @@ export default function ProfileClient() {
     expired: 'text-muted',
   };
 
-  const isCustomer = profile?.role !== 'admin';
+  const isAdmin = (session?.user as { role?: string })?.role === 'admin';
+  const isCustomer = !isAdmin;
 
   return (
     <div className="min-h-screen py-8 px-4">
