@@ -5,6 +5,45 @@ import { authOptions } from "@/lib/auth-options";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 
+// ---- Helper: construye line items para Stripe ---------------
+
+type StripeLineItem = {
+  price_data: { currency: string; product_data: { name: string }; unit_amount: number };
+  quantity: number;
+};
+
+function buildStripeLineItems(
+  items: Record<string, unknown>[],
+  tax: number,
+  shippingCost: number,
+  discount: number,
+  couponCode: string,
+): StripeLineItem[] {
+  const lineItems: StripeLineItem[] = items.map(i => ({
+    price_data: {
+      currency: "eur",
+      product_data: {
+        name: `${(i?.name as string) ?? "Producto"} (${(i?.material as string) ?? ""} - ${(i?.color as string) ?? ""})`,
+      },
+      unit_amount: Math.round(((i?.unitPrice as number) ?? 0) * 100),
+    },
+    quantity: (i?.quantity as number) ?? 1,
+  }));
+
+  if (tax > 0) {
+    lineItems.push({ price_data: { currency: "eur", product_data: { name: "IVA (21%)" }, unit_amount: Math.round(tax * 100) }, quantity: 1 });
+  }
+  if (shippingCost > 0) {
+    lineItems.push({ price_data: { currency: "eur", product_data: { name: "Envío" }, unit_amount: Math.round(shippingCost * 100) }, quantity: 1 });
+  }
+  if (discount > 0) {
+    lineItems.push({ price_data: { currency: "eur", product_data: { name: `Descuento (${couponCode})` }, unit_amount: -Math.round(discount * 100) }, quantity: 1 });
+  }
+  return lineItems;
+}
+
+// -------------------------------------------------------------
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -79,29 +118,13 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get("origin") ?? "http://localhost:3000";
 
-    // ---- Stripe line items ----
-    const lineItems = (items ?? []).map((i: Record<string, unknown>) => ({
-      price_data: {
-        currency: "eur",
-        product_data: {
-          name: `${(i?.name as string) ?? "Producto"} (${(i?.material as string) ?? ""} - ${(i?.color as string) ?? ""})`,
-        },
-        unit_amount: Math.round(((i?.unitPrice as number) ?? 0) * 100),
-      },
-      quantity: (i?.quantity as number) ?? 1,
-    }));
-
-    // Añadir descuento como ítem negativo en Stripe si aplica
-    if (discount > 0) {
-      lineItems.push({
-        price_data: {
-          currency: "eur",
-          product_data: { name: `Descuento (${couponCode})` },
-          unit_amount: -Math.round(discount * 100),
-        },
-        quantity: 1,
-      });
-    }
+    const lineItems = buildStripeLineItems(
+      items ?? [],
+      tax ?? 0,
+      shippingCost ?? 0,
+      discount,
+      couponCode ?? "",
+    );
 
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",

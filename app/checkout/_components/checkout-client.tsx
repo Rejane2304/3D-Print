@@ -8,6 +8,10 @@ import { useCartStore } from "@/lib/cart-store";
 import { useToast } from "@/components/toast-provider";
 import { useLanguage } from "@/lib/language-store";
 
+function capitalizeFirst(val: string): string {
+  return val.length > 0 ? val.charAt(0).toUpperCase() + val.slice(1) : val;
+}
+
 const STEPS = {
   es: [
     { label: "Envío", icon: MapPin },
@@ -25,7 +29,7 @@ export function CheckoutClient() {
   const { data: session, status } = useSession() || {};
   const router = useRouter();
   const { showToast } = useToast();
-  const { items, getSubtotal, clearCart } = useCartStore();
+  const { items, getSubtotal } = useCartStore();
   const { language } = useLanguage();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -47,13 +51,35 @@ export function CheckoutClient() {
   }, [status, router]);
 
   useEffect(() => {
-    if (session?.user) {
-      setShipping(prev => ({
-        ...prev,
-        name: (session?.user as Record<string, unknown>)?.name as string ?? prev.name,
-        email: (session?.user as Record<string, unknown>)?.email as string ?? prev.email,
-      }));
-    }
+    if (!session?.user) return;
+
+    // Pre-fill inmediato desde la sesión (sin esperar red)
+    setShipping(prev => ({
+      ...prev,
+      name: (session.user as Record<string, unknown>)?.name as string ?? prev.name,
+      email: (session.user as Record<string, unknown>)?.email as string ?? prev.email,
+    }));
+
+    // Pre-fill completo desde la base de datos (dirección guardada)
+    const loadProfile = async () => {
+      try {
+        const res = await fetch('/api/profile');
+        if (!res.ok) return;
+        const profile = await res.json() as Record<string, unknown>;
+        setShipping(prev => ({
+          ...prev,
+          name: (profile.name as string) || prev.name,
+          email: (profile.email as string) || prev.email,
+          phone: (profile.phone as string) || prev.phone,
+          address: (profile.address as string) || prev.address,
+          city: (profile.city as string) || prev.city,
+          state: (profile.state as string) || prev.state,
+          zip: (profile.zipCode as string) || prev.zip,
+          country: (profile.country as string) || prev.country,
+        }));
+      } catch { /* silently fail */ }
+    };
+    loadProfile();
   }, [session]);
 
   const subtotal = getSubtotal?.() ?? 0;
@@ -228,7 +254,6 @@ export function CheckoutClient() {
       });
       const data = await res?.json();
       if (data?.url) {
-        clearCart?.();
         globalThis.location.href = data.url;
       } else {
         showToast("error", data?.error ?? t.paymentErrorFallback);
@@ -294,17 +319,17 @@ export function CheckoutClient() {
               </div>
               <div className="md:col-span-2">
                 <label className="text-sm text-zinc-400 mb-1 block">{t.address}</label>
-                <input type="text" value={shipping.address} onChange={e => setShipping({ ...shipping, address: e.target.value })} placeholder={t.addressPlaceholder} className={fieldClass("address")} />
+                <input type="text" value={shipping.address} onChange={e => setShipping({ ...shipping, address: capitalizeFirst(e.target.value) })} placeholder={t.addressPlaceholder} className={fieldClass("address")} />
                 {errors?.address && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.address}</p>}
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.city}</label>
-                <input type="text" value={shipping.city} onChange={e => setShipping({ ...shipping, city: e.target.value })} placeholder={t.cityPlaceholder} className={fieldClass("city")} />
+                <input type="text" value={shipping.city} onChange={e => setShipping({ ...shipping, city: capitalizeFirst(e.target.value) })} placeholder={t.cityPlaceholder} className={fieldClass("city")} />
                 {errors?.city && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.city}</p>}
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.state}</label>
-                <input type="text" value={shipping.state} onChange={e => setShipping({ ...shipping, state: e.target.value })} placeholder={t.statePlaceholder} className={fieldClass("state")} />
+                <input type="text" value={shipping.state} onChange={e => setShipping({ ...shipping, state: capitalizeFirst(e.target.value) })} placeholder={t.statePlaceholder} className={fieldClass("state")} />
               </div>
               <div>
                 <label className="text-sm text-zinc-400 mb-1 block">{t.zip}</label>
@@ -326,7 +351,7 @@ export function CheckoutClient() {
                 <div key={item?.id ?? i} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{item?.name ?? ""}</p>
-                    <p className="text-xs text-zinc-400">{item?.material ?? ""} · {item?.color ?? ""} · {item?.dimX ?? 0}×{item?.dimY ?? 0}×{item?.dimZ ?? 0}mm · x{item?.quantity ?? 1}</p>
+                    <p className="text-xs text-zinc-400">{item?.material ?? ""} · {item?.color ?? ""} · {((item?.dimX ?? 0)/10).toFixed(1)}×{((item?.dimY ?? 0)/10).toFixed(1)}×{((item?.dimZ ?? 0)/10).toFixed(1)} cm · x{item?.quantity ?? 1}</p>
                   </div>
                   <span className="font-mono text-sm">€{((item?.unitPrice ?? 0) * (item?.quantity ?? 1)).toFixed(2)}</span>
                 </div>

@@ -1,4 +1,4 @@
-import { calculateWeight, calculatePrice, MATERIAL_INFO, PRICING_CONFIG } from '@/lib/price-calculator';
+import { calculateWeight, calculatePriceFromDimensions, MATERIAL_INFO, PRICING_CONFIG } from '@/lib/price-calculator';
 
 describe('Price Calculator', () => {
   describe('calculateWeight', () => {
@@ -21,64 +21,52 @@ describe('Price Calculator', () => {
     });
   });
 
-  describe('calculatePrice', () => {
-    it('should calculate price correctly for single quantity', () => {
-      const config = {
-        material: 'PLA',
-        dimX: 100,
-        dimY: 100,
-        dimZ: 100,
-        quantity: 1,
-        basePricePerGram: MATERIAL_INFO.PLA.basePricePerGram,
-        density: MATERIAL_INFO.PLA.density,
-        finishCost: 2,
-      };
-      const result = calculatePrice(config);
-      expect(result.total).toBeGreaterThan(0);
+  describe('calculatePriceFromDimensions', () => {
+    const plaMaterial = {
+      pricePerKg: MATERIAL_INFO.PLA.pricePerKg,
+      density: MATERIAL_INFO.PLA.density,
+      maintenanceFactor: MATERIAL_INFO.PLA.maintenanceFactor,
+    };
+
+    const petgMaterial = {
+      pricePerKg: MATERIAL_INFO.PETG.pricePerKg,
+      density: MATERIAL_INFO.PETG.density,
+      maintenanceFactor: MATERIAL_INFO.PETG.maintenanceFactor,
+    };
+
+    it('should return positive price and weight for single unit', () => {
+      const result = calculatePriceFromDimensions(100, 100, 100, 60, plaMaterial);
+      expect(result.finalPrice).toBeGreaterThan(0);
       expect(result.weight).toBeGreaterThan(0);
     });
 
-    it('should scale price with quantity', () => {
-      const baseConfig = {
-        material: 'PLA',
-        dimX: 50,
-        dimY: 50,
-        dimZ: 50,
-        basePricePerGram: MATERIAL_INFO.PLA.basePricePerGram,
-        density: MATERIAL_INFO.PLA.density,
-        finishCost: 2,
-      };
-      const resultSingle = calculatePrice({ ...baseConfig, quantity: 1 });
-      const resultDouble = calculatePrice({ ...baseConfig, quantity: 2 });
-      expect(resultDouble.total).toBeCloseTo(resultSingle.total * 2, 2);
+    it('should apply lower per-unit price for bulk quantity (10+)', () => {
+      const resultUnit = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, { quantity: 1 });
+      const resultBulk = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, { quantity: 10 });
+      expect(resultBulk.finalPrice).toBeLessThan(resultUnit.finalPrice);
     });
 
-    it('should have different prices for PLA and PETG', () => {
-      const baseDims = { dimX: 100, dimY: 100, dimZ: 100, quantity: 1, finishCost: 2 };
-      const configPLA = { ...baseDims, material: 'PLA', basePricePerGram: MATERIAL_INFO.PLA.basePricePerGram, density: MATERIAL_INFO.PLA.density };
-      const configPETG = { ...baseDims, material: 'PETG', basePricePerGram: MATERIAL_INFO.PETG.basePricePerGram, density: MATERIAL_INFO.PETG.density };
-      const pricePLA = calculatePrice(configPLA);
-      const pricePETG = calculatePrice(configPETG);
-      expect(pricePLA.total).not.toBe(pricePETG.total);
+    it('should produce different prices for PLA and PETG', () => {
+      const pricePLA  = calculatePriceFromDimensions(100, 100, 100, 60, plaMaterial);
+      const pricePETG = calculatePriceFromDimensions(100, 100, 100, 60, petgMaterial);
+      expect(pricePLA.finalPrice).not.toBe(pricePETG.finalPrice);
     });
 
-    it('should return correct structure', () => {
-      const config = {
-        material: 'PLA',
-        dimX: 50,
-        dimY: 50,
-        dimZ: 50,
-        quantity: 1,
-        basePricePerGram: 0.02,
-        density: 1.24,
-        finishCost: 2,
-      };
-      const result = calculatePrice(config);
+    it('should add finishCost as a flat fee (not affected by margin)', () => {
+      const noFinish   = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial);
+      const withFinish = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, { finishCost: 5 });
+      expect(withFinish.finalPrice - noFinish.finalPrice).toBeCloseTo(5, 1);
+    });
+
+    it('should return the full PriceCalculation structure', () => {
+      const result = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, { finishCost: 2 });
       expect(result).toHaveProperty('weight');
+      expect(result).toHaveProperty('printTimeMinutes');
       expect(result).toHaveProperty('materialCost');
+      expect(result).toHaveProperty('machineCost');
       expect(result).toHaveProperty('finishCost');
-      expect(result).toHaveProperty('subtotal');
-      expect(result).toHaveProperty('total');
+      expect(result).toHaveProperty('baseCost');
+      expect(result).toHaveProperty('finalPrice');
     });
   });
 

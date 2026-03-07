@@ -51,18 +51,6 @@ export interface PriceCalculation {
   finalPrice: number;           // precio según quantity
 }
 
-/** Configuración legacy para compatibilidad con código existente */
-export interface PriceConfig {
-  material: string;
-  dimX: number;
-  dimY: number;
-  dimZ: number;
-  quantity: number;
-  basePricePerGram: number;
-  density: number;
-  finishCost: number;
-}
-
 // ---- Funciones core -----------------------------------------
 
 /**
@@ -184,15 +172,17 @@ export function calculatePriceFromDimensions(
   dimZ: number,
   basePrintTimeMinutes: number,
   material: MaterialConfig,
-  quantity: number = 1,
-  finishCost: number = 0,
   options?: Readonly<{
+    quantity?: number;
+    finishCost?: number;
     fillFactor?: number;
     refDimX?: number;
     refDimY?: number;
     refDimZ?: number;
   }>
 ): PriceCalculation {
+  const quantity   = options?.quantity   ?? 1;
+  const finishCost = options?.finishCost ?? 0;
   const fillFactor = options?.fillFactor ?? PRICING_CONFIG.infillFactor;
 
   // Escalar tiempo de impresión con el volumen relativo a las dims de referencia
@@ -210,20 +200,20 @@ export function calculatePriceFromDimensions(
   const weightGrams = calculateWeight(dimX, dimY, dimZ, material.density, fillFactor);
   const result = calculateAdvancedPrice(weightGrams, printTimeMinutes, material, quantity);
 
-  // Añadir finishCost al baseCost y recalcular precios finales
-  const adjustedBase = result.baseCost + finishCost;
+  // finishCost es un coste fijo (manipulación/acabado): se suma DESPUÉS del margen
+  // para no multiplicarlo por 2.5× junto con los costes de producción.
   const margins = PRICING_CONFIG.margins;
-  const priceUnit = adjustedBase * margins.unit;
-  const priceMedium = adjustedBase * margins.medium;
-  const priceBulk = adjustedBase * margins.bulk;
-  const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
+  const priceUnit   = result.baseCost * margins.unit   + finishCost;
+  const priceMedium = result.baseCost * margins.medium + finishCost;
+  const priceBulk   = result.baseCost * margins.bulk   + finishCost;
+  const finalPrice  = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
 
   return {
     ...result,
     weight: round(weightGrams),
     printTimeMinutes: round(printTimeMinutes),
     finishCost: round(finishCost),
-    baseCost: round(adjustedBase),
+    baseCost: round(result.baseCost),
     priceUnit: round(priceUnit),
     priceMedium: round(priceMedium),
     priceBulk: round(priceBulk),
@@ -244,27 +234,6 @@ export function getPriceByQuantity(
   if (quantity >= 10) return priceBulk;
   if (quantity >= 5) return priceMedium;
   return priceUnit;
-}
-
-// ---- API legacy (compatibilidad total con código existente) --
-
-/**
- * @deprecated Usar calculatePriceFromDimensions para el motor completo.
- * Se mantiene para no romper el código existente.
- */
-export function calculatePrice(config: PriceConfig): {
-  weight: number;
-  materialCost: number;
-  finishCost: number;
-  subtotal: number;
-  total: number;
-} {
-  const weight = calculateWeight(config.dimX, config.dimY, config.dimZ, config.density);
-  const materialCost = config.basePricePerGram * weight;
-  const finishCost = config.finishCost;
-  const subtotal = materialCost + finishCost;
-  const total = subtotal * config.quantity;
-  return { weight, materialCost, finishCost, subtotal, total };
 }
 
 // ---- Datos de materiales (mantenidos para UI sin BD) ---------

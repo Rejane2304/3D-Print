@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const page = Number.parseInt(searchParams.get('page') || '1');
+    const limit = Number.parseInt(searchParams.get('limit') || '10');
     const search = searchParams.get('search') || '';
 
     const where = search
@@ -63,24 +63,24 @@ export async function POST(request: NextRequest) {
         description: data.description,
         category: data.category,
         material: data.material,
-        basePricePerGram: parseFloat(data.basePricePerGram),
-        density: parseFloat(data.density),
-        minDimX: parseFloat(data.minDimX || '10'),
-        minDimY: parseFloat(data.minDimY || '10'),
-        minDimZ: parseFloat(data.minDimZ || '10'),
-        maxDimX: parseFloat(data.maxDimX || '300'),
-        maxDimY: parseFloat(data.maxDimY || '300'),
-        maxDimZ: parseFloat(data.maxDimZ || '300'),
-        defaultDimX: parseFloat(data.defaultDimX || '50'),
-        defaultDimY: parseFloat(data.defaultDimY || '50'),
-        defaultDimZ: parseFloat(data.defaultDimZ || '50'),
-        finishCost: parseFloat(data.finishCost || '2.50'),
-        printTimeMinutes: parseInt(data.printTimeMinutes || '60'),
-        modelFillFactor: parseFloat(data.modelFillFactor || '0.15'),
+        basePricePerGram: Number.parseFloat(data.basePricePerGram),
+        density: Number.parseFloat(data.density),
+        minDimX: Number.parseFloat(data.minDimX || '10'),
+        minDimY: Number.parseFloat(data.minDimY || '10'),
+        minDimZ: Number.parseFloat(data.minDimZ || '10'),
+        maxDimX: Number.parseFloat(data.maxDimX || '300'),
+        maxDimY: Number.parseFloat(data.maxDimY || '300'),
+        maxDimZ: Number.parseFloat(data.maxDimZ || '300'),
+        defaultDimX: Number.parseFloat(data.defaultDimX || '50'),
+        defaultDimY: Number.parseFloat(data.defaultDimY || '50'),
+        defaultDimZ: Number.parseFloat(data.defaultDimZ || '50'),
+        finishCost: Number.parseFloat(data.finishCost || '2.50'),
+        printTimeMinutes: Number.parseInt(data.printTimeMinutes || '60'),
+        modelFillFactor: Number.parseFloat(data.modelFillFactor || '0.15'),
         images: data.images || [],
         colors: data.colors || ['#FFFFFF'],
         featured: data.featured || false,
-        stock: parseInt(data.stock || '100'),
+        stock: Number.parseInt(data.stock || '100'),
       },
     });
 

@@ -218,8 +218,7 @@ export function HomeClient() {
                               p?.defaultDimZ ?? 50,
                               p?.printTimeMinutes ?? 60,
                               matInfo,
-                              1,
-                              p?.finishCost ?? 0,
+                              { quantity: 1, finishCost: p?.finishCost ?? 0 },
                             );
                             return price.finalPrice.toFixed(2);
                           })()

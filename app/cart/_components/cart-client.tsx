@@ -114,7 +114,7 @@ export function CartClient() {
                   <div className="flex flex-wrap gap-2 text-xs text-zinc-400 mb-2">
                     <span className={`px-2 py-0.5 rounded-full ${item?.material === "PLA" ? "bg-cyan/10 text-cyan" : "bg-amber/10 text-amber"}`}>{item?.material ?? ""}</span>
                     <span>{item?.color ?? ""}</span>
-                    <span className="font-mono">{item?.dimX ?? 0}×{item?.dimY ?? 0}×{item?.dimZ ?? 0}mm</span>
+                    <span className="font-mono">{((item?.dimX ?? 0)/10).toFixed(1)}×{((item?.dimY ?? 0)/10).toFixed(1)}×{((item?.dimZ ?? 0)/10).toFixed(1)} cm</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">

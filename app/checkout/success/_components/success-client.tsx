@@ -5,13 +5,19 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle, Package, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/lib/language-store";
+import { useCartStore } from "@/lib/cart-store";
 
 export function SuccessClient() {
   const searchParams = useSearchParams();
   const sessionId = searchParams?.get("session_id") ?? "";
   const [mounted, setMounted] = useState(false);
   const { language } = useLanguage();
-  useEffect(() => { setMounted(true); }, []);
+  const { clearCart } = useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+    clearCart();
+  }, [clearCart]);
 
   const t = {
     es: {

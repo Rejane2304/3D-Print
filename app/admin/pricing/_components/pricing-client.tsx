@@ -83,6 +83,7 @@ export default function AdminPricingClient() {
   const [simDimZ, setSimDimZ] = useState<number>(5);
   const [simQty, setSimQty] = useState<number>(1);
   const [simPrintTime, setSimPrintTime] = useState<number>(60);
+  const [simFinishCost, setSimFinishCost] = useState<number>(2.5);
 
   // ---------------------------------------------------------------------------
   // Data loading
@@ -240,7 +241,10 @@ export default function AdminPricingClient() {
           density: simMaterial.density,
           maintenanceFactor: simMaterial.maintenanceFactor,
         },
-        simQty,
+        {
+          quantity: simQty,
+          finishCost: simFinishCost,
+        },
       )
     : null;
 
@@ -266,6 +270,7 @@ export default function AdminPricingClient() {
         { label: 'Mantenimiento', value: simResult.maintenanceCost },
         { label: 'Electricidad', value: simResult.operationCost },
         { label: 'Consumibles', value: simResult.consumablesCost },
+        { label: 'Acabado (fijo)', value: simResult.finishCost },
       ]
     : [];
 
@@ -679,6 +684,22 @@ export default function AdminPricingClient() {
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
               </div>
+              <div>
+                <label htmlFor="sim-finishcost" className="text-xs text-muted block mb-1">
+                  Acabado / manipulación (€)
+                </label>
+                <input
+                  id="sim-finishcost"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={simFinishCost}
+                  onChange={(e) =>
+                    setSimFinishCost(Number.parseFloat(e.target.value) || 0)
+                  }
+                  className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
+                />
+              </div>
             </div>
 
             {simResult ? (
@@ -720,8 +741,8 @@ export default function AdminPricingClient() {
                       </div>
                     ))}
                     <div className="border-t border-border pt-2 flex justify-between text-sm font-semibold">
-                      <span>Total base</span>
-                      <span className="font-mono">€{simResult.baseCost.toFixed(3)}</span>
+                      <span>Coste total</span>
+                      <span className="font-mono">€{(simResult.baseCost + simResult.finishCost).toFixed(3)}</span>
                     </div>
                   </div>
                 </div>

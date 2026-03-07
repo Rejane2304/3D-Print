@@ -178,9 +178,9 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
       dimX, dimY, dimZ,
       product.printTimeMinutes ?? 60,
       matConfig,
-      quantity,
-      product.finishCost ?? 2.5,
       {
+        quantity,
+        finishCost: product.finishCost ?? 2.5,
         fillFactor: product.modelFillFactor ?? 0.15,
         refDimX: product.defaultDimX,
         refDimY: product.defaultDimY,
