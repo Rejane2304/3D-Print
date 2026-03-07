@@ -5,9 +5,9 @@
  *    create this symlink automatically, unlike npm).
  * 2. Runs `prisma generate` to ensure types are up-to-date.
  */
-const fs   = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs   = require('node:fs');
+const path = require('node:path');
+const { execSync } = require('node:child_process');
 
 const link   = path.resolve(__dirname, '../node_modules/@prisma/client/.prisma');
 const target = path.resolve(__dirname, '../node_modules/.prisma');
