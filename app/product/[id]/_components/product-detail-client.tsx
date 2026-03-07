@@ -30,6 +30,10 @@ const COLOR_MAP: Record<string, string> = {
   "Transparente": "#d4d4d8", "Ámbar": "#FFBF00",
 };
 
+const MAX_DIM_CM = 25;
+const mmToCm = (mm: number) => mm / 10;
+const cmToMm = (cm: number) => cm * 10;
+
 export function ProductDetailClient({ productId }: Readonly<{ productId: string }>) {
   const { data: session } = useSession() || {};
   const addItem = useCartStore(s => s?.addItem);
@@ -47,7 +51,7 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
       ratingLabel: (count: number) => `${count} reseñas`,
       materialLabel: "Material",
       colorLabel: "Color",
-      dimensionsLabel: "Dimensiones (mm)",
+      dimensionsLabel: "Dimensiones (cm)",
       dimXLabel: "X (Ancho)", dimYLabel: "Y (Prof.)", dimZLabel: "Z (Alto)",
       quantityLabel: "Cantidad",
       qtyDecreaseAria: "Reducir cantidad", qtyIncreaseAria: "Aumentar cantidad",
@@ -83,7 +87,7 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
       ratingLabel: (count: number) => `${count} reviews`,
       materialLabel: "Material",
       colorLabel: "Color",
-      dimensionsLabel: "Dimensions (mm)",
+      dimensionsLabel: "Dimensions (cm)",
       dimXLabel: "X (Width)", dimYLabel: "Y (Depth)", dimZLabel: "Z (Height)",
       quantityLabel: "Quantity",
       qtyDecreaseAria: "Decrease quantity", qtyIncreaseAria: "Increase quantity",
@@ -120,9 +124,12 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
   const [selectedMaterial, setSelectedMaterial] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [dimX, setDimX] = useState(50);
-  const [dimY, setDimY] = useState(50);
-  const [dimZ, setDimZ] = useState(50);
+  const [dimX, setDimX] = useState(50);   // en mm (interno)
+  const [dimY, setDimY] = useState(50);   // en mm (interno)
+  const [dimZ, setDimZ] = useState(50);   // en mm (interno)
+  const [dimXStr, setDimXStr] = useState("5");  // cm como string (input)
+  const [dimYStr, setDimYStr] = useState("5");
+  const [dimZStr, setDimZStr] = useState("5");
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [reviewText, setReviewText] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
@@ -140,9 +147,15 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
         setProduct(productData);
         setSelectedMaterial(productData.material ?? "PLA");
         setSelectedColor(productData.colors?.[0] ?? "Blanco");
-        setDimX(clampDim(productData.defaultDimX ?? 50, productData.minDimX ?? 10, productData.maxDimX ?? 300));
-        setDimY(clampDim(productData.defaultDimY ?? 50, productData.minDimY ?? 10, productData.maxDimY ?? 300));
-        setDimZ(clampDim(productData.defaultDimZ ?? 50, productData.minDimZ ?? 10, productData.maxDimZ ?? 300));
+        const clampedX = clampDim(productData.defaultDimX ?? 50, productData.minDimX ?? 10, productData.maxDimX ?? 300);
+        const clampedY = clampDim(productData.defaultDimY ?? 50, productData.minDimY ?? 10, productData.maxDimY ?? 300);
+        const clampedZ = clampDim(productData.defaultDimZ ?? 50, productData.minDimZ ?? 10, productData.maxDimZ ?? 300);
+        setDimX(clampedX);
+        setDimY(clampedY);
+        setDimZ(clampedZ);
+        setDimXStr(String(mmToCm(clampedX)));
+        setDimYStr(String(mmToCm(clampedY)));
+        setDimZStr(String(mmToCm(clampedZ)));
       }
       if (Array.isArray(materialsData) && materialsData.length > 0) {
         setMaterials(materialsData);
@@ -352,23 +365,31 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
                 <label className="text-sm font-medium text-zinc-300 mb-3 block">{t.dimensionsLabel}</label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: t.dimXLabel, value: dimX, set: setDimX, min: product.minDimX ?? 10, max: product.maxDimX ?? 300 },
-                    { label: t.dimYLabel, value: dimY, set: setDimY, min: product.minDimY ?? 10, max: product.maxDimY ?? 300 },
-                    { label: t.dimZLabel, value: dimZ, set: setDimZ, min: product.minDimZ ?? 10, max: product.maxDimZ ?? 300 },
+                    { label: t.dimXLabel, val: dimXStr, setVal: setDimXStr, setMm: setDimX, minMm: product.minDimX ?? 10 },
+                    { label: t.dimYLabel, val: dimYStr, setVal: setDimYStr, setMm: setDimY, minMm: product.minDimY ?? 10 },
+                    { label: t.dimZLabel, val: dimZStr, setVal: setDimZStr, setMm: setDimZ, minMm: product.minDimZ ?? 10 },
                   ].map(d => (
                     <div key={d.label}>
-                      <span className="text-xs text-zinc-500 mb-1 block">{d.label} ({d.min}–{d.max})</span>
-                      <input type="number" min={d.min} max={d.max} step={1}
-                        value={Number.isFinite(d.value) ? d.value : ""}
-                        onChange={e => {
-                          const raw = Number.parseFloat(e.target.value);
-                          d.set(Number.isNaN(raw) ? d.min : raw);
-                        }}
+                      <span className="text-xs text-zinc-500 mb-1 block">{d.label} (Máx. {MAX_DIM_CM} cm)</span>
+                      <input
+                        type="number"
+                        min={mmToCm(d.minMm)}
+                        max={MAX_DIM_CM}
+                        step={0.5}
+                        value={d.val}
+                        onChange={e => d.setVal(e.target.value)}
                         onBlur={e => {
                           const raw = Number.parseFloat(e.target.value);
-                          d.set(clampDim(Number.isNaN(raw) ? d.min : raw, d.min, d.max));
+                          const clampedMm = clampDim(
+                            cmToMm(Number.isNaN(raw) ? mmToCm(d.minMm) : raw),
+                            d.minMm,
+                            cmToMm(MAX_DIM_CM)
+                          );
+                          d.setMm(clampedMm);
+                          d.setVal(String(mmToCm(clampedMm)));
                         }}
-                        className="w-full bg-white/5 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan text-center" />
+                        className="w-full bg-white/5 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan text-center"
+                      />
                     </div>
                   ))}
                 </div>
@@ -409,11 +430,6 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
               {/* Price Summary */}
               {priceCalc && (
                 <div className="bg-white/5 rounded-lg p-4 space-y-2">
-                  {/* Peso estimado — visible a todos */}
-                  <div className="flex justify-between text-xs text-zinc-500">
-                    <span>{t.estimatedWeight}</span>
-                    <span className="font-mono">{priceCalc.weight.toFixed(1)} g</span>
-                  </div>
                   <div className="flex justify-between items-baseline font-semibold">
                     <span>{t.totalLabel}</span>
                     <span className="font-mono text-xl text-cyan">
