@@ -29,6 +29,43 @@ export default function AdminPaymentsClient() {
 
   const totalPaid = orders.reduce((sum, o) => sum + (o.total || 0), 0);
 
+  function renderRows() {
+    if (loading) {
+      return (
+        <tr>
+          <td colSpan={4} className="px-4 py-6 text-center text-muted">
+            Cargando pagos...
+          </td>
+        </tr>
+      );
+    }
+    if (orders.length === 0) {
+      return (
+        <tr>
+          <td colSpan={4} className="px-4 py-6 text-center text-muted">
+            No hay pagos registrados.
+          </td>
+        </tr>
+      );
+    }
+    return orders.map((o) => (
+      <tr key={o.id} className="border-t border-border/60">
+        <td className="px-4 py-2 font-mono text-xs">
+          #{o.id.slice(-8).toUpperCase()}
+        </td>
+        <td className="px-4 py-2 text-muted">
+          {o.user?.name || o.user?.email || "Cliente"}
+        </td>
+        <td className="px-4 py-2 text-muted">
+          {new Date(o.createdAt).toLocaleDateString('es-ES')}
+        </td>
+        <td className="px-4 py-2 text-right font-mono">
+          €{o.total.toFixed(2)}
+        </td>
+      </tr>
+    ));
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -71,36 +108,7 @@ export default function AdminPaymentsClient() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-muted">
-                    Cargando pagos...
-                  </td>
-                </tr>
-              ) : orders.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-muted">
-                    No hay pagos registrados.
-                  </td>
-                </tr>
-              ) : (
-                orders.map((o) => (
-                  <tr key={o.id} className="border-t border-border/60">
-                    <td className="px-4 py-2 font-mono text-xs">
-                      #{o.id.slice(-8).toUpperCase()}
-                    </td>
-                    <td className="px-4 py-2 text-muted">
-                      {o.user?.name || o.user?.email || "Cliente"}
-                    </td>
-                    <td className="px-4 py-2 text-muted">
-                      {new Date(o.createdAt).toLocaleDateString('es-ES')}
-                    </td>
-                    <td className="px-4 py-2 text-right font-mono">
-                      €{o.total.toFixed(2)}
-                    </td>
-                  </tr>
-                ))
-              )}
+              {renderRows()}
             </tbody>
           </table>
         </div>

@@ -230,7 +230,7 @@ export default function AdminDashboardClient() {
                         {item.material}
                       </div>
                       <div className="text-sm text-muted">
-                        {item.pieces} pieza{item.pieces !== 1 ? 's' : ''} · {item.percentage.toFixed(1)}%
+                        {item.pieces} pieza{item.pieces === 1 ? '' : 's'} · {item.percentage.toFixed(1)}%
                       </div>
                     </div>
                     <div className="font-mono text-sm">
@@ -286,7 +286,7 @@ export default function AdminDashboardClient() {
                   <div className="flex justify-between text-xs text-muted mb-1">
                     <span>{bucket.bucket}</span>
                     <span>
-                      {bucket.count} pieza{bucket.count !== 1 ? 's' : ''}
+                      {bucket.count} pieza{bucket.count === 1 ? '' : 's'}
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">

@@ -37,7 +37,7 @@ interface AdminSidebarProps {
   setIsOpen: (v: boolean) => void;
 }
 
-export default function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
+export default function AdminSidebar({ isOpen, setIsOpen }: Readonly<AdminSidebarProps>) {
   const pathname = usePathname();
 
   return (

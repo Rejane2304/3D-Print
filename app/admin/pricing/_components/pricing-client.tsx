@@ -52,6 +52,10 @@ function marginPct(value: number): string {
   return `+${pct}%`;
 }
 
+function isMaterialKey(key: string): key is keyof typeof MATERIAL_INFO {
+  return key in MATERIAL_INFO;
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -240,8 +244,8 @@ export default function AdminPricingClient() {
       )
     : null;
 
-  const simMaterialInfo = simMaterialCode in MATERIAL_INFO
-    ? MATERIAL_INFO[simMaterialCode as keyof typeof MATERIAL_INFO]
+  const simMaterialInfo = isMaterialKey(simMaterialCode)
+    ? MATERIAL_INFO[simMaterialCode]
     : null;
 
   // ---------------------------------------------------------------------------

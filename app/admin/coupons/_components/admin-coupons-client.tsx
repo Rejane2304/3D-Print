@@ -4,6 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, Tag, CheckCircle, AlertTriangle } from 'lucide-react';
 import type { CouponType } from '@/lib/types';
 
+function getSaveLabel(saving: boolean, editing: string | null): string {
+  if (saving) return 'Guardando...';
+  if (editing) return 'Actualizar';
+  return 'Crear';
+}
+
 const emptyForm = {
   code: '', discountType: 'percentage', discountValue: '',
   minPurchase: '', maxUses: '',
@@ -108,44 +114,44 @@ export default function AdminCouponsClient() {
           <h2 className="font-semibold mb-4">{editing ? 'Editar cupón' : 'Nuevo cupón'}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Código</label>
-              <input type="text" placeholder="VERANO20" disabled={!!editing}
+              <label htmlFor="couponCode" className="text-xs text-zinc-400 block mb-1">Código</label>
+              <input id="couponCode" type="text" placeholder="VERANO20" disabled={!!editing}
                 value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan disabled:opacity-40 uppercase" />
             </div>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Tipo de descuento</label>
-              <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan">
+              <label htmlFor="couponDiscountType" className="text-xs text-zinc-400 block mb-1">Tipo de descuento</label>
+              <select id="couponDiscountType" value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan">
                 <option value="percentage">Porcentaje (%)</option>
                 <option value="fixed">Importe fijo (€)</option>
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Valor {form.discountType === 'percentage' ? '(%)' : '(€)'}</label>
-              <input type="number" placeholder={form.discountType === 'percentage' ? '10' : '5'} min="0"
+              <label htmlFor="couponDiscountValue" className="text-xs text-zinc-400 block mb-1">Valor {form.discountType === 'percentage' ? '(%)' : '(€)'}</label>
+              <input id="couponDiscountValue" type="number" placeholder={form.discountType === 'percentage' ? '10' : '5'} min="0"
                 value={form.discountValue} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan" />
             </div>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Compra mínima (€)</label>
-              <input type="number" placeholder="0 (sin límite)" min="0"
+              <label htmlFor="couponMinPurchase" className="text-xs text-zinc-400 block mb-1">Compra mínima (€)</label>
+              <input id="couponMinPurchase" type="number" placeholder="0 (sin límite)" min="0"
                 value={form.minPurchase} onChange={e => setForm(f => ({ ...f, minPurchase: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan" />
             </div>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Usos máximos</label>
-              <input type="number" placeholder="Ilimitado" min="1"
+              <label htmlFor="couponMaxUses" className="text-xs text-zinc-400 block mb-1">Usos máximos</label>
+              <input id="couponMaxUses" type="number" placeholder="Ilimitado" min="1"
                 value={form.maxUses} onChange={e => setForm(f => ({ ...f, maxUses: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan" />
             </div>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Válido desde</label>
-              <input type="date" value={form.validFrom} onChange={e => setForm(f => ({ ...f, validFrom: e.target.value }))}
+              <label htmlFor="couponValidFrom" className="text-xs text-zinc-400 block mb-1">Válido desde</label>
+              <input id="couponValidFrom" type="date" value={form.validFrom} onChange={e => setForm(f => ({ ...f, validFrom: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan" />
             </div>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Válido hasta (opcional)</label>
-              <input type="date" value={form.validUntil} onChange={e => setForm(f => ({ ...f, validUntil: e.target.value }))}
+              <label htmlFor="couponValidUntil" className="text-xs text-zinc-400 block mb-1">Válido hasta (opcional)</label>
+              <input id="couponValidUntil" type="date" value={form.validUntil} onChange={e => setForm(f => ({ ...f, validUntil: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan" />
             </div>
             <div className="flex items-center gap-2 pt-4">
@@ -155,7 +161,7 @@ export default function AdminCouponsClient() {
           </div>
           <div className="flex gap-3 mt-4">
             <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-cyan text-black rounded-lg text-sm font-semibold hover:bg-cyan-dim transition disabled:opacity-50">
-              {saving ? 'Guardando...' : (editing ? 'Actualizar' : 'Crear')}
+              {getSaveLabel(saving, editing)}
             </button>
             <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-4 py-2 bg-white/5 rounded-lg text-sm hover:bg-white/10 transition">Cancelar</button>
           </div>
