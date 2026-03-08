@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ShoppingCart, User, Menu, X, Search, LogOut, Package, Heart, Settings, Globe, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/lib/cart-store";
@@ -19,15 +19,15 @@ interface SearchResult {
 }
 
 export function Header() {
+  const [scrolled] = useState(false);
   const { data: session } = useSession() || {};
-  const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  // Estado y funciones para búsqueda
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const cartCount = useCartStore(s => s?.items?.length ?? 0);
   const { language, setLanguage } = useLanguage();
@@ -36,8 +36,23 @@ export function Header() {
   const userInitial = userName.trim().split(" ")[0]?.[0]?.toUpperCase() || "U";
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    setSearchResults([]);
+    setShowResults(false);
+  };
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowResults(true);
+  };
+  const selectResult = (id: string) => {
+    setShowResults(false);
+    setSearchQuery("");
+  };
+
   // Translations
   const t = {
+
     es: {
       home: 'Inicio',
       catalog: 'Catálogo',
@@ -89,72 +104,12 @@ export function Header() {
       menuAria: 'Menu',
       searchAria: 'Search',
       changeLanguageAria: 'Change language',
-    },
-  }[language];
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => { setMenuOpen(false); setSearchOpen(false); }, [pathname]);
-
-  // Click outside to close search results
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowResults(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Debounced search
-  const debounceRef = useRef<NodeJS.Timeout>();
-  const handleSearchInput = useCallback((value: string) => {
-    setSearchQuery(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value.length < 2) {
-      setSearchResults([]);
-      setShowResults(false);
-      return;
     }
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(value)}&limit=5`);
-        const data = await res.json();
-        setSearchResults(data || []);
-        setShowResults(true);
-      } catch {
-        setSearchResults([]);
-      }
-    }, 300);
-  }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery?.trim()) {
-      router.push(`/catalog?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchOpen(false);
-      setSearchQuery("");
-      setSearchResults([]);
-      setShowResults(false);
-    }
-  };
-
-  const selectResult = (id: string) => {
-    router.push(`/product/${id}`);
-    setSearchOpen(false);
-    setSearchQuery("");
-    setSearchResults([]);
-    setShowResults(false);
   };
 
   const navLinks = [
-    { href: "/", label: t.home },
-    { href: "/catalog", label: t.catalog },
+    { href: "/", label: t[language].home },
+    { href: "/catalog", label: t[language].catalog },
   ];
 
   return (
@@ -178,25 +133,25 @@ export function Header() {
           <button 
             onClick={() => setLanguage(language === 'es' ? 'en' : 'es')} 
             className="p-2 rounded-lg hover:bg-white/5 transition flex items-center gap-1 text-xs font-medium text-zinc-300"
-            aria-label={t.changeLanguageAria}
+            aria-label={t[language].changeLanguageAria}
           >
             <Globe className="w-4 h-4" />
             <span className="hidden sm:inline">{language.toUpperCase()}</span>
           </button>
 
-          <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 rounded-lg hover:bg-white/5 transition" aria-label={t.searchAria}>
+          <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 rounded-lg hover:bg-white/5 transition" aria-label={t[language].searchAria}>
             <Search className="w-5 h-5 text-zinc-300" />
           </button>
 
           {session?.user && !isAdmin && (
-            <Link href="/wishlist" className="p-2 rounded-lg hover:bg-white/5 transition relative" aria-label={t.wishlist}>
+            <Link href="/wishlist" className="p-2 rounded-lg hover:bg-white/5 transition relative" aria-label={t[language].wishlist}>
               <Heart className="w-5 h-5 text-zinc-300" />
             </Link>
           )}
 
           {/* Hide cart for admin users */}
           {!isAdmin && (
-            <Link href="/cart" className="p-2 rounded-lg hover:bg-white/5 transition relative" aria-label={t.cartAria}>
+            <Link href="/cart" className="p-2 rounded-lg hover:bg-white/5 transition relative" aria-label={t[language].cartAria}>
               <ShoppingCart className="w-5 h-5 text-zinc-300" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-cyan text-black text-xs font-bold flex items-center justify-center">
@@ -208,82 +163,61 @@ export function Header() {
 
           {session?.user ? (
             <div className="flex items-center gap-2">
-              {/* Admin menu dropdown */}
-              {isAdmin && (
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setAdminMenuOpen((v) => !v)}
-                    className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber/10 text-amber text-xs font-medium hover:bg-amber/20 transition"
-                  >
-                    <Settings className="w-4 h-4" />
-                    <span>{t.adminPanel}</span>
-                    <ChevronDown className="w-3 h-3" />
-                  </button>
-                  <AnimatePresence>
-                    {adminMenuOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        className="absolute right-0 mt-2 w-56 bg-bg-secondary border border-border rounded-lg shadow-xl z-50"
-                      >
-                        <nav className="py-2 text-xs">
-                          <Link href="/admin" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminDashboard}
+              {/* Avatar dropdown para usuario y admin */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setAdminMenuOpen((v) => !v)}
+                  className="flex items-center gap-2 rounded-full bg-cyan/15 px-2 py-1 hover:bg-cyan/25 transition"
+                                    aria-label={t[language].profile}
+                >
+                  <div className="w-8 h-8 rounded-full bg-cyan/25 flex items-center justify-center text-cyan text-sm font-bold">
+                    {userInitial}
+                  </div>
+                  <ChevronDown className="w-3 h-3 text-cyan" />
+                </button>
+                <AnimatePresence>
+                  {adminMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className="absolute right-0 mt-2 w-56 bg-bg-secondary border border-border rounded-lg shadow-xl z-50"
+                    >
+                      <nav className="py-2 text-xs">
+                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-cyan" onClick={() => setAdminMenuOpen(false)}>
+                          <User className="w-4 h-4 text-cyan" />
+                          <span className="text-cyan">{t[language].profile}</span>
+                        </Link>
+                        {isAdmin && (
+                          <Link href="/admin" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-cyan" onClick={() => setAdminMenuOpen(false)}>
+                            <Settings className="w-4 h-4 text-cyan" />
+                            <span className="text-cyan">{t[language].adminDashboard}</span>
                           </Link>
-                          <Link href="/admin/products" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminProducts}
-                          </Link>
-                          <Link href="/admin/users" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminClients}
-                          </Link>
-                          <Link href="/admin/orders" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminOrders}
-                          </Link>
-                          <Link href="/admin/inventory" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminInventory}
-                          </Link>
-                          <Link href="/admin/print-queue" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminPrintQueue}
-                          </Link>
-                          <Link href="/admin/payments" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminPayments}
-                          </Link>
-                          <Link href="/admin/settings" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary" onClick={() => setAdminMenuOpen(false)}>
-                            {t.adminSettings}
-                          </Link>
-                        </nav>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
-
-              <Link href="/profile" className="flex items-center gap-2 rounded-full bg-cyan/15 px-2 py-1 hover:bg-cyan/25 transition" aria-label={t.profile}>
-                <div className="w-8 h-8 rounded-full bg-cyan/25 flex items-center justify-center text-cyan text-sm font-bold">
-                  {userInitial}
-                </div>
-              </Link>
-              <button
-                onClick={async () => {
-                  // Vacía el carrito al cerrar sesión para evitar inconsistencias
-                  useCartStore.getState().clearCart();
-                  await signOut({ callbackUrl: "/" });
-                }}
-                className="p-2 rounded-lg hover:bg-white/5 transition"
-                aria-label={t.logout}
-              >
-                <LogOut className="w-5 h-5 text-zinc-300" />
-              </button>
+                        )}
+                        <button
+                          onClick={async () => {
+                            useCartStore.getState().clearCart();
+                            await signOut({ callbackUrl: "/" });
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-left"
+                        >
+                          <LogOut className="w-4 h-4 text-cyan" />
+                          <span className="text-cyan">{t[language].logout}</span>
+                        </button>
+                      </nav>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           ) : (
-            <Link href="/login" className="p-2 rounded-lg hover:bg-white/5 transition" aria-label={t.login}>
+            <Link href="/login" className="p-2 rounded-lg hover:bg-white/5 transition" aria-label={t[language].login}>
               <User className="w-5 h-5 text-zinc-300" />
             </Link>
           )}
 
-          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-white/5 transition md:hidden" aria-label={t.menuAria}>
+          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-white/5 transition md:hidden" aria-label={t[language].menuAria}>
             {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
@@ -305,7 +239,7 @@ export function Header() {
                     type="text" 
                     value={searchQuery} 
                     onChange={e => handleSearchInput(e?.target?.value ?? "")} 
-                    placeholder={t.search} 
+                                    placeholder={t[language].search} 
                     className="w-full bg-bg-tertiary rounded-lg px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-500" 
                     autoFocus 
                   />
@@ -346,7 +280,7 @@ export function Header() {
                               </div>
                             </div>
                             <div className="text-sm text-cyan font-medium">
-                              {t.from} €{(result.basePricePerGram * 10 + 2.5).toFixed(2)}
+                              {t[language].from} €{(result.basePricePerGram * 10 + 2.5).toFixed(2)}
                             </div>
                           </button>
                         ))}
@@ -355,7 +289,7 @@ export function Header() {
                   </AnimatePresence>
                 </div>
                 <button type="submit" className="px-4 py-2 bg-cyan text-black rounded-lg text-sm font-medium hover:bg-cyan-dark transition">
-                  {t.searchBtn}
+                  {t[language].searchBtn}
                 </button>
               </form>
             </div>
@@ -380,11 +314,11 @@ export function Header() {
                 <>
                   <Link href="/wishlist" className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2 flex items-center gap-2">
                     <Heart className="w-4 h-4" />
-                    {t.wishlist}
+                    {t[language].wishlist}
                   </Link>
                   <Link href="/profile" className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2 flex items-center gap-2">
                     <User className="w-4 h-4" />
-                    {t.profile}
+                    {t[language].profile}
                   </Link>
                 </>
               )}
@@ -395,3 +329,4 @@ export function Header() {
     </header>
   );
 }
+

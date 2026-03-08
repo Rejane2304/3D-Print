@@ -260,7 +260,7 @@ export default function AdminProductsClient() {
                         {product.material}
                       </span>
                     </td>
-                    <td className="px-4 py-3">€{product.basePricePerGram.toFixed(3)}</td>
+                    <td className="px-4 py-3">€{product.basePricePerGram.toFixed(2)}</td>
                     <td className="px-4 py-3">
                       <span className={product.stock < 10 ? 'text-red-400' : ''}>
                         {product.stock}

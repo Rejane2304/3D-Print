@@ -1,4 +1,3 @@
-'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit, Trash2, RefreshCw, CheckCircle, AlertTriangle, Layers } from 'lucide-react';
@@ -10,6 +9,12 @@ const emptyForm = {
 };
 
 export default function AdminMaterialsClient() {
+    // ...existing code...
+    const getSaveButtonLabel = () => {
+      if (saving) return 'Guardando...';
+      if (editing) return 'Actualizar';
+      return 'Crear';
+    };
   const [materials, setMaterials] = useState<MaterialType[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
@@ -142,9 +147,9 @@ export default function AdminMaterialsClient() {
               </div>
             ))}
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Color (hex)</label>
+              <label htmlFor="colorHex" className="text-xs text-zinc-400 block mb-1">Color (hex)</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} className="w-10 h-9 rounded cursor-pointer bg-transparent border border-white/10" />
+                <input id="colorHex" type="color" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} className="w-10 h-9 rounded cursor-pointer bg-transparent border border-white/10" />
                 <input type="text" value={form.color} onChange={e => setForm(f => ({ ...f, color: e.target.value }))} className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan" />
               </div>
             </div>
@@ -155,7 +160,7 @@ export default function AdminMaterialsClient() {
           </div>
           <div className="flex gap-3 mt-4">
             <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-cyan text-black rounded-lg text-sm font-semibold hover:bg-cyan-dim transition disabled:opacity-50">
-              {saving ? 'Guardando...' : (editing ? 'Actualizar' : 'Crear')}
+              {getSaveButtonLabel()}
             </button>
             <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-4 py-2 bg-white/5 rounded-lg text-sm hover:bg-white/10 transition">Cancelar</button>
           </div>

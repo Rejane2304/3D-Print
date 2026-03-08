@@ -376,7 +376,7 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
                         min={mmToCm(d.minMm)}
                         max={MAX_DIM_CM}
                         step={0.5}
-                        value={d.val}
+                        value={Number(d.val).toFixed(2)}
                         onChange={e => d.setVal(e.target.value)}
                         onBlur={e => {
                           const raw = Number.parseFloat(e.target.value);
@@ -454,7 +454,7 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
                             <div className="space-y-1 pt-2 border-t border-white/5">
                               <div className="flex justify-between text-xs">
                                 <span className="text-zinc-500">{t.estimatedWeight}</span>
-                                <span className="font-mono text-zinc-300">{priceCalc.weight.toFixed(2)} g</span>
+                                <span className="font-mono text-zinc-300">{priceCalc.weight.toFixed(3)} g</span>
                               </div>
                               <div className="flex justify-between text-xs">
                                 <span className="text-zinc-500">{t.printTimeLabel}</span>
@@ -470,12 +470,12 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
                               ].map(({ label, value }) => (
                                 <div key={label} className="flex justify-between text-xs">
                                   <span className="text-zinc-500">{label}</span>
-                                  <span className="font-mono text-zinc-300">€{value.toFixed(3)}</span>
+                                  <span className="font-mono text-zinc-300">€{value.toFixed(2)}</span>
                                 </div>
                               ))}
                               <div className="flex justify-between text-xs font-semibold border-t border-white/5 pt-1">
                                 <span className="text-zinc-300">{t.baseCost}</span>
-                                <span className="font-mono text-zinc-100">€{priceCalc.baseCost.toFixed(3)}</span>
+                                <span className="font-mono text-zinc-100">€{priceCalc.baseCost.toFixed(2)}</span>
                               </div>
                             </div>
                           </motion.div>
@@ -489,7 +489,12 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
               )}
 
               {/* Add to Cart */}
-              <button onClick={handleAddToCart} className="w-full py-3 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition flex items-center justify-center gap-2">
+              <button
+                onClick={handleAddToCart}
+                className="w-full py-3 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={isAdmin}
+                title={isAdmin ? t.adminNoPurchase : undefined}
+              >
                 <ShoppingCart className="w-5 h-5" /> {t.addToCart}
               </button>
             </div>

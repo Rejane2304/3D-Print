@@ -4,8 +4,9 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Search, Filter, Star, ChevronLeft, ChevronRight, SlidersHorizontal, X as XIcon } from "lucide-react";
+import { Filter, Star, ChevronLeft, ChevronRight, SlidersHorizontal, X as XIcon } from "lucide-react";
 import { ProductType } from "@/lib/types";
+import { calculatePriceFromDimensions, MATERIAL_INFO } from "@/lib/price-calculator";
 import { useLanguage } from "@/lib/language-store";
 
 const CATEGORIES = ["Todos", "Accesorios", "Decoracion", "Figuras", "Funcional", "Articulados"] as const;
@@ -167,7 +168,6 @@ export function CatalogClient() {
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <form onSubmit={handleSearch} className="flex-1 flex gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
               <input
                 type="text"
                 value={search}
@@ -306,18 +306,35 @@ export function CatalogClient() {
                           )}
                         </div>
                       )}
-                      <p className="font-mono text-sm text-cyan">
-                        {t.from} €{
-                          (() => {
-                            const mat = p?.material ?? "PLA";
-                            const bppg = p?.basePricePerGram ?? 0;
-                            const den = p?.density ?? (mat === "PETG" ? 1.27 : 1.24);
-                            const vol = ((p?.defaultDimX ?? 50) * (p?.defaultDimY ?? 50) * (p?.defaultDimZ ?? 50)) / 1000;
-                            const wt = vol * den * 0.2;
-                            return (bppg * wt + (p?.finishCost ?? 0)).toFixed(2);
-                          })()
-                        }
-                      </p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="font-mono text-xs text-zinc-400">
+                          ({((p?.defaultDimX ?? 0) / 10).toFixed(2)} x {((p?.defaultDimY ?? 0) / 10).toFixed(2)} x {((p?.defaultDimZ ?? 0) / 10).toFixed(2)} cm)
+                        </span>
+                        {(() => {
+                          // Obtener info de material
+                          const mat = MATERIAL_INFO[p?.material ?? "PLA"] ?? MATERIAL_INFO["PLA"];
+                          // Calcular precio unitario (1 ud, dimensiones por defecto, coste de acabado si existe)
+                          const price = calculatePriceFromDimensions(
+                            p?.defaultDimX ?? 0,
+                            p?.defaultDimY ?? 0,
+                            p?.defaultDimZ ?? 0,
+                            p?.printTimeMinutes ?? 60,
+                            mat,
+                            {
+                              finishCost: p?.finishCost ?? 0,
+                              fillFactor: p?.modelFillFactor ?? undefined,
+                              refDimX: p?.defaultDimX ?? 0,
+                              refDimY: p?.defaultDimY ?? 0,
+                              refDimZ: p?.defaultDimZ ?? 0,
+                            }
+                          );
+                          return (
+                            <span className="font-mono text-cyan text-2xl font-bold">
+                              €{price.finalPrice.toFixed(2)}
+                            </span>
+                          );
+                        })()}
+                      </div>
                     </div>
                   </div>
                 </Link>

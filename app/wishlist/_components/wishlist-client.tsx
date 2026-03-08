@@ -186,20 +186,8 @@ export default function WishlistClient() {
                       </h3>
                     </Link>
                     <p className="text-sm text-muted mb-3">{item.product.category}</p>
-                    <p className="text-lg font-bold text-cyan mb-4">
-                      {t.from} €{
-                        (() => {
-                          const product = item.product;
-                          const material = product.material ?? "PLA";
-                          const basePricePerGram = product.basePricePerGram ?? 0;
-                          const density = product.density ?? (material === "PETG" ? 1.27 : 1.24);
-                          const volumeCm3 = ((product.defaultDimX ?? 50) * (product.defaultDimY ?? 50) * (product.defaultDimZ ?? 50)) / 1000;
-                          const weight = volumeCm3 * density * 0.2;
-                          const materialCost = basePricePerGram * weight;
-                          const subtotal = materialCost + (product.finishCost ?? 0);
-                          return subtotal.toFixed(2);
-                        })()
-                      }
+                    <p className="font-mono text-sm text-cyan mb-4">
+                      {`${((item.product.defaultDimX ?? 0) / 10).toFixed(2)} x ${((item.product.defaultDimY ?? 0) / 10).toFixed(2)} x ${((item.product.defaultDimZ ?? 0) / 10).toFixed(2)} cm`}
                     </p>
 
                     <div className="flex gap-2">

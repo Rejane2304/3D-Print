@@ -328,7 +328,7 @@ export default function AdminOrdersClient() {
                         <div>
                           <div className="font-medium">{item.name}</div>
                           <div className="text-sm text-muted">
-                            {item.material} • {item.color} • {(item.dimX / 10).toFixed(1)}×{(item.dimY / 10).toFixed(1)}×{(item.dimZ / 10).toFixed(1)} cm • x{item.quantity}
+                            {item.material} • {item.color} • {item.dimX.toFixed(2)}×{item.dimY.toFixed(2)}×{item.dimZ.toFixed(2)} mm • x{item.quantity}
                           </div>
                         </div>
                         <div className="font-medium">€{(item.unitPrice * item.quantity).toFixed(2)}</div>

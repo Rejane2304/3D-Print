@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Layers, Zap, Shield, Palette, Star } from "lucide-react";
 import { ProductType } from "@/lib/types";
-import { MATERIAL_INFO, calculatePriceFromDimensions } from "@/lib/price-calculator";
+import { MATERIAL_INFO } from "@/lib/price-calculator";
+import Image from "next/image";
 import { useLanguage } from "@/lib/language-store";
 
 function CountUp({ target, suffix = "" }: Readonly<{ target: number; suffix?: string }>) {
@@ -204,26 +204,49 @@ export function HomeClient() {
                     <div className="p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${p?.material === "PLA" ? "bg-cyan/10 text-cyan" : "bg-amber/10 text-amber"}`}>{p?.material ?? ""}</span>
-                        {(p?.rating ?? 0) > 0 && <span className="flex items-center gap-1 text-xs text-zinc-400"><Star className="w-3 h-3 fill-amber text-amber" />{(p?.rating ?? 0).toFixed(1)}</span>}
+                        <span className="text-xs text-zinc-500">{p?.category ?? ""}</span>
+                        {(p?.rating ?? 0) > 0 && <span className="flex items-center gap-1 text-xs text-zinc-400 ml-auto"><Star className="w-3 h-3 fill-amber text-amber" />{(p?.rating ?? 0).toFixed(1)}</span>}
                       </div>
                       <h3 className="font-semibold text-sm mb-1 group-hover:text-cyan transition-colors">{p?.name ?? ""}</h3>
-                      <p className="font-mono text-sm text-cyan">
-                        {tFeatured.from} €{
-                          (() => {
-                        const mat = p?.material ?? "PLA";
-                            const matInfo = MATERIAL_INFO[mat] ?? MATERIAL_INFO.PLA;
-                            const price = calculatePriceFromDimensions(
-                              p?.defaultDimX ?? 50,
-                              p?.defaultDimY ?? 50,
-                              p?.defaultDimZ ?? 50,
-                              p?.printTimeMinutes ?? 60,
-                              matInfo,
-                              { quantity: 1, finishCost: p?.finishCost ?? 0 },
-                            );
-                            return price.finalPrice.toFixed(2);
-                          })()
-                        }
-                      </p>
+                      {(p?.colors?.length ?? 0) > 0 && (
+                        <div className="flex items-center gap-1 mb-2">
+                          {(p?.colors ?? []).slice(0, 3).map((color: string) => (
+                            <span key={color} className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: MATERIAL_INFO[p?.material ?? "PLA"]?.color ?? "#6B7280" }} title={color} />
+                          ))}
+                          {(p?.colors?.length ?? 0) > 3 && (
+                            <span className="text-xs text-zinc-500">
+                              +{(p?.colors?.length ?? 0) - 3}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="font-mono text-xs text-zinc-400">
+                          ({((p?.defaultDimX ?? 0) / 10).toFixed(2)} x {((p?.defaultDimY ?? 0) / 10).toFixed(2)} x {((p?.defaultDimZ ?? 0) / 10).toFixed(2)} cm)
+                        </span>
+                        {(() => {
+                          const mat = MATERIAL_INFO[p?.material ?? "PLA"] ?? MATERIAL_INFO["PLA"];
+                          const price = require("@/lib/price-calculator").calculatePriceFromDimensions(
+                            p?.defaultDimX ?? 0,
+                            p?.defaultDimY ?? 0,
+                            p?.defaultDimZ ?? 0,
+                            p?.printTimeMinutes ?? 60,
+                            mat,
+                            {
+                              finishCost: p?.finishCost ?? 0,
+                              fillFactor: p?.modelFillFactor ?? undefined,
+                              refDimX: p?.defaultDimX ?? 0,
+                              refDimY: p?.defaultDimY ?? 0,
+                              refDimZ: p?.defaultDimZ ?? 0,
+                            }
+                          );
+                          return (
+                            <span className="font-mono text-cyan text-2xl font-bold">
+                              €{price.finalPrice.toFixed(2)}
+                            </span>
+                          );
+                        })()}
+                      </div>
                     </div>
                   </div>
                 </Link>
