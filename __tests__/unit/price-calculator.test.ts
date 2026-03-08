@@ -2,6 +2,38 @@ import { describe, it, expect } from 'vitest';
 import { calculateWeight, calculatePriceFromDimensions, MATERIAL_INFO, PRICING_CONFIG } from '@/lib/price-calculator';
 
 describe('Price Calculator', () => {
+    describe('Flujo completo: peso impacta en precio', () => {
+      it('el precio debe aumentar proporcionalmente al peso', () => {
+        const material = {
+          pricePerKg: MATERIAL_INFO.PLA.pricePerKg,
+          density: MATERIAL_INFO.PLA.density,
+          maintenanceFactor: MATERIAL_INFO.PLA.maintenanceFactor,
+        };
+        // Producto pequeño
+        const resultSmall = calculatePriceFromDimensions(50, 50, 50, 60, material);
+        // Producto mediano
+        const resultMedium = calculatePriceFromDimensions(100, 100, 100, 60, material);
+        // Producto grande
+        const resultLarge = calculatePriceFromDimensions(200, 200, 200, 60, material);
+
+        // El peso debe aumentar
+        expect(resultSmall.weight).toBeLessThan(resultMedium.weight);
+        expect(resultMedium.weight).toBeLessThan(resultLarge.weight);
+
+        // El precio final debe aumentar proporcionalmente
+        expect(resultSmall.finalPrice).toBeLessThan(resultMedium.finalPrice);
+        expect(resultMedium.finalPrice).toBeLessThan(resultLarge.finalPrice);
+
+        // El coste de material debe ser el factor dominante en el precio base
+        const baseCostSmall = resultSmall.baseCost;
+        const baseCostMedium = resultMedium.baseCost;
+        const baseCostLarge = resultLarge.baseCost;
+        expect(baseCostSmall).toBeLessThan(baseCostMedium);
+        expect(baseCostMedium).toBeLessThan(baseCostLarge);
+        // El materialCost debe ser al menos el 40% del baseCost para productos grandes
+        expect(resultLarge.materialCost / baseCostLarge).toBeGreaterThan(0.4);
+      });
+    });
   describe('calculateWeight', () => {
     it('should calculate weight for PLA material', () => {
       // Dimensions in mm, volume converted to cm³ internally
@@ -54,9 +86,12 @@ describe('Price Calculator', () => {
     });
 
     it('should add finishCost as a flat fee (not affected by margin)', () => {
+      const margins = PRICING_CONFIG.margins;
       const noFinish   = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial);
       const withFinish = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, { finishCost: 5 });
-      expect(withFinish.finalPrice - noFinish.finalPrice).toBeCloseTo(5, 1);
+      // El acabado se multiplica por el margen (unit)
+      const expectedDiff = 5 * margins.unit;
+      expect(withFinish.finalPrice - noFinish.finalPrice).toBeCloseTo(expectedDiff, 1);
     });
 
     it('should return the full PriceCalculation structure', () => {

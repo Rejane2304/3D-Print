@@ -36,20 +36,22 @@ export interface MaterialConfig {
 }
 
 export interface PriceCalculation {
-  weight: number;               // gramos estimados
-  printTimeMinutes: number;     // tiempo de impresión escalado (min)
+  weight: number;
+  printTimeMinutes: number;
   materialCost: number;
   machineCost: number;
   maintenanceCost: number;
   operationCost: number;
   consumablesCost: number;
-  finishCost: number;           // coste de acabado fijo
-  baseCost: number;             // suma de todos los costes
-  priceUnit: number;            // precio 1–4 uds. (×margen)
-  priceMedium: number;          // precio 5–9 uds.
-  priceBulk: number;            // precio 10+ uds.
-  finalPrice: number;           // precio según quantity
+  finishCost: number;
+  energyCost: number;
+  baseCost: number;
+  priceUnit: number;
+  priceMedium: number;
+  priceBulk: number;
+  finalPrice: number;
 }
+// ...existing code...
 
 // ---- Funciones core -----------------------------------------
 
@@ -125,12 +127,20 @@ export function calculateAdvancedPrice(
     config?.consumablesCostPerHour ?? PRICING_CONFIG.consumablesCostPerHour;
   const margins = config?.margins ?? PRICING_CONFIG.margins;
 
+  // Parámetros para energía
+  const printerPowerKW = 0.15; // 150W = 0.15kW
+  const energyPricePerKWh = 0.27; // €/kWh
+
   const materialCost = weightKg * material.pricePerKg;
   const machineCost = printTimeHours * machineAmortizationPerHour;
   const maintenanceCost = printTimeHours * material.maintenanceFactor;
   const operationCost = printTimeHours * operationCostPerHour;
   const consumablesCost = printTimeHours * consumablesCostPerHour;
-  const baseCost = materialCost + machineCost + maintenanceCost + operationCost + consumablesCost;
+  const energyCost = printTimeHours * printerPowerKW * energyPricePerKWh;
+
+  // El acabado se suma antes del margen
+  const finishCost = 0; // Se sobreescribe en calculatePriceFromDimensions
+  const baseCost = materialCost + machineCost + maintenanceCost + operationCost + consumablesCost + energyCost + finishCost;
 
   const priceUnit = baseCost * margins.unit;
   const priceMedium = baseCost * margins.medium;
@@ -146,7 +156,8 @@ export function calculateAdvancedPrice(
     maintenanceCost: round(maintenanceCost),
     operationCost: round(operationCost),
     consumablesCost: round(consumablesCost),
-    finishCost: 0,
+    finishCost: round(finishCost),
+    energyCost: round(energyCost),
     baseCost: round(baseCost),
     priceUnit: round(priceUnit),
     priceMedium: round(priceMedium),
@@ -198,14 +209,14 @@ export function calculatePriceFromDimensions(
       : basePrintTimeMinutes;
 
   const weightGrams = calculateWeight(dimX, dimY, dimZ, material.density, fillFactor);
+  // Adaptar: el acabado se suma antes del margen
   const result = calculateAdvancedPrice(weightGrams, printTimeMinutes, material, quantity);
-
-  // finishCost es un coste fijo (manipulación/acabado): se suma DESPUÉS del margen
-  // para no multiplicarlo por 2.5× junto con los costes de producción.
+  // Recalcular baseCost incluyendo acabado
+  const baseCost = result.materialCost + result.machineCost + result.maintenanceCost + result.operationCost + result.consumablesCost + (result.energyCost ?? 0) + finishCost;
   const margins = PRICING_CONFIG.margins;
-  const priceUnit   = result.baseCost * margins.unit   + finishCost;
-  const priceMedium = result.baseCost * margins.medium + finishCost;
-  const priceBulk   = result.baseCost * margins.bulk   + finishCost;
+  const priceUnit   = baseCost * margins.unit;
+  const priceMedium = baseCost * margins.medium;
+  const priceBulk   = baseCost * margins.bulk;
   const finalPrice  = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
 
   return {
@@ -213,7 +224,7 @@ export function calculatePriceFromDimensions(
     weight: round(weightGrams),
     printTimeMinutes: round(printTimeMinutes),
     finishCost: round(finishCost),
-    baseCost: round(result.baseCost),
+    baseCost: round(baseCost),
     priceUnit: round(priceUnit),
     priceMedium: round(priceMedium),
     priceBulk: round(priceBulk),

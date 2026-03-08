@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import type { User, Product } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { updateAllProductPrices } from "@/lib/pricing-service";
+import { updateAllProductPrices } from "../lib/pricing-service.js";
 
 const prisma = new PrismaClient();
 

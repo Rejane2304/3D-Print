@@ -5,8 +5,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.tsx'],
     coverage: {
-      provider: 'c8',
-      reports: ['text', 'html'],
+      provider: 'istanbul',
       include: ['lib/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
       exclude: ['**/*.d.ts', '**/node_modules/**'],
     },

@@ -454,7 +454,13 @@ export function ProductDetailClient({ productId }: Readonly<{ productId: string 
                             <div className="space-y-1 pt-2 border-t border-white/5">
                               <div className="flex justify-between text-xs">
                                 <span className="text-zinc-500">{t.estimatedWeight}</span>
-                                <span className="font-mono text-zinc-300">{priceCalc.weight.toFixed(3)} g</span>
+                                <span className="font-mono text-zinc-300">
+                                  {(() => {
+                                    if (priceCalc.weight < 1) return priceCalc.weight.toFixed(2);
+                                    if (priceCalc.weight < 10) return priceCalc.weight.toFixed(3);
+                                    return Math.round(priceCalc.weight);
+                                  })()} g
+                                </span>
                               </div>
                               <div className="flex justify-between text-xs">
                                 <span className="text-zinc-500">{t.printTimeLabel}</span>

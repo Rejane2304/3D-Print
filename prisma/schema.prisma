@@ -94,7 +94,7 @@ model Product {
   material         String                  // material por defecto (código)
   basePricePerGram Float
   density          Float
-  printTimeMinutes Int            @default(60)
+  printTimeMinutes Int            @default(90)
   minDimX          Float          @default(10)
   minDimY          Float          @default(10)
   minDimZ          Float          @default(10)
