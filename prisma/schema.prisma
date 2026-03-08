@@ -1,3 +1,14 @@
+// ===== IMPRESORAS =====
+model Printer {
+  id        String   @id @default(cuid())
+  name      String
+  location  String?
+  status    String   @default("available") // available, busy, maintenance
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+  orderItems OrderItem[]
+}
 generator client {
   provider = "prisma-client-js"
 }
@@ -203,6 +214,8 @@ model Order {
   userId          String
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   items           OrderItem[]
+  printerId       String?
+  printer         Printer?  @relation(fields: [printerId], references: [id])
   subtotal        Float
   tax             Float
   shipping        Float
@@ -240,6 +253,8 @@ model OrderItem {
   order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   materialRef Material? @relation(fields: [materialId], references: [id])
+  printerId  String?
+  printer    Printer? @relation(fields: [printerId], references: [id])
 }
 
 // ===== RESEÑAS =====
@@ -303,4 +318,18 @@ model PricingConfig {
   marginMedium               Float    @default(2.0)
   marginBulk                 Float    @default(1.5)
   updatedAt                  DateTime @updatedAt
+}
+
+// ===== ALERTAS ADMIN =====
+model Alert {
+  id        String   @id @default(cuid())
+  type      String   // "stock", "print_queue", "customer_message", "order_issue", "other"
+  message   String   @db.Text
+  data      String?  // JSON opcional para detalles
+  seen      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    String?  // Quién generó la alerta (opcional)
+  orderId   String?  // Relación con pedido (opcional)
+  productId String?  // Relación con producto (opcional)
+  materialId String? // Relación con material (opcional)
 }

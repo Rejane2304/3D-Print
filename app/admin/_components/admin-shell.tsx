@@ -9,8 +9,8 @@ export default function AdminShell({ children }: Readonly<{ children: React.Reac
 
   return (
     <div className="min-h-screen bg-bg">
-      {/* Mobile sticky top bar — hidden on lg+ */}
-      <div className="lg:hidden sticky top-16 z-40 flex items-center gap-3 px-4 py-3 bg-bg-secondary border-b border-border">
+      {/* Sticky top bar para todos los tamaños */}
+      <div className="sticky top-16 z-40 flex items-center gap-3 px-4 py-3 bg-bg-secondary border-b border-border">
         <button
           onClick={() => setIsOpen((v) => !v)}
           className="p-2 rounded-lg hover:bg-bg-tertiary transition-colors"

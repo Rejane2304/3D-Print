@@ -28,6 +28,7 @@ const menuItems = [
   { href: '/admin/inventory', label: 'Inventario', icon: Boxes },
   { href: '/admin/coupons', label: 'Cupones', icon: Tag },
   { href: '/admin/print-queue', label: 'Cola de impresión', icon: Printer },
+  { href: '/admin/alerts', label: 'Alertas', icon: CreditCard },
   { href: '/admin/payments', label: 'Pagos', icon: CreditCard },
   { href: '/admin/settings', label: 'Configuración', icon: Settings },
 ];
@@ -49,7 +50,7 @@ export default function AdminSidebar({ isOpen, setIsOpen }: Readonly<AdminSideba
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="lg:hidden fixed inset-0 top-16 bg-black/60 backdrop-blur-sm z-30"
+            className="lg:hidden fixed inset-0 top-16 bg-black/60 backdrop-blur-sm z-10"
             onClick={() => setIsOpen(false)}
           />
         )}
@@ -58,9 +59,9 @@ export default function AdminSidebar({ isOpen, setIsOpen }: Readonly<AdminSideba
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-bg-secondary border-r border-border
-          z-40 flex flex-col transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          absolute top-16 left-0 max-h-[calc(100vh-4rem)] w-64 bg-bg-secondary border-r border-border
+          z-10 flex flex-col transition-transform duration-300 ease-in-out overflow-y-auto
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         <div className="p-6 flex-1 overflow-y-auto">

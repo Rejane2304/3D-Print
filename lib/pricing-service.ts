@@ -4,8 +4,8 @@
 // Usar sólo en API routes / Server Components (accede a Prisma).
 // =============================================================
 
-import prisma from './db.js';
-import { calculateAdvancedPrice, PRICING_CONFIG } from './price-calculator.js';
+import prisma from './db';
+import { calculateAdvancedPrice, PRICING_CONFIG } from './price-calculator';
 
 // ---- Leer configuración de precios desde BD (con fallback a constantes)
 

@@ -9,6 +9,9 @@ async function main() {
   console.log("🌱 Iniciando seed de base de datos...");
 
   // Limpiar datos existentes (en orden correcto por dependencias)
+  // Limpiar Alert primero (alertas admin)
+  await prisma.alert.deleteMany();
+  // Limpiar PointsTransaction, ignorar error si no existe
   await prisma.pointsTransaction.deleteMany();
   await prisma.review.deleteMany();
   await prisma.orderItem.deleteMany();

@@ -28,11 +28,31 @@ export default function AdminPrintQueueClient() {
     fetchQueue();
   }, [fetchQueue]);
 
+  const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  async function updateOrderStatus(orderId: string, status: string) {
+    setActionLoading(orderId + status);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error("Error actualizando pedido");
+      showToast("success", "Pedido actualizado");
+      await fetchQueue();
+    } catch {
+      showToast("error", "Error al actualizar pedido");
+    }
+    setActionLoading(null);
+  }
+
   function renderRows() {
     if (loading) {
       return (
         <tr>
-          <td colSpan={4} className="px-4 py-6 text-center text-muted">
+          <td colSpan={5} className="px-4 py-6 text-center text-muted">
             Cargando cola...
           </td>
         </tr>
@@ -41,7 +61,7 @@ export default function AdminPrintQueueClient() {
     if (orders.length === 0) {
       return (
         <tr>
-          <td colSpan={4} className="px-4 py-6 text-center text-muted">
+          <td colSpan={5} className="px-4 py-6 text-center text-muted">
             No hay pedidos en cola de impresión.
           </td>
         </tr>
@@ -60,6 +80,22 @@ export default function AdminPrintQueueClient() {
         </td>
         <td className="px-4 py-2 text-right">
           {o.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0}
+        </td>
+        <td className="px-4 py-2 text-right">
+          <button
+            className="mr-2 text-cyan underline text-xs"
+            onClick={() => setSelectedOrder(o)}
+          >Detalles</button>
+          <button
+            className="mr-2 text-green-600 underline text-xs"
+            disabled={actionLoading === o.id + "printed"}
+            onClick={() => updateOrderStatus(o.id, "printed")}
+          >{actionLoading === o.id + "printed" ? "Guardando..." : "Marcar impreso"}</button>
+          <button
+            className="text-red-600 underline text-xs"
+            disabled={actionLoading === o.id + "cancelled"}
+            onClick={() => updateOrderStatus(o.id, "cancelled")}
+          >{actionLoading === o.id + "cancelled" ? "Guardando..." : "Cancelar"}</button>
         </td>
       </tr>
     ));
@@ -99,8 +135,38 @@ export default function AdminPrintQueueClient() {
                 <th className="px-4 py-2 text-left">Cliente</th>
                 <th className="px-4 py-2 text-left">Fecha</th>
                 <th className="px-4 py-2 text-right">Piezas</th>
+                <th className="px-4 py-2 text-right">Acciones</th>
               </tr>
             </thead>
+                  {/* Modal de detalles */}
+                  {selectedOrder && (
+                    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+                      <div className="bg-bg-secondary rounded-xl border border-border p-6 w-full max-w-lg shadow-xl relative">
+                        <button
+                          className="absolute top-3 right-3 text-muted hover:text-white"
+                          onClick={() => setSelectedOrder(null)}
+                        >✕</button>
+                        <h2 className="text-xl font-bold mb-2">Detalles del pedido</h2>
+                        <div className="mb-4">
+                          <div><b>ID:</b> #{selectedOrder.id.slice(-8).toUpperCase()}</div>
+                          <div><b>Cliente:</b> {selectedOrder.user?.name || selectedOrder.user?.email || "Cliente"}</div>
+                          <div><b>Fecha:</b> {new Date(selectedOrder.createdAt).toLocaleString("es-ES")}</div>
+                          <div><b>Piezas:</b> {selectedOrder.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0}</div>
+                          <div><b>Estado:</b> {selectedOrder.status}</div>
+                        </div>
+                        <div>
+                          <b>Items:</b>
+                          <ul className="mt-2">
+                            {selectedOrder.items?.map((item) => (
+                              <li key={item.id} className="mb-1">
+                                {item.productName} x {item.quantity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
             <tbody>
               {renderRows()}
             </tbody>

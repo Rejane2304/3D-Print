@@ -56,6 +56,23 @@ CREATE TABLE "VerificationToken" (
 );
 
 -- CreateTable
+CREATE TABLE "Material" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "pricePerKg" DOUBLE PRECISION NOT NULL,
+    "maintenanceFactor" DOUBLE PRECISION NOT NULL,
+    "density" DOUBLE PRECISION NOT NULL,
+    "description" TEXT,
+    "color" TEXT,
+    "inStock" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Material_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -64,6 +81,7 @@ CREATE TABLE "Product" (
     "material" TEXT NOT NULL,
     "basePricePerGram" DOUBLE PRECISION NOT NULL,
     "density" DOUBLE PRECISION NOT NULL,
+    "printTimeMinutes" INTEGER NOT NULL DEFAULT 90,
     "minDimX" DOUBLE PRECISION NOT NULL DEFAULT 10,
     "minDimY" DOUBLE PRECISION NOT NULL DEFAULT 10,
     "minDimZ" DOUBLE PRECISION NOT NULL DEFAULT 10,
@@ -74,16 +92,67 @@ CREATE TABLE "Product" (
     "defaultDimY" DOUBLE PRECISION NOT NULL DEFAULT 50,
     "defaultDimZ" DOUBLE PRECISION NOT NULL DEFAULT 50,
     "finishCost" DOUBLE PRECISION NOT NULL DEFAULT 2.50,
+    "modelFillFactor" DOUBLE PRECISION NOT NULL DEFAULT 0.15,
     "images" TEXT[],
     "colors" TEXT[],
     "featured" BOOLEAN NOT NULL DEFAULT false,
     "stock" INTEGER NOT NULL DEFAULT 100,
     "rating" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "reviewCount" INTEGER NOT NULL DEFAULT 0,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ProductPrice" (
+    "id" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "materialId" TEXT NOT NULL,
+    "materialCost" DOUBLE PRECISION NOT NULL,
+    "machineCost" DOUBLE PRECISION NOT NULL,
+    "maintenanceCost" DOUBLE PRECISION NOT NULL,
+    "operationCost" DOUBLE PRECISION NOT NULL,
+    "baseCost" DOUBLE PRECISION NOT NULL,
+    "priceUnit" DOUBLE PRECISION NOT NULL,
+    "priceMedium" DOUBLE PRECISION NOT NULL,
+    "priceBulk" DOUBLE PRECISION NOT NULL,
+    "calculatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ProductPrice_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Inventory" (
+    "id" TEXT NOT NULL,
+    "materialId" TEXT NOT NULL,
+    "quantity" DOUBLE PRECISION NOT NULL,
+    "minStock" DOUBLE PRECISION NOT NULL DEFAULT 500,
+    "location" TEXT,
+    "lastRefill" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Inventory_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Coupon" (
+    "id" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "discountType" TEXT NOT NULL,
+    "discountValue" DOUBLE PRECISION NOT NULL,
+    "minPurchase" DOUBLE PRECISION,
+    "maxUses" INTEGER,
+    "usedCount" INTEGER NOT NULL DEFAULT 0,
+    "validFrom" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "validUntil" TIMESTAMP(3),
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Coupon_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -101,6 +170,7 @@ CREATE TABLE "CartItem" (
     "id" TEXT NOT NULL,
     "cartId" TEXT NOT NULL,
     "productId" TEXT NOT NULL,
+    "materialId" TEXT,
     "material" TEXT NOT NULL,
     "color" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL DEFAULT 1,
@@ -119,9 +189,11 @@ CREATE TABLE "Order" (
     "subtotal" DOUBLE PRECISION NOT NULL,
     "tax" DOUBLE PRECISION NOT NULL,
     "shipping" DOUBLE PRECISION NOT NULL,
+    "discount" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "total" DOUBLE PRECISION NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'pending',
     "stripeSessionId" TEXT,
+    "couponId" TEXT,
     "shippingName" TEXT,
     "shippingEmail" TEXT,
     "shippingPhone" TEXT,
@@ -141,6 +213,7 @@ CREATE TABLE "OrderItem" (
     "id" TEXT NOT NULL,
     "orderId" TEXT NOT NULL,
     "productId" TEXT NOT NULL,
+    "materialId" TEXT,
     "name" TEXT NOT NULL,
     "material" TEXT NOT NULL,
     "color" TEXT NOT NULL,
@@ -210,6 +283,36 @@ CREATE TABLE "PointsTransaction" (
     CONSTRAINT "PointsTransaction_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "PricingConfig" (
+    "id" TEXT NOT NULL,
+    "machineAmortizationPerHour" DOUBLE PRECISION NOT NULL DEFAULT 0.12,
+    "operationCostPerHour" DOUBLE PRECISION NOT NULL DEFAULT 0.04,
+    "consumablesCostPerHour" DOUBLE PRECISION NOT NULL DEFAULT 0.02,
+    "marginUnit" DOUBLE PRECISION NOT NULL DEFAULT 2.5,
+    "marginMedium" DOUBLE PRECISION NOT NULL DEFAULT 2.0,
+    "marginBulk" DOUBLE PRECISION NOT NULL DEFAULT 1.5,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PricingConfig_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Alert" (
+    "id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "data" TEXT,
+    "seen" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT,
+    "orderId" TEXT,
+    "productId" TEXT,
+    "materialId" TEXT,
+
+    CONSTRAINT "Alert_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -226,10 +329,25 @@ CREATE UNIQUE INDEX "VerificationToken_token_key" ON "VerificationToken"("token"
 CREATE UNIQUE INDEX "VerificationToken_identifier_token_key" ON "VerificationToken"("identifier", "token");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Material_code_key" ON "Material"("code");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ProductPrice_productId_materialId_key" ON "ProductPrice"("productId", "materialId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Inventory_materialId_key" ON "Inventory"("materialId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Coupon_code_key" ON "Coupon"("code");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Cart_userId_key" ON "Cart"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Order_stripeSessionId_key" ON "Order"("stripeSessionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Review_userId_productId_key" ON "Review"("userId", "productId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Newsletter_email_key" ON "Newsletter"("email");
@@ -244,6 +362,15 @@ ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "ProductPrice" ADD CONSTRAINT "ProductPrice_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ProductPrice" ADD CONSTRAINT "ProductPrice_materialId_fkey" FOREIGN KEY ("materialId") REFERENCES "Material"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Inventory" ADD CONSTRAINT "Inventory_materialId_fkey" FOREIGN KEY ("materialId") REFERENCES "Material"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -253,13 +380,22 @@ ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_cartId_fkey" FOREIGN KEY ("cartI
 ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_materialId_fkey" FOREIGN KEY ("materialId") REFERENCES "Material"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_couponId_fkey" FOREIGN KEY ("couponId") REFERENCES "Coupon"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_materialId_fkey" FOREIGN KEY ("materialId") REFERENCES "Material"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
