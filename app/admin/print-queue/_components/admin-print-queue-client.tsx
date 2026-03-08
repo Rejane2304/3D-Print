@@ -377,4 +377,5 @@ export default function AdminPrintQueueClient() {
                                   </motion.div>
                                 </div>
                               );
+}
 
