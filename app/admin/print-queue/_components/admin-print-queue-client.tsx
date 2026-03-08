@@ -1,3 +1,15 @@
+import { useRef } from "react";
+  const [filters, setFilters] = useState({ status: "processing", client: "", printer: "" });
+  const [printers, setPrinters] = useState<{ id: string; name: string }[]>([]);
+  const printerModalOrder = useRef<OrderType | null>(null);
+  const [showPrinterModal, setShowPrinterModal] = useState(false);
+
+  // Fetch printers
+  useEffect(() => {
+    fetch("/api/admin/printers")
+      .then((res) => res.json())
+      .then((data) => setPrinters(data.printers || []));
+  }, []);
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -14,19 +26,38 @@ export default function AdminPrintQueueClient() {
   const fetchQueue = useCallback(async () => {
     setLoading(true);
     try {
-      // Cola = pedidos pagados o en proceso
-      const res = await fetch("/api/admin/orders?status=processing&limit=50");
+      const params = new URLSearchParams();
+      if (filters.status) params.append("status", filters.status);
+      if (filters.client) params.append("client", filters.client);
+      if (filters.printer) params.append("printer", filters.printer);
+      params.append("limit", "50");
+      const res = await fetch(`/api/admin/orders?${params.toString()}`);
       const data = await res.json();
       setOrders(data.orders || []);
     } catch {
       showToast("error", "Error al cargar cola de impresión");
     }
     setLoading(false);
-  }, [showToast]);
+  }, [showToast, filters]);
 
   useEffect(() => {
     fetchQueue();
   }, [fetchQueue]);
+  async function assignPrinter(orderId: string, printerId: string, orderItemId?: string) {
+    try {
+      const res = await fetch("/api/admin/printers", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, printerId, orderItemId }),
+      });
+      if (!res.ok) throw new Error("Error asignando impresora");
+      showToast("success", "Impresora asignada");
+      await fetchQueue();
+      setShowPrinterModal(false);
+    } catch {
+      showToast("error", "Error al asignar impresora");
+    }
+  }
 
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -52,7 +83,7 @@ export default function AdminPrintQueueClient() {
     if (loading) {
       return (
         <tr>
-          <td colSpan={5} className="px-4 py-6 text-center text-muted">
+          <td colSpan={6} className="px-4 py-6 text-center text-muted">
             Cargando cola...
           </td>
         </tr>
@@ -61,7 +92,7 @@ export default function AdminPrintQueueClient() {
     if (orders.length === 0) {
       return (
         <tr>
-          <td colSpan={5} className="px-4 py-6 text-center text-muted">
+          <td colSpan={6} className="px-4 py-6 text-center text-muted">
             No hay pedidos en cola de impresión.
           </td>
         </tr>
@@ -80,6 +111,19 @@ export default function AdminPrintQueueClient() {
         </td>
         <td className="px-4 py-2 text-right">
           {o.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0}
+        </td>
+        <td className="px-4 py-2 text-right">
+          {o.printer?.name ? (
+            <span className="text-cyan">{o.printer.name}</span>
+          ) : (
+            <button
+              className="mr-2 text-cyan underline text-xs"
+              onClick={() => {
+                printerModalOrder.current = o;
+                setShowPrinterModal(true);
+              }}
+            >Asignar impresora</button>
+          )}
         </td>
         <td className="px-4 py-2 text-right">
           <button
@@ -135,9 +179,78 @@ export default function AdminPrintQueueClient() {
                 <th className="px-4 py-2 text-left">Cliente</th>
                 <th className="px-4 py-2 text-left">Fecha</th>
                 <th className="px-4 py-2 text-right">Piezas</th>
+                <th className="px-4 py-2 text-right">Impresora</th>
                 <th className="px-4 py-2 text-right">Acciones</th>
               </tr>
             </thead>
+                        {/* Filtros */}
+                        <div className="flex gap-4 mb-4">
+                          <div>
+                            <label className="mr-2 text-sm">Estado:</label>
+                            <select
+                              value={filters.status}
+                              onChange={e => setFilters(f => ({ ...f, status: e.target.value }))}
+                              className="border rounded px-2 py-1"
+                            >
+                              <option value="">Todos</option>
+                              <option value="processing">Procesando</option>
+                              <option value="printed">Impreso</option>
+                              <option value="cancelled">Cancelado</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="mr-2 text-sm">Cliente:</label>
+                            <input
+                              type="text"
+                              value={filters.client}
+                              onChange={e => setFilters(f => ({ ...f, client: e.target.value }))}
+                              className="border rounded px-2 py-1"
+                              placeholder="Nombre o email"
+                            />
+                          </div>
+                          <div>
+                            <label className="mr-2 text-sm">Impresora:</label>
+                            <select
+                              value={filters.printer}
+                              onChange={e => setFilters(f => ({ ...f, printer: e.target.value }))}
+                              className="border rounded px-2 py-1"
+                            >
+                              <option value="">Todas</option>
+                              {printers.map(p => (
+                                <option key={p.id} value={p.id}>{p.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                        {/* Modal asignar impresora */}
+                        {showPrinterModal && printerModalOrder.current && (
+                          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+                            <div className="bg-bg-secondary rounded-xl border border-border p-6 w-full max-w-md shadow-xl relative">
+                              <button
+                                className="absolute top-3 right-3 text-muted hover:text-white"
+                                onClick={() => setShowPrinterModal(false)}
+                              >✕</button>
+                              <h2 className="text-xl font-bold mb-2">Asignar impresora</h2>
+                              <div className="mb-4">
+                                <div><b>Pedido:</b> #{printerModalOrder.current.id.slice(-8).toUpperCase()}</div>
+                                <div><b>Cliente:</b> {printerModalOrder.current.user?.name || printerModalOrder.current.user?.email || "Cliente"}</div>
+                              </div>
+                              <div>
+                                <label className="mb-2 block">Selecciona impresora:</label>
+                                <select
+                                  className="border rounded px-2 py-1 w-full"
+                                  onChange={e => assignPrinter(printerModalOrder.current!.id, e.target.value)}
+                                  defaultValue=""
+                                >
+                                  <option value="">Selecciona...</option>
+                                  {printers.map(p => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                   {/* Modal de detalles */}
                   {selectedOrder && (
                     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
@@ -158,8 +271,22 @@ export default function AdminPrintQueueClient() {
                           <b>Items:</b>
                           <ul className="mt-2">
                             {selectedOrder.items?.map((item) => (
-                              <li key={item.id} className="mb-1">
-                                {item.productName} x {item.quantity}
+                              <li key={item.id} className="mb-2 flex items-center gap-2">
+                                <span>{item.productName} x {item.quantity}</span>
+                                {item.printer?.name ? (
+                                  <span className="text-cyan text-xs">{item.printer.name}</span>
+                                ) : (
+                                  <select
+                                    className="border rounded px-2 py-1 text-xs"
+                                    onChange={e => assignPrinter(selectedOrder.id, e.target.value, item.id)}
+                                    defaultValue=""
+                                  >
+                                    <option value="">Asignar impresora...</option>
+                                    {printers.map(p => (
+                                      <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                  </select>
+                                )}
                               </li>
                             ))}
                           </ul>
