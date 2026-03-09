@@ -147,7 +147,7 @@ export function HomeClient() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#121212] via-[#0a1628] to-[#121212]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#1a1a2e]" />
         <div className="absolute top-20 right-10 w-96 h-96 bg-cyan/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-10 w-80 h-80 bg-amber/5 rounded-full blur-3xl" />
         <div className="max-w-site mx-auto px-4 relative z-10">
@@ -171,7 +171,7 @@ export function HomeClient() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 border-y border-white/5 bg-[#0d0d0d]">
+      <section className="py-16 border-y border-white/5 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0d1b3a]">
         <div className="max-w-site mx-auto px-4 grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
           {[
             { key: "products", label: tStats.products, target: productCount || 0, suffix: "" },
@@ -187,7 +187,7 @@ export function HomeClient() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-br from-[#27408b] via-[#3a5ba0] to-[#27408b]">
         <div className="max-w-site mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">{tFeatured.title}</h2>
@@ -198,7 +198,7 @@ export function HomeClient() {
               <motion.div key={p?.id ?? i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
                 <Link href={`/product/${p?.id}`} className="block group">
                   <div className="bg-bg-card rounded-lg overflow-hidden card-shadow card-shadow-hover transition-all duration-300">
-                    <div className="relative aspect-video bg-zinc-800">
+                    <div className="relative aspect-video bg-gradient-to-br from-[#1a2540] to-[#223366]">
                       <Image src={p?.images?.[0] ?? "/og-image.png"} alt={p?.name ?? tFeatured.product} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                     </div>
                     <div className="p-4">
@@ -262,7 +262,7 @@ export function HomeClient() {
       </section>
 
       {/* Materials */}
-      <section className="py-20 bg-[#0d0d0d]">
+      <section className="py-20 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#1a1a2e]">
         <div className="max-w-site mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">{tMaterials.title}</h2>
@@ -273,7 +273,7 @@ export function HomeClient() {
               const info = MATERIAL_INFO[mat];
               return (
                 <motion.div key={mat} initial={{ opacity: 0, x: i === 0 ? -30 : 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
-                  className="bg-bg-card rounded-xl p-6 card-shadow hover:shadow-lg transition-all duration-300 border border-white/5">
+                  className="bg-gradient-to-br from-[#1a2540] to-[#223366] rounded-xl p-6 card-shadow hover:shadow-lg transition-all duration-300 border border-white/10">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${info.color}15` }}>
                       <Layers className="w-6 h-6" style={{ color: info.color }} />
@@ -300,7 +300,7 @@ export function HomeClient() {
       </section>
 
       {/* Benefits */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-br from-[#27408b] via-[#3a5ba0] to-[#27408b]">
         <div className="max-w-site mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-3">
@@ -314,7 +314,7 @@ export function HomeClient() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {tBenefits.map((b) => (
               <motion.div key={b.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: tBenefits.indexOf(b) * 0.1 }}
-                className="bg-bg-card rounded-xl p-6 card-shadow hover:shadow-lg transition-all duration-300 border border-white/5 text-center">
+                className="bg-gradient-to-br from-[#1a2540] to-[#223366] rounded-xl p-6 card-shadow hover:shadow-lg transition-all duration-300 border border-white/10 text-center">
                 <div className="w-12 h-12 rounded-lg bg-cyan/10 flex items-center justify-center mx-auto mb-4">
                   <b.icon className="w-6 h-6 text-cyan" />
                 </div>
@@ -327,7 +327,7 @@ export function HomeClient() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#0d0d0d]">
+      <section className="py-20 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#1a1a2e]">
         <div className="max-w-site mx-auto px-4 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className="text-3xl font-bold mb-4">{tCTA.title}</h2>

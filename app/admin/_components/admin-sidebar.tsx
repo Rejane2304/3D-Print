@@ -59,9 +59,11 @@ export default function AdminSidebar({ isOpen, setIsOpen }: Readonly<AdminSideba
       {/* Sidebar */}
       <aside
         className={`
+          lg:fixed lg:top-16 lg:left-0 lg:max-h-[calc(100vh-4rem)] lg:w-64 lg:bg-bg-secondary lg:border-r lg:border-border
+          lg:z-10 lg:flex lg:flex-col lg:transition-none lg:overflow-y-auto
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           absolute top-16 left-0 max-h-[calc(100vh-4rem)] w-64 bg-bg-secondary border-r border-border
           z-10 flex flex-col transition-transform duration-300 ease-in-out overflow-y-auto
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         <div className="p-6 flex-1 overflow-y-auto">

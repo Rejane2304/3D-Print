@@ -380,7 +380,7 @@ export default function ProfileClient() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-amber/20 to-cyan/20 border border-border rounded-xl p-6"
+              className="bg-gradient-to-br from-[#1a2540] to-[#223366] border border-white/20 rounded-xl p-6 shadow-lg backdrop-blur-sm"
             >
               <div className="flex items-center gap-3 mb-4">
                 <Star className="w-8 h-8 text-amber" />

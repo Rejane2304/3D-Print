@@ -81,11 +81,14 @@ export interface OrderType {
   items: OrderItemType[];
   user?: { name: string | null; email: string };
   coupon?: CouponType | null;
+  printer?: { id: string; name: string } | null;
 }
 
 export interface OrderItemType {
   id: string;
   name: string;
+  productName?: string;
+  printer?: { id: string; name: string } | null;
   materialId?: string | null;
   material: string;
   color: string;

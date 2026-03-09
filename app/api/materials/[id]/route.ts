@@ -6,11 +6,12 @@ export const dynamic = 'force-dynamic';
 /** GET /api/materials/[id] — Detalle de material (público) */
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const paramsObj = await context.params;
   try {
     const material = await prisma.material.findUnique({
-      where: { id: params.id },
+      where: { id: paramsObj.id },
       include: { inventory: true },
     });
     if (!material) return NextResponse.json({ error: 'Not found' }, { status: 404 });

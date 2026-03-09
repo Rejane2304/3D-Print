@@ -5,8 +5,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #050712;
-  --background-main: #181a24;
+  --background: #27408b;
+  --background-main: #27408b;
   --foreground: #e4e4e7;
   --card: #1e1e2e;
   --card-hover: #252538;

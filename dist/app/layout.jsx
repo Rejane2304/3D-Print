@@ -20,7 +20,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (<html lang="es" suppressHydrationWarning>
       <head>
-        <Script src="https://apps.abacus.ai/chatllm/appllm-lib.js" strategy="afterInteractive"/>
       </head>
       <body className="min-h-screen flex flex-col">
         <Providers>

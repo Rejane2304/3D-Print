@@ -1,4 +1,4 @@
-import AdminAlertsPage from "./page";
+import AdminAlertsPage from "../page";
 
 export default function AlertsClient() {
   return <AdminAlertsPage />;
