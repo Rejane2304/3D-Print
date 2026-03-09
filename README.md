@@ -157,7 +157,7 @@ Ver `.env.example` para configuración. Variables principales:
 ---
 
 ## Contacto
-Para dudas o soporte, consulta la documentación interna o contacta al equipo.
+Proyecto desarrollado y mantenido por una sola persona. Para dudas, revisa este README o la documentación interna.
 
 ## Comandos útiles
 
