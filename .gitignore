@@ -1,3 +1,13 @@
+# Mac OS
+.AppleDouble
+.LSOverride
+
+# Windows
+desktop.ini
+
+# Lockfiles
+pnpm-lock.yaml
+
 # Node / Yarn
 node_modules
 npm-debug.log*
