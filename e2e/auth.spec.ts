@@ -3,14 +3,14 @@ import { test, expect } from '@playwright/test';
 test.describe('Authentication', () => {
   test('should display login page', async ({ page }) => {
     await page.goto('/login');
-    const loginForm = page.locator('form');
+      const loginForm = page.getByRole('main').locator('form');
     await expect(loginForm).toBeVisible();
   });
 
   test('should have email and password fields', async ({ page }) => {
     await page.goto('/login');
-    const emailInput = page.locator('input[type="email"]');
-    const passwordInput = page.locator('input[type="password"]');
+      const emailInput = page.getByRole('main').locator('input[type="email"]');
+      const passwordInput = page.getByRole('main').locator('input[type="password"]');
     
     await expect(emailInput).toBeVisible();
     await expect(passwordInput).toBeVisible();
@@ -18,7 +18,7 @@ test.describe('Authentication', () => {
 
   test('should show validation error for empty form', async ({ page }) => {
     await page.goto('/login');
-    const submitBtn = page.locator('button[type="submit"]');
+    const submitBtn = page.getByRole('main').locator('button[type="submit"]');
     await submitBtn.click();
     // Browser validation should prevent submission
   });

@@ -32,9 +32,11 @@ Plataforma de ecommerce para productos impresos en 3D. Incluye motor de precios 
 Ver `.env.example` para configuración.
 
 ## Estado
-- Tests unitarios: Vitest (100% verde)
-- Tests E2E: Playwright
-- Linter: ESLint
+- Tests unitarios: Vitest (100% verde, sin advertencias)
+- Tests E2E: Playwright (100% verde, sin advertencias)
+- Linter: ESLint (sin errores ni advertencias)
+- Rama principal: main (desarrollo directo, sin ramas extra)
 
 ## Contacto
 Para dudas o soporte, consulta la documentación interna o contacta al equipo.
+
