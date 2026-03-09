@@ -14,7 +14,7 @@ export function Footer() {
     es: {
       about: "Productos impresos en 3D de alta calidad con materiales PLA y PETG. Personaliza cada pieza a tu medida.",
       contact: "Contacto",
-      newsletter: "Newsletter",
+      newsletter: "Suscríbete",
       newsletterDesc: "Recibe novedades y ofertas exclusivas.",
       placeholder: "tu@email.com",
       send: "Enviar",

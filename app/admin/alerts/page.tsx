@@ -84,7 +84,7 @@ export default function AdminAlertsPage() {
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="border rounded px-2 py-1"
+            className="border rounded px-2 py-1 text-black"
           >
             <option value="">Todos</option>
             {ALERT_TYPES.map((t) => (
@@ -99,7 +99,7 @@ export default function AdminAlertsPage() {
           <select
             value={seen}
             onChange={(e) => setSeen(e.target.value)}
-            className="border rounded px-2 py-1"
+            className="border rounded px-2 py-1 text-black"
           >
             {SEEN_FILTERS.map((f) => (
               <option key={f.value} value={f.value}>
