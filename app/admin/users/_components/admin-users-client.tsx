@@ -79,7 +79,7 @@ export default function AdminUsersClient() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Usuarios</h1>
+        <h1 className="text-3xl font-bold mb-2">Panel de control</h1>
         <p className="text-muted">Gestiona los usuarios de la plataforma</p>
       </div>
 
@@ -252,6 +252,7 @@ export default function AdminUsersClient() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Rol</label>
+                    <label htmlFor="role" className="block text-sm font-medium mb-2">Rol</label>
                   <select
                     value={userDetails?.role || selectedUser.role}
                     onChange={(e) =>

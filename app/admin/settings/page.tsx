@@ -30,7 +30,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Configuración</h1>
+        <h1 className="text-3xl font-bold mb-2">Panel de control</h1>
         <p className="text-muted">Ajusta los parámetros de tu tienda</p>
       </div>
 

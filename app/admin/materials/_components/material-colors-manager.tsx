@@ -80,7 +80,7 @@ export default function MaterialColorsManager({
   useEffect(() => {
     loadMaterialColors();
     loadAllColors();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, [materialId, loadMaterialColors]);
 
   const notify = (type: "success" | "error", msg: string) => {

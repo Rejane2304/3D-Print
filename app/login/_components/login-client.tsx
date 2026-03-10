@@ -23,7 +23,7 @@ function getBarColor(len: number): string {
 }
 
 export function LoginClient() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const { showToast } = useToast();
   const { language } = useLanguage();
@@ -91,15 +91,18 @@ export function LoginClient() {
   }[language];
 
   useEffect(() => {
+    console.log("[LoginClient] useEffect status:", status, "session:", session);
     if (status === "authenticated") {
       // Redirige admin directamente al panel
       if ((session?.user as any)?.role === "admin") {
+        console.log("[LoginClient] Redirigiendo a /admin");
         router.replace("/admin");
       } else {
+        console.log("[LoginClient] Redirigiendo a /");
         router.replace("/");
       }
     }
-  }, [status, router]);
+  }, [status, router, session]);
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
@@ -117,6 +120,10 @@ export function LoginClient() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+      // eslint-disable-next-line no-console
+      console.log("[LoginClient] handleSubmit", { email, isLogin, status, session });
+      // eslint-disable-next-line no-console
+      console.log("[LoginClient] useEffect status:", status, "session:", session);
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
@@ -128,6 +135,21 @@ export function LoginClient() {
           redirect: false,
         });
         if (result?.ok) {
+          // Espera activa: polling de sesión hasta que el rol sea 'admin'
+          let tries = 0;
+          let adminDetected = false;
+          while (tries < 20 && !adminDetected) {
+            await new Promise((r) => setTimeout(r, 250));
+            const currentSession = await update?.();
+            if ((currentSession?.user as any)?.role === "admin") {
+              adminDetected = true;
+              router.replace("/admin");
+              setLoading(false);
+              return;
+            }
+            tries++;
+          }
+          // Si no detecta admin, redirige a home
           router.replace("/");
         } else {
           showToast("error", t.invalidCredentials);
@@ -145,7 +167,10 @@ export function LoginClient() {
             redirect: false,
           });
           if (result?.ok) {
-            router.replace("/");
+            if (typeof update === "function") {
+              await update();
+            }
+            router.replace("/admin");
           }
         } else {
           const data = await res?.json().catch(() => ({}));

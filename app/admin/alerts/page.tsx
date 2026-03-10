@@ -79,7 +79,7 @@ export default function AdminAlertsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Alertas del sistema</h1>
+      <h1 className="text-2xl font-bold mb-4">Panel de control</h1>
       <div className="flex gap-4 mb-6">
         <div>
           <span className="mr-2">Tipo:</span>

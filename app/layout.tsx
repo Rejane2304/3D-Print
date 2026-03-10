@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-// @ts-expect-error Next.js layout requires this import
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/header";
@@ -25,10 +24,22 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Detecta si es la página de inicio usando pathname de Next.js
+  const isHome =
+    globalThis.window === undefined
+      ? require("next/navigation").usePathname?.() === "/"
+      : globalThis.window.location.pathname === "/";
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es">
       <head></head>
-      <body className="min-h-screen flex flex-col">
+      <body
+        className={
+          `min-h-screen flex flex-col` +
+          (isHome
+            ? " bg-gradient-to-br from-[#050712] via-[#181a24] to-[#00FFFF]"
+            : "")
+        }
+      >
         <Providers>
           <Header />
           <main className="flex-1 pt-16">{children}</main>

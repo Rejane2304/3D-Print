@@ -1,0 +1,49 @@
+{
+  "cookies": [
+    {
+      "name": "next-auth.csrf-token",
+      "value": "162c973d1b8e3631083a0f4bdb38bf0ef929088ceaac252273b97bd6beff8a33%7Cd01e752e6de286b80307e5e9513689072bd447a3ad2b1c8a185032807ab42651",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "next-auth.callback-url",
+      "value": "http%3A%2F%2Flocalhost%3A3000%2Flogin",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "next-auth.session-token",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..1XnDnwq9b2Rh0BcI.x8NQBqQt9ACwDvS6C9cON48MEk0elWzx1iw3_HvbaufA3yu7KcaxZlk52OWGpd7SK7FYhB77fyjeBl9vogmZYfEv7OEzvFkmqpOwfSw3Cyqgh_v1Xl7pyaOH7H9hEPIltehid0WUVFjgOTkGQiV_UyDZHIHBU-EK-jbLCep8a6vli732qFo5CC3huamtR9IQJcpE-pFJBihtVoPQwcZlBLL0FsshH_qpiUaFwuNcuLd66Wez8R-FSKtp-i28huYSAg79t39SiCNYVxfKLPg8PtTiNw.A6sCShBgcWPWtrwpM4xO9A",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1775743699.049599,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "nextauth.message",
+          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1773151698}"
+        },
+        {
+          "name": "3dprint-language",
+          "value": "{\"state\":{\"language\":\"es\",\"_hasHydrated\":true},\"version\":0}"
+        }
+      ]
+    }
+  ]
+}

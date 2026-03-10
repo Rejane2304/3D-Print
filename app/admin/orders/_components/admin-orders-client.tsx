@@ -240,10 +240,14 @@ export default function AdminOrdersClient() {
     );
   }
 
+  useEffect(() => {
+    
+    console.log("[AdminOrdersClient] render h1 Panel de control");
+  }, []);
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Pedidos</h1>
+        <h1 className="text-3xl font-bold mb-2">Panel de control</h1>
         <p className="text-muted">Gestiona los pedidos de tus clientes</p>
       </div>
 

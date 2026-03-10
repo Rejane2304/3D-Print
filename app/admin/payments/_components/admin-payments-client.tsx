@@ -70,7 +70,7 @@ export default function AdminPaymentsClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Gestión de pagos</h1>
+          <h1 className="text-2xl font-bold">Panel de control</h1>
           <p className="text-muted text-sm">
             Visión general de pedidos pagados y liquidaciones.
           </p>

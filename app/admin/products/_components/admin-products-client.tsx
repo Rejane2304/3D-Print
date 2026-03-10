@@ -187,7 +187,7 @@ export default function AdminProductsClient() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Productos</h1>
+          <h1 className="text-3xl font-bold mb-2">Panel de control</h1>
           <p className="text-muted">Gestiona tu catálogo de productos</p>
         </div>
         <button

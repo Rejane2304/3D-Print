@@ -31,7 +31,7 @@ export default function AdminInventoryClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Gestión de inventario</h1>
+          <h1 className="text-2xl font-bold">Panel de control</h1>
           <p className="text-muted text-sm">
             Controla el stock de tus productos impresos en 3D.
           </p>
@@ -70,14 +70,15 @@ export default function AdminInventoryClient() {
                     Cargando inventario...
                   </td>
                 </tr>
-              ) : products.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-muted">
-                    No hay productos en inventario.
-                  </td>
-                </tr>
               ) : (
-                products.map((p) => (
+                products.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-6 text-center text-muted">
+                      No hay productos en inventario.
+                    </td>
+                  </tr>
+                ) : (
+                  products.map((p) => (
                   <tr key={p.id} className="border-t border-border/60">
                     <td className="px-4 py-2">{p.name}</td>
                     <td className="px-4 py-2 text-muted">{p.category}</td>
@@ -89,7 +90,7 @@ export default function AdminInventoryClient() {
                     </td>
                   </tr>
                 ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>

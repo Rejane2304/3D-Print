@@ -165,7 +165,7 @@ export default function AdminPrintQueueClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Cola de impresión</h1>
+          <h1 className="text-2xl font-bold">Panel de control</h1>
           <p className="text-muted text-sm">
             Pedidos en estado &quot;procesando&quot; listos para planificar en
             impresoras.

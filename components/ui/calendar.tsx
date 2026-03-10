@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { FC } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-const IconLeft: FC = () => <ChevronLeft className="h-4 w-4" />;
-const IconRight: FC = () => <ChevronRight className="h-4 w-4" />;
+const IconLeft = (props: any) => <ChevronLeft className="h-4 w-4" {...props} />;
+const IconRight = (props: any) => <ChevronRight className="h-4 w-4" {...props} />;
 import { DayPicker } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
