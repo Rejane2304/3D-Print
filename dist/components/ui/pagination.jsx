@@ -1,46 +1,102 @@
-'use client';
-import * as React from 'react';
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
-import { useLanguage } from '@/lib/language-store';
-const Pagination = ({ className, ...props }) => (<nav role="navigation" aria-label="pagination" className={cn('mx-auto flex w-full justify-center', className)} {...props}/>);
-Pagination.displayName = 'Pagination';
-const PaginationContent = React.forwardRef(({ className, ...props }, ref) => (<ul ref={ref} className={cn('flex flex-row items-center gap-1', className)} {...props}/>));
-PaginationContent.displayName = 'PaginationContent';
-const PaginationItem = React.forwardRef(({ className, ...props }, ref) => (<li ref={ref} className={cn('', className)} {...props}/>));
-PaginationItem.displayName = 'PaginationItem';
-const PaginationLink = ({ className, isActive, size = 'icon', ...props }) => (<a aria-current={isActive ? 'page' : undefined} className={cn(buttonVariants({
-        variant: isActive ? 'outline' : 'ghost',
+"use client";
+import * as React from "react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { useLanguage } from "@/lib/language-store";
+const Pagination = ({ className, ...props }) => (
+  <nav
+    role="navigation"
+    aria-label="pagination"
+    className={cn("mx-auto flex w-full justify-center", className)}
+    {...props}
+  />
+);
+Pagination.displayName = "Pagination";
+const PaginationContent = React.forwardRef(({ className, ...props }, ref) => (
+  <ul
+    ref={ref}
+    className={cn("flex flex-row items-center gap-1", className)}
+    {...props}
+  />
+));
+PaginationContent.displayName = "PaginationContent";
+const PaginationItem = React.forwardRef(({ className, ...props }, ref) => (
+  <li ref={ref} className={cn("", className)} {...props} />
+));
+PaginationItem.displayName = "PaginationItem";
+const PaginationLink = ({ className, isActive, size = "icon", ...props }) => (
+  <a
+    aria-current={isActive ? "page" : undefined}
+    className={cn(
+      buttonVariants({
+        variant: isActive ? "outline" : "ghost",
         size,
-    }), className)} {...props}/>);
-PaginationLink.displayName = 'PaginationLink';
+      }),
+      className,
+    )}
+    {...props}
+  />
+);
+PaginationLink.displayName = "PaginationLink";
 function PaginationPrevious({ className, ...props }) {
-    const { language } = useLanguage();
-    const label = language === 'es' ? 'Anterior' : 'Previous';
-    const ariaLabel = language === 'es' ? 'Ir a la página anterior' : 'Go to previous page';
-    return (<PaginationLink aria-label={ariaLabel} size="default" className={cn('gap-1 pl-2.5', className)} {...props}>
-      <ChevronLeft className="h-4 w-4"/>
+  const { language } = useLanguage();
+  const label = language === "es" ? "Anterior" : "Previous";
+  const ariaLabel =
+    language === "es" ? "Ir a la página anterior" : "Go to previous page";
+  return (
+    <PaginationLink
+      aria-label={ariaLabel}
+      size="default"
+      className={cn("gap-1 pl-2.5", className)}
+      {...props}
+    >
+      <ChevronLeft className="h-4 w-4" />
       <span>{label}</span>
-    </PaginationLink>);
+    </PaginationLink>
+  );
 }
-PaginationPrevious.displayName = 'PaginationPrevious';
+PaginationPrevious.displayName = "PaginationPrevious";
 function PaginationNext({ className, ...props }) {
-    const { language } = useLanguage();
-    const label = language === 'es' ? 'Siguiente' : 'Next';
-    const ariaLabel = language === 'es' ? 'Ir a la página siguiente' : 'Go to next page';
-    return (<PaginationLink aria-label={ariaLabel} size="default" className={cn('gap-1 pr-2.5', className)} {...props}>
+  const { language } = useLanguage();
+  const label = language === "es" ? "Siguiente" : "Next";
+  const ariaLabel =
+    language === "es" ? "Ir a la página siguiente" : "Go to next page";
+  return (
+    <PaginationLink
+      aria-label={ariaLabel}
+      size="default"
+      className={cn("gap-1 pr-2.5", className)}
+      {...props}
+    >
       <span>{label}</span>
-      <ChevronRight className="h-4 w-4"/>
-    </PaginationLink>);
+      <ChevronRight className="h-4 w-4" />
+    </PaginationLink>
+  );
 }
-PaginationNext.displayName = 'PaginationNext';
+PaginationNext.displayName = "PaginationNext";
 function PaginationEllipsis({ className, ...props }) {
-    const { language } = useLanguage();
-    return (<span aria-hidden className={cn('flex h-9 w-9 items-center justify-center', className)} {...props}>
-      <MoreHorizontal className="h-4 w-4"/>
-      <span className="sr-only">{language === 'es' ? 'Más páginas' : 'More pages'}</span>
-    </span>);
+  const { language } = useLanguage();
+  return (
+    <span
+      aria-hidden
+      className={cn("flex h-9 w-9 items-center justify-center", className)}
+      {...props}
+    >
+      <MoreHorizontal className="h-4 w-4" />
+      <span className="sr-only">
+        {language === "es" ? "Más páginas" : "More pages"}
+      </span>
+    </span>
+  );
 }
-PaginationEllipsis.displayName = 'PaginationEllipsis';
-export { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, };
+PaginationEllipsis.displayName = "PaginationEllipsis";
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+};

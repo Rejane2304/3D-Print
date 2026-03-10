@@ -21,8 +21,13 @@ export async function POST(req: NextRequest) {
         // Incrementar usedCount del cupón si se usó uno
         if (couponId) {
           await prisma.coupon
-            .update({ where: { id: couponId }, data: { usedCount: { increment: 1 } } })
-            .catch((err: unknown) => console.error("Error updating coupon usedCount:", err));
+            .update({
+              where: { id: couponId },
+              data: { usedCount: { increment: 1 } },
+            })
+            .catch((err: unknown) =>
+              console.error("Error updating coupon usedCount:", err),
+            );
         }
 
         // Otorgar puntos de fidelidad (1 punto por euro gastado, sobre total con descuento)

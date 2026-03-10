@@ -1,0 +1,58 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["@typescript-eslint", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
+  },
+  "rules": {
+    "prettier/prettier": ["warn", { "endOfLine": "auto" }],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.test.ts",
+          "**/*.test.tsx",
+          "**/*.spec.ts",
+          "**/*.spec.tsx",
+          "**/test/**",
+          "**/tests/**",
+          "**/__tests__/**",
+          "**/setupTests.ts",
+          "**/vitest.setup.tsx"
+        ],
+        "optionalDependencies": false,
+        "peerDependencies": false,
+        "packageDir": ["./"]
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "dist/",
+    "node_modules/",
+    ".next/",
+    "*.config.js",
+    "*.config.ts",
+    "private/",
+    "scripts/postinstall.js"
+  ]
+}

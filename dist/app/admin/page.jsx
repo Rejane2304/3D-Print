@@ -1,4 +1,4 @@
-import AdminDashboardClient from './_components/admin-dashboard-client';
+import AdminDashboardClient from "./_components/admin-dashboard-client";
 export default function AdminDashboardPage() {
-    return <AdminDashboardClient />;
+  return <AdminDashboardClient />;
 }

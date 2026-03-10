@@ -10,8 +10,8 @@
 
 // ---- Motor de precios (autocontenido, sin imports externos) ----
 
-const MACHINE_AMORTIZATION = 0.25;  // $/h
-const OPERATION_COST = 0.05;        // $/h electricidad
+const MACHINE_AMORTIZATION = 0.25; // $/h
+const OPERATION_COST = 0.05; // $/h electricidad
 const INFILL_FACTOR = 0.2;
 const MARGINS = { unit: 2.5, medium: 2.0, bulk: 1.5 } as const;
 
@@ -45,7 +45,8 @@ interface CalcResult {
 }
 
 function calcPrice(product: ProductInput, material: MaterialInput): CalcResult {
-  const vol = (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
+  const vol =
+    (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
   const weightKg = (vol * material.density * INFILL_FACTOR) / 1000;
   const hours = product.printTimeMinutes / 60;
 
@@ -53,7 +54,12 @@ function calcPrice(product: ProductInput, material: MaterialInput): CalcResult {
   const machineCost = hours * MACHINE_AMORTIZATION;
   const maintenanceCost = hours * material.maintenanceFactor;
   const operationCost = hours * OPERATION_COST;
-  const baseCost = materialCost + machineCost + maintenanceCost + operationCost + product.finishCost;
+  const baseCost =
+    materialCost +
+    machineCost +
+    maintenanceCost +
+    operationCost +
+    product.finishCost;
 
   const r = (n: number) => Math.round(n * 100) / 100;
   return {
@@ -77,7 +83,7 @@ self.onmessage = (event: MessageEvent) => {
     materials: MaterialInput[];
   };
 
-  if (type !== 'CALCULATE_PRICES') return;
+  if (type !== "CALCULATE_PRICES") return;
 
   try {
     const total = products.length * materials.length;
@@ -93,7 +99,7 @@ self.onmessage = (event: MessageEvent) => {
         // Reportar progreso cada 5 cálculos
         if (processed % 5 === 0 || processed === total) {
           self.postMessage({
-            type: 'PROGRESS',
+            type: "PROGRESS",
             current: processed,
             total,
             percentage: Math.round((processed / total) * 100),
@@ -102,11 +108,12 @@ self.onmessage = (event: MessageEvent) => {
       }
     }
 
-    self.postMessage({ type: 'RESULT', prices });
+    self.postMessage({ type: "RESULT", prices });
   } catch (error) {
     self.postMessage({
-      type: 'ERROR',
-      message: error instanceof Error ? error.message : 'Worker calculation failed',
+      type: "ERROR",
+      message:
+        error instanceof Error ? error.message : "Worker calculation failed",
     });
   }
 };

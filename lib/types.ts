@@ -125,7 +125,7 @@ export interface WishlistItemType {
 export interface PointsTransactionType {
   id: string;
   points: number;
-  type: 'earned' | 'redeemed' | 'bonus' | 'expired';
+  type: "earned" | "redeemed" | "bonus" | "expired";
   description: string;
   orderId: string | null;
   createdAt: string;
@@ -140,7 +140,12 @@ export interface DashboardStatsType {
   topProducts: { product: ProductType; totalSold: number }[];
   revenueByMonth: { month: string; revenue: number }[];
   ordersByStatus: { status: string; count: number }[];
-  costByMaterial?: { material: string; averageUnitPrice: number; pieces: number; percentage: number }[];
+  costByMaterial?: {
+    material: string;
+    averageUnitPrice: number;
+    pieces: number;
+    percentage: number;
+  }[];
   sizeDistribution?: { bucket: string; count: number }[];
 }
 
@@ -191,7 +196,7 @@ export interface InventoryType {
 export interface CouponType {
   id: string;
   code: string;
-  discountType: 'percentage' | 'fixed';
+  discountType: "percentage" | "fixed";
   discountValue: number;
   minPurchase: number | null;
   maxUses: number | null;
@@ -204,8 +209,8 @@ export interface CouponType {
 
 // ---- Web Worker (pricing worker) ----------------------------
 
-export type WorkerMessageType = 'CALCULATE_PRICES';
-export type WorkerResponseType = 'PROGRESS' | 'RESULT' | 'ERROR';
+export type WorkerMessageType = "CALCULATE_PRICES";
+export type WorkerResponseType = "PROGRESS" | "RESULT" | "ERROR";
 
 export interface WorkerInput {
   type: WorkerMessageType;
@@ -214,19 +219,19 @@ export interface WorkerInput {
 }
 
 export interface WorkerProgressMessage {
-  type: 'PROGRESS';
+  type: "PROGRESS";
   current: number;
   total: number;
   percentage: number;
 }
 
 export interface WorkerResultMessage {
-  type: 'RESULT';
+  type: "RESULT";
   prices: Record<string, Record<string, ProductPriceType>>;
 }
 
 export interface WorkerErrorMessage {
-  type: 'ERROR';
+  type: "ERROR";
   message: string;
 }
 

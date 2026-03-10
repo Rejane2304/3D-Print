@@ -1,33 +1,35 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from "vitest";
 // Integration tests for Authentication API
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 
 const mockUsers = [
   {
-    id: '1',
-    email: 'test@example.com',
-    password: bcrypt.hashSync('fakepass', 10), // Contraseña genérica para test
-    name: 'Test User',
-    role: 'user',
+    id: "1",
+    email: "test@example.com",
+    password: bcrypt.hashSync("fakepass", 10), // Contraseña genérica para test
+    name: "Test User",
+    role: "user",
   },
 ];
 
-vi.mock('@/lib/db', () => ({
+vi.mock("@/lib/db", () => ({
   __esModule: true,
   prisma: {
     user: {
       findUnique: vi.fn((args) => {
         const { where } = args as { where?: { email?: string } };
         // Usar optional chaining para evitar advertencia
-        const user = mockUsers.find(u => u.email === where?.email);
+        const user = mockUsers.find((u) => u.email === where?.email);
         return Promise.resolve(user || null);
       }),
       create: vi.fn((args) => {
-        const { data } = args as { data: { email: string; password: string; name: string } };
+        const { data } = args as {
+          data: { email: string; password: string; name: string };
+        };
         const newUser = {
           id: String(mockUsers.length + 1),
           ...data,
-          role: 'user',
+          role: "user",
         };
         mockUsers.push(newUser);
         return Promise.resolve(newUser);
@@ -36,34 +38,44 @@ vi.mock('@/lib/db', () => ({
   },
 }));
 
-describe('Auth API Integration', () => {
-  describe('POST /api/auth/login', () => {
-    it('should login with valid credentials', async () => {
-      const { POST } = await import('@/app/api/auth/login/route');
+describe("Auth API Integration", () => {
+  describe("POST /api/auth/login", () => {
+    it("should login with valid credentials", async () => {
+      const { POST } = await import("@/app/api/auth/login/route");
       const request = {
-        json: async () => ({ email: process.env.TEST_EMAIL || 'test@example.com', password: process.env.TEST_PASSWORD || 'fakepass' }),
+        json: async () => ({
+          email: process.env.TEST_EMAIL || "test@example.com",
+          password: process.env.TEST_PASSWORD || "fakepass",
+        }),
       } as any;
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data.email).toBe('test@example.com');
+      expect(data.email).toBe("test@example.com");
     });
 
-    it('should reject invalid password', async () => {
-      const { POST } = await import('@/app/api/auth/login/route');
+    it("should reject invalid password", async () => {
+      const { POST } = await import("@/app/api/auth/login/route");
       const request = {
-        json: async () => ({ email: process.env.TEST_EMAIL || 'test@example.com', password: process.env.TEST_PASSWORD_INVALID || 'wrongpass' }),
+        json: async () => ({
+          email: process.env.TEST_EMAIL || "test@example.com",
+          password: process.env.TEST_PASSWORD_INVALID || "wrongpass",
+        }),
       } as any;
       const response = await POST(request);
 
       expect(response.status).toBe(401);
     });
 
-    it('should reject non-existent user', async () => {
-      const { POST } = await import('@/app/api/auth/login/route');
+    it("should reject non-existent user", async () => {
+      const { POST } = await import("@/app/api/auth/login/route");
       const request = {
-        json: async () => ({ email: process.env.TEST_EMAIL_NONEXISTENT || 'nonexistent@example.com', password: process.env.TEST_PASSWORD || 'fakepass' }),
+        json: async () => ({
+          email:
+            process.env.TEST_EMAIL_NONEXISTENT || "nonexistent@example.com",
+          password: process.env.TEST_PASSWORD || "fakepass",
+        }),
       } as any;
       const response = await POST(request);
 
@@ -71,30 +83,30 @@ describe('Auth API Integration', () => {
     });
   });
 
-  describe('POST /api/signup', () => {
-    it('should create new user', async () => {
-      const { POST } = await import('@/app/api/signup/route');
+  describe("POST /api/signup", () => {
+    it("should create new user", async () => {
+      const { POST } = await import("@/app/api/signup/route");
       const request = {
         json: async () => ({
-          email: process.env.TEST_EMAIL_NEWUSER || 'newuser@example.com',
-          password: process.env.TEST_PASSWORD || 'fakepass',
-          name: 'New User',
+          email: process.env.TEST_EMAIL_NEWUSER || "newuser@example.com",
+          password: process.env.TEST_PASSWORD || "fakepass",
+          name: "New User",
         }),
       } as any;
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(201);
-      expect(data.email).toBe('newuser@example.com');
+      expect(data.email).toBe("newuser@example.com");
     });
 
-    it('should reject duplicate email', async () => {
-      const { POST } = await import('@/app/api/signup/route');
+    it("should reject duplicate email", async () => {
+      const { POST } = await import("@/app/api/signup/route");
       const request = {
         json: async () => ({
-          email: process.env.TEST_EMAIL || 'test@example.com',
-          password: process.env.TEST_PASSWORD || 'fakepass',
-          name: 'Duplicate User',
+          email: process.env.TEST_EMAIL || "test@example.com",
+          password: process.env.TEST_PASSWORD || "fakepass",
+          name: "Duplicate User",
         }),
       } as any;
       const response = await POST(request);

@@ -36,13 +36,26 @@ export async function GET(req: NextRequest) {
     else orderBy.createdAt = "desc";
 
     const [products, total] = await Promise.all([
-      prisma.product.findMany({ where, orderBy, skip: (page - 1) * limit, take: limit }),
+      prisma.product.findMany({
+        where,
+        orderBy,
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
       prisma.product.count({ where }),
     ]);
 
-    return NextResponse.json({ products, total, page, totalPages: Math.ceil(total / limit) });
+    return NextResponse.json({
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err: unknown) {
     console.error("Products fetch error:", err);
-    return NextResponse.json({ error: "Error fetching products" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error fetching products" },
+      { status: 500 },
+    );
   }
 }

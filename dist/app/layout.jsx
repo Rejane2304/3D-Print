@@ -6,21 +6,22 @@ import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/toast-provider";
 export const dynamic = "force-dynamic";
 export const metadata = {
-    title: "3D Print — Productos Impresos en 3D",
-    description: "Ecommerce de productos personalizados impresos en 3D con materiales PLA y PETG de alta calidad.",
-    metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
-    icons: {
-        icon: "/favicon.svg",
-        shortcut: "/favicon.svg",
-    },
-    openGraph: {
-        images: ["/og-image.png"],
-    },
+  title: "3D Print — Productos Impresos en 3D",
+  description:
+    "Ecommerce de productos personalizados impresos en 3D con materiales PLA y PETG de alta calidad.",
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
+  openGraph: {
+    images: ["/og-image.png"],
+  },
 };
 export default function RootLayout({ children }) {
-    return (<html lang="es" suppressHydrationWarning>
-      <head>
-      </head>
+  return (
+    <html lang="es" suppressHydrationWarning>
+      <head></head>
       <body className="min-h-screen flex flex-col">
         <Providers>
           <Header />
@@ -29,5 +30,6 @@ export default function RootLayout({ children }) {
           <Toaster />
         </Providers>
       </body>
-    </html>);
+    </html>
+  );
 }

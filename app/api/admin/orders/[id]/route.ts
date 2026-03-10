@@ -1,19 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-options';
-import prisma from '@/lib/db';
-import { sendEmail, tplReadyToShip, tplShipped } from '@/lib/email';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import prisma from "@/lib/db";
+import { sendEmail, tplReadyToShip, tplShipped } from "@/lib/email";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user || (session.user as { role?: string }).role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (
+      !session?.user ||
+      (session.user as { role?: string }).role !== "admin"
+    ) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -26,47 +29,71 @@ export async function GET(
     });
 
     if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     return NextResponse.json(order);
   } catch (error) {
-    console.error('Error fetching order:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching order:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
-async function maybeNotifyCustomer(order: {
-  id: string;
-  total: number;
-  shippingName: string | null;
-  shippingEmail: string | null;
-  shippingAddress: string | null;
-  shippingCity: string | null;
-  shippingState: string | null;
-  shippingZip: string | null;
-  shippingCountry: string | null;
-}, newStatus: string): Promise<void> {
+async function maybeNotifyCustomer(
+  order: {
+    id: string;
+    total: number;
+    shippingName: string | null;
+    shippingEmail: string | null;
+    shippingAddress: string | null;
+    shippingCity: string | null;
+    shippingState: string | null;
+    shippingZip: string | null;
+    shippingCountry: string | null;
+  },
+  newStatus: string,
+): Promise<void> {
   const email = order.shippingEmail;
   if (!email) return;
-  const name = order.shippingName || 'Cliente';
-  if (newStatus === 'ready') {
-    await sendEmail(email, '¡Tu pedido está listo para el envío!', tplReadyToShip(name, order.id, order.total));
-  } else if (newStatus === 'shipped') {
-    const address = [order.shippingAddress, order.shippingCity, order.shippingState, order.shippingZip, order.shippingCountry]
-      .filter((v): v is string => Boolean(v)).join(', ');
-    await sendEmail(email, '¡Tu pedido ha sido enviado!', tplShipped(name, order.id, address));
+  const name = order.shippingName || "Cliente";
+  if (newStatus === "ready") {
+    await sendEmail(
+      email,
+      "¡Tu pedido está listo para el envío!",
+      tplReadyToShip(name, order.id, order.total),
+    );
+  } else if (newStatus === "shipped") {
+    const address = [
+      order.shippingAddress,
+      order.shippingCity,
+      order.shippingState,
+      order.shippingZip,
+      order.shippingCountry,
+    ]
+      .filter((v): v is string => Boolean(v))
+      .join(", ");
+    await sendEmail(
+      email,
+      "¡Tu pedido ha sido enviado!",
+      tplShipped(name, order.id, address),
+    );
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user || (session.user as { role?: string }).role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (
+      !session?.user ||
+      (session.user as { role?: string }).role !== "admin"
+    ) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
@@ -81,14 +108,16 @@ export async function PUT(
       },
     });
 
-    await maybeNotifyCustomer(order, status).catch(err =>
-      console.error('Email notification error:', err)
+    await maybeNotifyCustomer(order, status).catch((err) =>
+      console.error("Email notification error:", err),
     );
 
     return NextResponse.json(order);
   } catch (error) {
-    console.error('Error updating order:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error updating order:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
-

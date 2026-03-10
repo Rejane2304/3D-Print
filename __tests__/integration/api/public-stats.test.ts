@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from "vitest";
 /**
  * Integration tests for public stats API
  * Garantiza que los contadores que ve el usuario
@@ -8,10 +8,7 @@ import { describe, it, expect, vi } from 'vitest';
 const mockCounts = {
   products: 30,
   customers: 12,
-  materials: [
-    { material: "PLA" },
-    { material: "PETG" },
-  ],
+  materials: [{ material: "PLA" }, { material: "PETG" }],
 };
 
 vi.mock("@/lib/db", () => ({
@@ -46,4 +43,3 @@ describe("Public Stats API Integration", () => {
     });
   });
 });
-

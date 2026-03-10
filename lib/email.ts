@@ -4,29 +4,35 @@
 // Sin configuración: los mensajes se loguean en consola (no-op).
 // =============================================================
 
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 function getTransporter() {
   if (!process.env.EMAIL_SERVER_HOST) return null;
   return nodemailer.createTransport({
     host: process.env.EMAIL_SERVER_HOST,
     port: Number(process.env.EMAIL_SERVER_PORT ?? 587),
-    secure: process.env.EMAIL_SERVER_SECURE === 'true',
+    secure: process.env.EMAIL_SERVER_SECURE === "true",
     auth: {
-      user: process.env.EMAIL_SERVER_USER ?? '',
-      pass: process.env.EMAIL_SERVER_PASSWORD ?? '',
+      user: process.env.EMAIL_SERVER_USER ?? "",
+      pass: process.env.EMAIL_SERVER_PASSWORD ?? "",
     },
   });
 }
 
-export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+export async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+): Promise<void> {
   const transporter = getTransporter();
   if (!transporter) {
-    console.log(`[EMAIL] To: ${to} | Subject: ${subject} (EMAIL_SERVER_HOST no configurado)`);
+    console.log(
+      `[EMAIL] To: ${to} | Subject: ${subject} (EMAIL_SERVER_HOST no configurado)`,
+    );
     return;
   }
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM ?? 'noreply@3dprint.es',
+    from: process.env.EMAIL_FROM ?? "noreply@3dprint.es",
     to,
     subject,
     html,
@@ -35,7 +41,11 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 
 // ---- Plantillas ----------------------------------------------
 
-export function tplReadyToShip(name: string, orderId: string, total: number): string {
+export function tplReadyToShip(
+  name: string,
+  orderId: string,
+  total: number,
+): string {
   const ref = orderId.slice(-8).toUpperCase();
   return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e5e5e5;border-radius:12px;overflow:hidden">
@@ -52,7 +62,7 @@ export function tplReadyToShip(name: string, orderId: string, total: number): st
       <p style="margin:8px 0 0;font-size:14px;color:#aaa">Total: <strong style="color:#e5e5e5">€${total.toFixed(2)}</strong></p>
     </div>
     <p>En breve recibirás la información de seguimiento del envío.</p>
-    <a href="${process.env.NEXTAUTH_URL ?? 'http://localhost:3000'}/orders"
+    <a href="${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/orders"
        style="display:inline-block;margin-top:8px;padding:12px 24px;background:#00FFFF;color:#000;font-weight:bold;border-radius:8px;text-decoration:none">
       Ver mis pedidos
     </a>
@@ -63,7 +73,11 @@ export function tplReadyToShip(name: string, orderId: string, total: number): st
 </div>`;
 }
 
-export function tplShipped(name: string, orderId: string, address: string): string {
+export function tplShipped(
+  name: string,
+  orderId: string,
+  address: string,
+): string {
   const ref = orderId.slice(-8).toUpperCase();
   return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e5e5e5;border-radius:12px;overflow:hidden">
@@ -77,7 +91,7 @@ export function tplShipped(name: string, orderId: string, address: string): stri
       ${address}
     </div>
     <p>Puedes consultar el estado de todos tus pedidos en tu cuenta.</p>
-    <a href="${process.env.NEXTAUTH_URL ?? 'http://localhost:3000'}/orders"
+    <a href="${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/orders"
        style="display:inline-block;margin-top:8px;padding:12px 24px;background:#00FFFF;color:#000;font-weight:bold;border-radius:8px;text-decoration:none">
       Ver mis pedidos
     </a>

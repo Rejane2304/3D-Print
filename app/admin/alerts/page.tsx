@@ -72,7 +72,9 @@ export default function AdminAlertsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, seen: true }),
     });
-    setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, seen: true } : a)));
+    setAlerts((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, seen: true } : a)),
+    );
   };
 
   return (
@@ -109,52 +111,57 @@ export default function AdminAlertsPage() {
           </select>
         </div>
       </div>
-      {
-        (() => {
-          if (loading) {
-            return <div>Cargando alertas...</div>;
-          }
-          if (alerts.length === 0) {
-            return <div>No hay alertas para los filtros seleccionados.</div>;
-          }
-          return (
-            <table className="w-full border">
-              <thead>
-                <tr>
-                  <th className="p-2 border">Tipo</th>
-                  <th className="p-2 border">Mensaje</th>
-                  <th className="p-2 border">Fecha</th>
-                  <th className="p-2 border">Estado</th>
-                  <th className="p-2 border">Acciones</th>
+      {(() => {
+        if (loading) {
+          return <div>Cargando alertas...</div>;
+        }
+        if (alerts.length === 0) {
+          return <div>No hay alertas para los filtros seleccionados.</div>;
+        }
+        return (
+          <table className="w-full border">
+            <thead>
+              <tr>
+                <th className="p-2 border">Tipo</th>
+                <th className="p-2 border">Mensaje</th>
+                <th className="p-2 border">Fecha</th>
+                <th className="p-2 border">Estado</th>
+                <th className="p-2 border">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {alerts.map((alert) => (
+                <tr
+                  key={alert.id}
+                  className={alert.seen ? "bg-gray-100" : "bg-white"}
+                >
+                  <td className="p-2 border">
+                    <Badge>{getTypeLabel(alert.type)}</Badge>
+                  </td>
+                  <td className="p-2 border">{alert.message}</td>
+                  <td className="p-2 border">
+                    {new Date(alert.createdAt).toLocaleString("es-ES")}
+                  </td>
+                  <td className="p-2 border">
+                    {alert.seen ? (
+                      <span className="text-green-600">Vista</span>
+                    ) : (
+                      <span className="text-red-600">Nueva</span>
+                    )}
+                  </td>
+                  <td className="p-2 border">
+                    {!alert.seen && (
+                      <Button size="sm" onClick={() => markAsSeen(alert.id)}>
+                        Marcar como vista
+                      </Button>
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {alerts.map((alert) => (
-                  <tr key={alert.id} className={alert.seen ? "bg-gray-100" : "bg-white"}>
-                    <td className="p-2 border">
-                      <Badge>{getTypeLabel(alert.type)}</Badge>
-                    </td>
-                    <td className="p-2 border">{alert.message}</td>
-                    <td className="p-2 border">
-                      {new Date(alert.createdAt).toLocaleString("es-ES")}
-                    </td>
-                    <td className="p-2 border">
-                      {alert.seen ? <span className="text-green-600">Vista</span> : <span className="text-red-600">Nueva</span>}
-                    </td>
-                    <td className="p-2 border">
-                      {!alert.seen && (
-                        <Button size="sm" onClick={() => markAsSeen(alert.id)}>
-                          Marcar como vista
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          );
-        })()
-      }
+              ))}
+            </tbody>
+          </table>
+        );
+      })()}
       <div className="flex justify-between mt-4">
         <Button
           disabled={page <= 1}

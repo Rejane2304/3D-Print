@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   DollarSign,
   ShoppingCart,
@@ -10,17 +10,17 @@ import {
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
-} from 'lucide-react';
-import Link from 'next/link';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import type { DashboardStatsType } from '@/lib/types';
+} from "lucide-react";
+import Link from "next/link";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
+import type { DashboardStatsType } from "@/lib/types";
 
 export default function AdminDashboardClient() {
   const [stats, setStats] = useState<DashboardStatsType | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/admin/stats')
+    fetch("/api/admin/stats")
       .then((res) => res.json())
       .then((data) => {
         setStats(data);
@@ -39,67 +39,77 @@ export default function AdminDashboardClient() {
 
   const statCards = [
     {
-      label: 'Ingresos Totales',
+      label: "Ingresos Totales",
       value: `€${(stats?.totalRevenue || 0).toFixed(2)}`,
       icon: DollarSign,
-      color: 'cyan',
-      change: '+12.5%',
+      color: "cyan",
+      change: "+12.5%",
       positive: true,
     },
     {
-      label: 'Pedidos Totales',
+      label: "Pedidos Totales",
       value: stats?.totalOrders || 0,
       icon: ShoppingCart,
-      color: 'amber',
-      change: '+8.2%',
+      color: "amber",
+      change: "+8.2%",
       positive: true,
     },
     {
-      label: 'Productos',
+      label: "Productos",
       value: stats?.totalProducts || 0,
       icon: Package,
-      color: 'cyan',
-      change: '+2',
+      color: "cyan",
+      change: "+2",
       positive: true,
     },
     {
-      label: 'Usuarios',
+      label: "Usuarios",
       value: stats?.totalUsers || 0,
       icon: Users,
-      color: 'amber',
-      change: '+15.3%',
+      color: "amber",
+      change: "+15.3%",
       positive: true,
     },
   ];
 
   const statusColors: Record<string, string> = {
-    pending: 'bg-yellow-500/20 text-yellow-400',
-    paid: 'bg-green-500/20 text-green-400',
-    processing: 'bg-blue-500/20 text-blue-400',
-    shipped: 'bg-purple-500/20 text-purple-400',
-    delivered: 'bg-cyan/20 text-cyan',
-    cancelled: 'bg-red-500/20 text-red-400',
+    pending: "bg-yellow-500/20 text-yellow-400",
+    paid: "bg-green-500/20 text-green-400",
+    processing: "bg-blue-500/20 text-blue-400",
+    shipped: "bg-purple-500/20 text-purple-400",
+    delivered: "bg-cyan/20 text-cyan",
+    cancelled: "bg-red-500/20 text-red-400",
   };
 
   const statusLabels: Record<string, { es: string; en: string }> = {
-    pending: { es: 'pendiente', en: 'pending' },
-    paid: { es: 'pagado', en: 'paid' },
-    processing: { es: 'en proceso', en: 'processing' },
-    shipped: { es: 'enviado', en: 'shipped' },
-    delivered: { es: 'entregado', en: 'delivered' },
-    cancelled: { es: 'cancelado', en: 'cancelled' },
+    pending: { es: "pendiente", en: "pending" },
+    paid: { es: "pagado", en: "paid" },
+    processing: { es: "en proceso", en: "processing" },
+    shipped: { es: "enviado", en: "shipped" },
+    delivered: { es: "entregado", en: "delivered" },
+    cancelled: { es: "cancelado", en: "cancelled" },
   };
 
   const pieColors: Record<string, string> = {
-    PLA: '#00FFFF',
-    PETG: '#FFBF00',
+    PLA: "#00FFFF",
+    PETG: "#FFBF00",
   };
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Panel de control</h1>
-        <p className="text-muted">Bienvenido al panel de administración de 3D Print</p>
+        <p className="text-muted">
+          Bienvenido al panel de administración de 3D Print
+        </p>
+        <div className="mt-6">
+          <Link
+            href="/admin/catalog"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan text-black rounded-lg font-semibold hover:bg-cyan-dim transition"
+          >
+            Catálogo de impresión
+          </Link>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -113,11 +123,21 @@ export default function AdminDashboardClient() {
             className="bg-bg-secondary border border-border rounded-xl p-6"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg ${stat.color === 'cyan' ? 'bg-cyan/20' : 'bg-amber/20'}`}>
-                <stat.icon className={`w-6 h-6 ${stat.color === 'cyan' ? 'text-cyan' : 'text-amber'}`} />
+              <div
+                className={`p-3 rounded-lg ${stat.color === "cyan" ? "bg-cyan/20" : "bg-amber/20"}`}
+              >
+                <stat.icon
+                  className={`w-6 h-6 ${stat.color === "cyan" ? "text-cyan" : "text-amber"}`}
+                />
               </div>
-              <div className={`flex items-center gap-1 text-sm ${stat.positive ? 'text-green-400' : 'text-red-400'}`}>
-                {stat.positive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+              <div
+                className={`flex items-center gap-1 text-sm ${stat.positive ? "text-green-400" : "text-red-400"}`}
+              >
+                {stat.positive ? (
+                  <ArrowUpRight className="w-4 h-4" />
+                ) : (
+                  <ArrowDownRight className="w-4 h-4" />
+                )}
                 {stat.change}
               </div>
             </div>
@@ -137,7 +157,10 @@ export default function AdminDashboardClient() {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Pedidos Recientes</h2>
-            <Link href="/admin/orders" className="text-cyan text-sm hover:underline">
+            <Link
+              href="/admin/orders"
+              className="text-cyan text-sm hover:underline"
+            >
               Ver todos
             </Link>
           </div>
@@ -149,21 +172,27 @@ export default function AdminDashboardClient() {
                   className="flex items-center justify-between py-3 border-b border-border last:border-0"
                 >
                   <div>
-                    <div className="font-medium">#{order.id.slice(-8).toUpperCase()}</div>
+                    <div className="font-medium">
+                      #{order.id.slice(-8).toUpperCase()}
+                    </div>
                     <div className="text-sm text-muted">
-                      {order.user?.name || order.user?.email || 'Usuario'}
+                      {order.user?.name || order.user?.email || "Usuario"}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-medium">€{order.total.toFixed(2)}</div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${statusColors[order.status] || 'bg-gray-500/20'}`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${statusColors[order.status] || "bg-gray-500/20"}`}
+                    >
                       {statusLabels[order.status]?.es ?? order.status}
                     </span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-muted text-center py-4">No hay pedidos recientes</p>
+              <p className="text-muted text-center py-4">
+                No hay pedidos recientes
+              </p>
             )}
           </div>
         </motion.div>
@@ -177,7 +206,10 @@ export default function AdminDashboardClient() {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Productos Más Vendidos</h2>
-            <Link href="/admin/products" className="text-cyan text-sm hover:underline">
+            <Link
+              href="/admin/products"
+              className="text-cyan text-sm hover:underline"
+            >
               Ver todos
             </Link>
           </div>
@@ -192,8 +224,12 @@ export default function AdminDashboardClient() {
                     {index + 1}
                   </div>
                   <div className="flex-1">
-                    <div className="font-medium">{item.product?.name || 'Producto'}</div>
-                    <div className="text-sm text-muted">{item.product?.category}</div>
+                    <div className="font-medium">
+                      {item.product?.name || "Producto"}
+                    </div>
+                    <div className="text-sm text-muted">
+                      {item.product?.category}
+                    </div>
                   </div>
                   <div className="text-right">
                     <div className="font-medium flex items-center gap-1">
@@ -204,7 +240,9 @@ export default function AdminDashboardClient() {
                 </div>
               ))
             ) : (
-              <p className="text-muted text-center py-4">No hay datos de ventas</p>
+              <p className="text-muted text-center py-4">
+                No hay datos de ventas
+              </p>
             )}
           </div>
         </motion.div>
@@ -224,13 +262,17 @@ export default function AdminDashboardClient() {
             <>
               <div className="space-y-3 mb-6">
                 {stats.costByMaterial.map((item) => (
-                  <div key={item.material} className="flex items-center justify-between">
+                  <div
+                    key={item.material}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center text-xs font-semibold">
                         {item.material}
                       </div>
                       <div className="text-sm text-muted">
-                        {item.pieces} pieza{item.pieces === 1 ? '' : 's'} · {item.percentage.toFixed(1)}%
+                        {item.pieces} pieza{item.pieces === 1 ? "" : "s"} ·{" "}
+                        {item.percentage.toFixed(1)}%
                       </div>
                     </div>
                     <div className="font-mono text-sm">
@@ -249,12 +291,19 @@ export default function AdminDashboardClient() {
                       cx="50%"
                       cy="50%"
                       outerRadius={70}
-                      label={(entry) => `${entry.material} ${entry.percentage.toFixed(0)}%`}
+                      label={(entry) =>
+                        `${entry.material} ${entry.percentage.toFixed(0)}%`
+                      }
                     >
                       {stats.costByMaterial.map((entry, index) => (
                         <Cell
                           key={entry.material}
-                          fill={pieColors[entry.material] || ['#00FFFF', '#FFBF00', '#22C55E', '#6366F1'][index % 4]}
+                          fill={
+                            pieColors[entry.material] ||
+                            ["#00FFFF", "#FFBF00", "#22C55E", "#6366F1"][
+                              index % 4
+                            ]
+                          }
                         />
                       ))}
                     </Pie>
@@ -267,7 +316,9 @@ export default function AdminDashboardClient() {
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted">Sin datos suficientes de pedidos.</p>
+            <p className="text-sm text-muted">
+              Sin datos suficientes de pedidos.
+            </p>
           )}
         </motion.div>
 
@@ -278,7 +329,9 @@ export default function AdminDashboardClient() {
           transition={{ delay: 0.6 }}
           className="bg-bg-secondary border border-border rounded-xl p-6"
         >
-          <h2 className="text-xl font-bold mb-6">Distribución de tamaños (lado mayor)</h2>
+          <h2 className="text-xl font-bold mb-6">
+            Distribución de tamaños (lado mayor)
+          </h2>
           {stats?.sizeDistribution && stats.sizeDistribution.length > 0 ? (
             <div className="space-y-3">
               {stats.sizeDistribution.map((bucket) => (
@@ -286,7 +339,7 @@ export default function AdminDashboardClient() {
                   <div className="flex justify-between text-xs text-muted mb-1">
                     <span>{bucket.bucket}</span>
                     <span>
-                      {bucket.count} pieza{bucket.count === 1 ? '' : 's'}
+                      {bucket.count} pieza{bucket.count === 1 ? "" : "s"}
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-bg-tertiary overflow-hidden">
@@ -301,7 +354,9 @@ export default function AdminDashboardClient() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted">Aún no hay datos de tamaños impresos.</p>
+            <p className="text-sm text-muted">
+              Aún no hay datos de tamaños impresos.
+            </p>
           )}
         </motion.div>
       </div>
@@ -320,12 +375,16 @@ export default function AdminDashboardClient() {
               key={item.status}
               className="text-center p-4 bg-bg-tertiary rounded-lg"
             >
-              <div className={`inline-block px-3 py-1 rounded-full text-sm mb-2 ${statusColors[item.status] || 'bg-gray-500/20'}`}>
+              <div
+                className={`inline-block px-3 py-1 rounded-full text-sm mb-2 ${statusColors[item.status] || "bg-gray-500/20"}`}
+              >
                 {statusLabels[item.status]?.es ?? item.status}
               </div>
               <div className="text-2xl font-bold">{item.count}</div>
             </div>
-          )) || <p className="col-span-full text-center text-muted">Sin datos</p>}
+          )) || (
+            <p className="col-span-full text-center text-muted">Sin datos</p>
+          )}
         </div>
       </motion.div>
     </div>

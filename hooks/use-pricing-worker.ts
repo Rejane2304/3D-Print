@@ -5,10 +5,10 @@
  * Solo funciona en el cliente (usa useEffect).
  */
 
-'use client';
+"use client";
 
-import { useRef, useState, useCallback, useEffect } from 'react';
-import type { MaterialType, ProductType } from '@/lib/types';
+import { useRef, useState, useCallback, useEffect } from "react";
+import type { MaterialType, ProductType } from "@/lib/types";
 
 interface PriceResult {
   materialCost: number;
@@ -25,8 +25,8 @@ interface PriceResult {
 type PricesMatrix = Record<string, Record<string, PriceResult>>;
 
 interface WorkerState {
-  status: 'idle' | 'calculating' | 'done' | 'error';
-  progress: number;    // 0–100
+  status: "idle" | "calculating" | "done" | "error";
+  progress: number; // 0–100
   prices: PricesMatrix;
   error: string | null;
 }
@@ -34,7 +34,7 @@ interface WorkerState {
 export function usePricingWorker() {
   const workerRef = useRef<Worker | null>(null);
   const [state, setState] = useState<WorkerState>({
-    status: 'idle',
+    status: "idle",
     progress: 0,
     prices: {},
     error: null,
@@ -52,33 +52,33 @@ export function usePricingWorker() {
       // Terminar worker previo si existe
       workerRef.current?.terminate();
 
-      setState({ status: 'calculating', progress: 0, prices: {}, error: null });
+      setState({ status: "calculating", progress: 0, prices: {}, error: null });
 
       const worker = new Worker(
-        new URL('../workers/pricing.worker.ts', import.meta.url)
+        new URL("../workers/pricing.worker.ts", import.meta.url),
       );
       workerRef.current = worker;
 
       worker.onmessage = (e: MessageEvent) => {
         const msg = e.data as { type: string; [key: string]: unknown };
 
-        if (msg.type === 'PROGRESS') {
+        if (msg.type === "PROGRESS") {
           setState((prev) => ({
             ...prev,
             progress: msg.percentage as number,
           }));
-        } else if (msg.type === 'RESULT') {
+        } else if (msg.type === "RESULT") {
           setState({
-            status: 'done',
+            status: "done",
             progress: 100,
             prices: msg.prices as PricesMatrix,
             error: null,
           });
           worker.terminate();
           workerRef.current = null;
-        } else if (msg.type === 'ERROR') {
+        } else if (msg.type === "ERROR") {
           setState({
-            status: 'error',
+            status: "error",
             progress: 0,
             prices: {},
             error: msg.message as string,
@@ -90,7 +90,7 @@ export function usePricingWorker() {
 
       worker.onerror = (err) => {
         setState({
-          status: 'error',
+          status: "error",
           progress: 0,
           prices: {},
           error: err.message,
@@ -100,25 +100,25 @@ export function usePricingWorker() {
       };
 
       worker.postMessage({
-        type: 'CALCULATE_PRICES',
+        type: "CALCULATE_PRICES",
         products,
         materials,
       });
     },
-    []
+    [],
   );
 
   const reset = useCallback(() => {
     workerRef.current?.terminate();
     workerRef.current = null;
-    setState({ status: 'idle', progress: 0, prices: {}, error: null });
+    setState({ status: "idle", progress: 0, prices: {}, error: null });
   }, []);
 
   return {
     ...state,
     calculate,
     reset,
-    isCalculating: state.status === 'calculating',
-    isDone: state.status === 'done',
+    isCalculating: state.status === "calculating",
+    isDone: state.status === "done",
   };
 }

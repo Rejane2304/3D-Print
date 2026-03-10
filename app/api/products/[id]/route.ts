@@ -1,9 +1,11 @@
-
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
-export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> } | { params: { id: string } }) {
+export async function GET(
+  _req: NextRequest,
+  context: { params: Promise<{ id: string }> } | { params: { id: string } },
+) {
   // Next.js puede pasar params como promesa, resolvemos si es necesario
   let params: { id: string };
   if (context.params instanceof Promise) {

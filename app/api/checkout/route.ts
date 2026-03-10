@@ -8,7 +8,11 @@ import { prisma } from "@/lib/db";
 // ---- Helper: construye line items para Stripe ---------------
 
 type StripeLineItem = {
-  price_data: { currency: string; product_data: { name: string }; unit_amount: number };
+  price_data: {
+    currency: string;
+    product_data: { name: string };
+    unit_amount: number;
+  };
   quantity: number;
 };
 
@@ -19,7 +23,7 @@ function buildStripeLineItems(
   discount: number,
   couponCode: string,
 ): StripeLineItem[] {
-  const lineItems: StripeLineItem[] = items.map(i => ({
+  const lineItems: StripeLineItem[] = items.map((i) => ({
     price_data: {
       currency: "eur",
       product_data: {
@@ -31,13 +35,34 @@ function buildStripeLineItems(
   }));
 
   if (tax > 0) {
-    lineItems.push({ price_data: { currency: "eur", product_data: { name: "IVA (21%)" }, unit_amount: Math.round(tax * 100) }, quantity: 1 });
+    lineItems.push({
+      price_data: {
+        currency: "eur",
+        product_data: { name: "IVA (21%)" },
+        unit_amount: Math.round(tax * 100),
+      },
+      quantity: 1,
+    });
   }
   if (shippingCost > 0) {
-    lineItems.push({ price_data: { currency: "eur", product_data: { name: "Envío" }, unit_amount: Math.round(shippingCost * 100) }, quantity: 1 });
+    lineItems.push({
+      price_data: {
+        currency: "eur",
+        product_data: { name: "Envío" },
+        unit_amount: Math.round(shippingCost * 100),
+      },
+      quantity: 1,
+    });
   }
   if (discount > 0) {
-    lineItems.push({ price_data: { currency: "eur", product_data: { name: `Descuento (${couponCode})` }, unit_amount: -Math.round(discount * 100) }, quantity: 1 });
+    lineItems.push({
+      price_data: {
+        currency: "eur",
+        product_data: { name: `Descuento (${couponCode})` },
+        unit_amount: -Math.round(discount * 100),
+      },
+      quantity: 1,
+    });
   }
   return lineItems;
 }
@@ -47,12 +72,15 @@ function buildStripeLineItems(
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const userId = (session.user as Record<string, unknown>)?.id as string;
     const body = await req.json();
-    const { items, shipping, subtotal, tax, shippingCost, total, couponCode } = body ?? {};
+    const { items, shipping, subtotal, tax, shippingCost, total, couponCode } =
+      body ?? {};
 
-    if (!items?.length) return NextResponse.json({ error: "No items" }, { status: 400 });
+    if (!items?.length)
+      return NextResponse.json({ error: "No items" }, { status: 400 });
 
     // ---- Validar cupón si se proporcionó ----
     let couponId: string | null = null;
@@ -140,7 +168,11 @@ export async function POST(req: NextRequest) {
       data: { stripeSessionId: stripeSession.id },
     });
 
-    return NextResponse.json({ url: stripeSession.url, orderId: order.id, discount });
+    return NextResponse.json({
+      url: stripeSession.url,
+      orderId: order.id,
+      discount,
+    });
   } catch (err: unknown) {
     console.error("Checkout error:", err);
     return NextResponse.json({ error: "Checkout failed" }, { status: 500 });

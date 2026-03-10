@@ -3,37 +3,38 @@
 // Configura las variables de entorno EMAIL_* para activarlo.
 // Sin configuración: los mensajes se loguean en consola (no-op).
 // =============================================================
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 function getTransporter() {
-    if (!process.env.EMAIL_SERVER_HOST)
-        return null;
-    return nodemailer.createTransport({
-        host: process.env.EMAIL_SERVER_HOST,
-        port: Number(process.env.EMAIL_SERVER_PORT ?? 587),
-        secure: process.env.EMAIL_SERVER_SECURE === 'true',
-        auth: {
-            user: process.env.EMAIL_SERVER_USER ?? '',
-            pass: process.env.EMAIL_SERVER_PASSWORD ?? '',
-        },
-    });
+  if (!process.env.EMAIL_SERVER_HOST) return null;
+  return nodemailer.createTransport({
+    host: process.env.EMAIL_SERVER_HOST,
+    port: Number(process.env.EMAIL_SERVER_PORT ?? 587),
+    secure: process.env.EMAIL_SERVER_SECURE === "true",
+    auth: {
+      user: process.env.EMAIL_SERVER_USER ?? "",
+      pass: process.env.EMAIL_SERVER_PASSWORD ?? "",
+    },
+  });
 }
 export async function sendEmail(to, subject, html) {
-    const transporter = getTransporter();
-    if (!transporter) {
-        console.log(`[EMAIL] To: ${to} | Subject: ${subject} (EMAIL_SERVER_HOST no configurado)`);
-        return;
-    }
-    await transporter.sendMail({
-        from: process.env.EMAIL_FROM ?? 'noreply@3dprint.es',
-        to,
-        subject,
-        html,
-    });
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log(
+      `[EMAIL] To: ${to} | Subject: ${subject} (EMAIL_SERVER_HOST no configurado)`,
+    );
+    return;
+  }
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM ?? "noreply@3dprint.es",
+    to,
+    subject,
+    html,
+  });
 }
 // ---- Plantillas ----------------------------------------------
 export function tplReadyToShip(name, orderId, total) {
-    const ref = orderId.slice(-8).toUpperCase();
-    return `
+  const ref = orderId.slice(-8).toUpperCase();
+  return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e5e5e5;border-radius:12px;overflow:hidden">
   <div style="background:#111;padding:24px;border-bottom:2px solid #00FFFF">
     <h1 style="margin:0;color:#00FFFF;font-size:22px">🎉 ¡Tu pedido está listo para el envío!</h1>
@@ -48,7 +49,7 @@ export function tplReadyToShip(name, orderId, total) {
       <p style="margin:8px 0 0;font-size:14px;color:#aaa">Total: <strong style="color:#e5e5e5">€${total.toFixed(2)}</strong></p>
     </div>
     <p>En breve recibirás la información de seguimiento del envío.</p>
-    <a href="${process.env.NEXTAUTH_URL ?? 'http://localhost:3000'}/orders"
+    <a href="${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/orders"
        style="display:inline-block;margin-top:8px;padding:12px 24px;background:#00FFFF;color:#000;font-weight:bold;border-radius:8px;text-decoration:none">
       Ver mis pedidos
     </a>
@@ -59,8 +60,8 @@ export function tplReadyToShip(name, orderId, total) {
 </div>`;
 }
 export function tplShipped(name, orderId, address) {
-    const ref = orderId.slice(-8).toUpperCase();
-    return `
+  const ref = orderId.slice(-8).toUpperCase();
+  return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e5e5e5;border-radius:12px;overflow:hidden">
   <div style="background:#111;padding:24px;border-bottom:2px solid #00FFFF">
     <h1 style="margin:0;color:#00FFFF;font-size:22px">📦 ¡Tu pedido ha sido enviado!</h1>
@@ -72,7 +73,7 @@ export function tplShipped(name, orderId, address) {
       ${address}
     </div>
     <p>Puedes consultar el estado de todos tus pedidos en tu cuenta.</p>
-    <a href="${process.env.NEXTAUTH_URL ?? 'http://localhost:3000'}/orders"
+    <a href="${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/orders"
        style="display:inline-block;margin-top:8px;padding:12px 24px;background:#00FFFF;color:#000;font-weight:bold;border-radius:8px;text-decoration:none">
       Ver mis pedidos
     </a>

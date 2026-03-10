@@ -77,6 +77,20 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ===== COLORES =====
+model Color {
+  id          String     @id @default(cuid())
+  name        String
+  code        String     @unique // Ej: "Bambu Green", "Pantone 123C"
+  hex         String     // #RRGGBB
+  image       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  materials   MaterialColor[]
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+}
+
 // ===== MATERIALES =====
 model Material {
   id                String         @id @default(cuid())
@@ -86,7 +100,6 @@ model Material {
   maintenanceFactor Float                   // Factor desgaste USD/hora
   density           Float                   // g/cm³
   description       String?
-  color             String?
   inStock           Boolean        @default(true)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
@@ -94,6 +107,21 @@ model Material {
   inventory         Inventory?
   cartItems         CartItem[]
   orderItems        OrderItem[]
+  colors            MaterialColor[]
+}
+
+// Relación N:M Material-Color
+model MaterialColor {
+  id         String   @id @default(cuid())
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  materialId String
+  color      Color    @relation(fields: [colorId], references: [id], onDelete: Cascade)
+  colorId    String
+  stock      Float    @default(0) // gramos disponibles de ese color/material
+  image      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  @@unique([materialId, colorId])
 }
 
 // ===== PRODUCTOS =====
@@ -118,7 +146,6 @@ model Product {
   finishCost       Float          @default(2.50)
   modelFillFactor  Float          @default(0.15)  // factor calibrado desde laminador (peso_real / vol_bbox / densidad)
   images           String[]
-  colors           String[]
   featured         Boolean        @default(false)
   stock            Int            @default(100)
   rating           Float          @default(0)
@@ -196,8 +223,8 @@ model CartItem {
   cartId     String
   productId  String
   materialId String?
+  colorId    String?
   material   String
-  color      String
   quantity   Int      @default(1)
   dimX       Float
   dimY       Float
@@ -206,6 +233,7 @@ model CartItem {
   cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   materialRef Material? @relation(fields: [materialId], references: [id])
+  color      Color?   @relation(fields: [colorId], references: [id])
 }
 
 // ===== PEDIDOS =====
@@ -242,9 +270,9 @@ model OrderItem {
   orderId    String
   productId  String
   materialId String?
+  colorId    String?
   name       String
   material   String
-  color      String
   quantity   Int
   dimX       Float
   dimY       Float
@@ -253,6 +281,7 @@ model OrderItem {
   order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   materialRef Material? @relation(fields: [materialId], references: [id])
+  color      Color?   @relation(fields: [colorId], references: [id])
   printerId  String?
   printer    Printer? @relation(fields: [printerId], references: [id])
 }

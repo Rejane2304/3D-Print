@@ -5,6 +5,7 @@
 ---
 
 ## Tabla de Contenidos
+
 - [Ecommerce 3D Print](#ecommerce-3d-print)
   - [Tabla de Contenidos](#tabla-de-contenidos)
   - [Arquitectura](#arquitectura)
@@ -52,6 +53,7 @@ graph TD
 ---
 
 ## Backend
+
 - **Framework:** Next.js (API routes)
 - **Motor de precios:** Algoritmo en `lib/price-calculator.ts` y worker en `workers/pricing.worker.ts`
 - **Autenticación:** NextAuth.js
@@ -73,6 +75,7 @@ Content-Type: application/json
 ---
 
 ## Frontend
+
 - **Framework:** Next.js (App Router)
 - **UI:** TailwindCSS, componentes en `components/ui/`
 - **Estado:** Zustand
@@ -85,6 +88,7 @@ Content-Type: application/json
 ---
 
 ## Base de datos
+
 - **ORM:** Prisma
 - **Schema:** `prisma/schema.prisma`
 - **Migraciones:** `prisma/migrations/`
@@ -133,7 +137,9 @@ Content-Type: application/json
 ---
 
 ## Variables de entorno
+
 Ver `.env.example` para configuración. Variables principales:
+
 - `DATABASE_URL` — conexión a base de datos
 - `STRIPE_SECRET_KEY` — clave de Stripe
 - `NEXTAUTH_URL` — URL base para autenticación
@@ -141,6 +147,7 @@ Ver `.env.example` para configuración. Variables principales:
 ---
 
 ## Estado del proyecto
+
 - Tests unitarios: Vitest (100% verde, sin advertencias)
 - Tests E2E: Playwright (100% verde, sin advertencias)
 - Linter: ESLint (sin errores ni advertencias)
@@ -149,6 +156,7 @@ Ver `.env.example` para configuración. Variables principales:
 ---
 
 ## Despliegue y recomendaciones
+
 - Ignora carpetas: `node_modules`, `.next`, `__tests__`, `e2e`, `private`, `playwright-report`, `test-results`, `logs`, `.env*`, `.vscode`, `.idea`, `.DS_Store`, etc.
 - Solo sube a producción: `app/`, `components/`, `lib/`, `prisma/`, `public/`, `workers/`, `package.json`, `next.config.js`, `tsconfig.json`, etc.
 - Revisa dependencias y scripts antes de deploy.
@@ -157,6 +165,7 @@ Ver `.env.example` para configuración. Variables principales:
 ---
 
 ## Contacto
+
 Proyecto desarrollado y mantenido por una sola persona. Para dudas, revisa este README o la documentación interna.
 
 ## Comandos útiles
@@ -168,6 +177,7 @@ Proyecto desarrollado y mantenido por una sola persona. Para dudas, revisa este 
 - `npx playwright test` — tests E2E
 
 ## Stack
+
 - Next.js
 - TypeScript
 - Prisma
@@ -177,6 +187,7 @@ Proyecto desarrollado y mantenido por una sola persona. Para dudas, revisa este 
 - Playwright
 
 ## Estructura
+
 - `app/` — rutas, vistas y lógica principal
 - `components/` — componentes reutilizables
 - `lib/` — lógica de negocio y utilidades
@@ -186,14 +197,16 @@ Proyecto desarrollado y mantenido por una sola persona. Para dudas, revisa este 
 - `workers/` — web workers
 
 ## Variables de entorno
+
 Ver `.env.example` para configuración.
 
 ## Estado
+
 - Tests unitarios: Vitest (100% verde, sin advertencias)
 - Tests E2E: Playwright (100% verde, sin advertencias)
 - Linter: ESLint (sin errores ni advertencias)
 - Rama principal: main (desarrollo directo, sin ramas extra)
 
 ## Contacto
-Para dudas o soporte, consulta la documentación interna o contacta al equipo.
 
+Proyecto desarrollado y mantenido por una sola persona. Para dudas, revisa este README o la documentación interna.

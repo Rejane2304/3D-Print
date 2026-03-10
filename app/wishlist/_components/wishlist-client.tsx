@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, ShoppingCart, Trash2, Package } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useToast } from '@/components/toast-provider';
-import { useCartStore } from '@/lib/cart-store';
-import { useLanguage } from '@/lib/language-store';
-import type { WishlistItemType } from '@/lib/types';
+import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, ShoppingCart, Trash2, Package } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useToast } from "@/components/toast-provider";
+import { useCartStore } from "@/lib/cart-store";
+import { useLanguage } from "@/lib/language-store";
+import type { WishlistItemType } from "@/lib/types";
 
 export default function WishlistClient() {
   const { status } = useSession() || {};
@@ -25,7 +25,8 @@ export default function WishlistClient() {
   const t = {
     es: {
       title: "Mi Lista de Deseos",
-      saved: (n: number) => `${n} producto${n === 1 ? "" : "s"} guardado${n === 1 ? "" : "s"}`,
+      saved: (n: number) =>
+        `${n} producto${n === 1 ? "" : "s"} guardado${n === 1 ? "" : "s"}`,
       emptyTitle: "Tu lista de deseos está vacía",
       emptyDesc: "Guarda tus productos favoritos para comprarlos más tarde",
       exploreCatalog: "Explorar Catálogo",
@@ -53,43 +54,44 @@ export default function WishlistClient() {
 
   const fetchWishlist = useCallback(async () => {
     try {
-      const res = await fetch('/api/wishlist');
+      const res = await fetch("/api/wishlist");
       const data = await res.json();
       setWishlist(data);
     } catch {
-      showToast('error', t.errorLoad);
+      showToast("error", t.errorLoad);
     }
     setLoading(false);
   }, [showToast, t.errorLoad]);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (status === 'authenticated') {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (status === "authenticated") {
       fetchWishlist();
     }
   }, [status, router, fetchWishlist]);
 
   const removeFromWishlist = async (productId: string) => {
     try {
-      const res = await fetch('/api/wishlist', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/wishlist", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId }),
       });
       if (res.ok) {
         setWishlist(wishlist.filter((item) => item.productId !== productId));
-        showToast('success', t.removed);
+        showToast("success", t.removed);
       }
     } catch {
-      showToast('error', t.errorRemove);
+      showToast("error", t.errorRemove);
     }
   };
 
   const moveToCart = (item: WishlistItemType) => {
     const product = item.product;
     const weight =
-      ((product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000) *
+      ((product.defaultDimX * product.defaultDimY * product.defaultDimZ) /
+        1000) *
       product.density *
       0.2;
     const price = weight * product.basePricePerGram + product.finishCost;
@@ -98,9 +100,9 @@ export default function WishlistClient() {
       id: `${product.id}-${Date.now()}`,
       productId: product.id,
       name: product.name,
-      image: product.images[0] || '',
+      image: product.images[0] || "",
       material: product.material,
-      color: product.colors[0] || '#FFFFFF',
+      color: product.colors[0] || "#FFFFFF",
       quantity: 1,
       dimensions: {
         x: product.defaultDimX,
@@ -111,10 +113,10 @@ export default function WishlistClient() {
     });
 
     removeFromWishlist(item.productId);
-    showToast('success', t.movedToCart);
+    showToast("success", t.movedToCart);
   };
 
-  if (status === 'loading' || loading) {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
@@ -172,7 +174,7 @@ export default function WishlistClient() {
                         />
                       )}
                       <div
-                        className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${item.product.material === 'PLA' ? 'bg-cyan/90 text-black' : 'bg-amber/90 text-black'}`}
+                        className={`absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium ${item.product.material === "PLA" ? "bg-cyan/90 text-black" : "bg-amber/90 text-black"}`}
                       >
                         {item.product.material}
                       </div>
@@ -185,7 +187,9 @@ export default function WishlistClient() {
                         {item.product.name}
                       </h3>
                     </Link>
-                    <p className="text-sm text-muted mb-3">{item.product.category}</p>
+                    <p className="text-sm text-muted mb-3">
+                      {item.product.category}
+                    </p>
                     <p className="font-mono text-sm text-cyan mb-4">
                       {`${((item.product.defaultDimX ?? 0) / 10).toFixed(2)} x ${((item.product.defaultDimY ?? 0) / 10).toFixed(2)} x ${((item.product.defaultDimZ ?? 0) / 10).toFixed(2)} cm`}
                     </p>

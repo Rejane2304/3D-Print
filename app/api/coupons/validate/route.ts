@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/db";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/coupons/validate
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const { code, subtotal = 0 } = await request.json();
 
     if (!code) {
-      return NextResponse.json({ error: 'Code is required' }, { status: 400 });
+      return NextResponse.json({ error: "Code is required" }, { status: 400 });
     }
 
     const coupon = await prisma.coupon.findUnique({
@@ -22,27 +22,39 @@ export async function POST(request: NextRequest) {
     });
 
     if (!coupon || !coupon.isActive) {
-      return NextResponse.json({ valid: false, error: 'Coupon not found or inactive' }, { status: 200 });
+      return NextResponse.json(
+        { valid: false, error: "Coupon not found or inactive" },
+        { status: 200 },
+      );
     }
 
     const now = new Date();
     if (coupon.validUntil && coupon.validUntil < now) {
-      return NextResponse.json({ valid: false, error: 'Coupon has expired' }, { status: 200 });
+      return NextResponse.json(
+        { valid: false, error: "Coupon has expired" },
+        { status: 200 },
+      );
     }
 
     if (coupon.maxUses !== null && coupon.usedCount >= coupon.maxUses) {
-      return NextResponse.json({ valid: false, error: 'Coupon usage limit reached' }, { status: 200 });
+      return NextResponse.json(
+        { valid: false, error: "Coupon usage limit reached" },
+        { status: 200 },
+      );
     }
 
     if (coupon.minPurchase !== null && subtotal < coupon.minPurchase) {
-      return NextResponse.json({
-        valid: false,
-        error: `Minimum purchase of €${coupon.minPurchase.toFixed(2)} required`,
-      }, { status: 200 });
+      return NextResponse.json(
+        {
+          valid: false,
+          error: `Minimum purchase of €${coupon.minPurchase.toFixed(2)} required`,
+        },
+        { status: 200 },
+      );
     }
 
     const discount =
-      coupon.discountType === 'percentage'
+      coupon.discountType === "percentage"
         ? (subtotal * coupon.discountValue) / 100
         : coupon.discountValue;
 
@@ -57,7 +69,10 @@ export async function POST(request: NextRequest) {
       discount: Math.round(discount * 100) / 100,
     });
   } catch (error) {
-    console.error('Error validating coupon:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error validating coupon:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

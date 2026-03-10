@@ -4,8 +4,8 @@
 // Usar sólo en API routes / Server Components (accede a Prisma).
 // =============================================================
 
-import prisma from './db';
-import { calculateAdvancedPrice, PRICING_CONFIG } from './price-calculator';
+import prisma from "./db";
+import { calculateAdvancedPrice, PRICING_CONFIG } from "./price-calculator";
 
 // ---- Leer configuración de precios desde BD (con fallback a constantes)
 
@@ -46,7 +46,9 @@ export async function updateProductPrices(productId: string): Promise<void> {
   const product = await prisma.product.findUnique({ where: { id: productId } });
   if (!product) throw new Error(`Product not found: ${productId}`);
 
-  const materials = await prisma.material.findMany({ where: { inStock: true } });
+  const materials = await prisma.material.findMany({
+    where: { inStock: true },
+  });
   const config = await getPricingConfig();
 
   for (const mat of materials) {
@@ -60,7 +62,7 @@ export async function updateProductPrices(productId: string): Promise<void> {
         maintenanceFactor: mat.maintenanceFactor,
       },
       1,
-      config
+      config,
     );
 
     await prisma.productPrice.upsert({
@@ -110,7 +112,7 @@ export async function getProductPrices(productId: string) {
   return prisma.productPrice.findMany({
     where: { productId },
     include: { material: true },
-    orderBy: { material: { code: 'asc' } },
+    orderBy: { material: { code: "asc" } },
   });
 }
 
@@ -120,14 +122,17 @@ export async function getProductPrices(productId: string) {
  * Calcula el peso en gramos a partir de las dimensiones por defecto del producto.
  * Usa el modelFillFactor calibrado desde el laminador (fallback: 0.15).
  */
-function getDefaultWeight(product: Readonly<{
-  defaultDimX: number;
-  defaultDimY: number;
-  defaultDimZ: number;
-  density: number;
-  modelFillFactor?: number;
-}>): number {
-  const volumeCm3 = (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
+function getDefaultWeight(
+  product: Readonly<{
+    defaultDimX: number;
+    defaultDimY: number;
+    defaultDimZ: number;
+    density: number;
+    modelFillFactor?: number;
+  }>,
+): number {
+  const volumeCm3 =
+    (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
   const fillFactor = product.modelFillFactor ?? 0.15;
   return volumeCm3 * product.density * fillFactor;
 }

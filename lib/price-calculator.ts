@@ -21,9 +21,9 @@ export const PRICING_CONFIG = {
    */
   infillFactor: 0.15,
   margins: {
-    unit: 2.5,   // ×250% para 1–4 uds.
-    medium: 2,   // ×200% para 5–9 uds.
-    bulk: 1.5,   // ×150% para 10+ uds.
+    unit: 2.5, // ×250% para 1–4 uds.
+    medium: 2, // ×200% para 5–9 uds.
+    bulk: 1.5, // ×150% para 10+ uds.
   },
 } as const;
 
@@ -69,7 +69,7 @@ export function calculateWeight(
   dimY: number,
   dimZ: number,
   density: number,
-  fillFactor: number = PRICING_CONFIG.infillFactor
+  fillFactor: number = PRICING_CONFIG.infillFactor,
 ): number {
   const volumeCm3 = (dimX * dimY * dimZ) / 1000;
   return volumeCm3 * density * fillFactor;
@@ -89,7 +89,7 @@ export function scalePrintTime(
   dimZ: number,
   refDimX: number,
   refDimY: number,
-  refDimZ: number
+  refDimZ: number,
 ): number {
   const refVol = refDimX * refDimY * refDimZ;
   if (refVol <= 0) return basePrintTimeMinutes;
@@ -114,13 +114,14 @@ export function calculateAdvancedPrice(
     operationCostPerHour?: number;
     consumablesCostPerHour?: number;
     margins?: Readonly<{ unit: number; medium: number; bulk: number }>;
-  }>
+  }>,
 ): PriceCalculation {
   const printTimeHours = printTimeMinutes / 60;
   const weightKg = weightGrams / 1000;
 
   const machineAmortizationPerHour =
-    config?.machineAmortizationPerHour ?? PRICING_CONFIG.machineAmortizationPerHour;
+    config?.machineAmortizationPerHour ??
+    PRICING_CONFIG.machineAmortizationPerHour;
   const operationCostPerHour =
     config?.operationCostPerHour ?? PRICING_CONFIG.operationCostPerHour;
   const consumablesCostPerHour =
@@ -140,13 +141,25 @@ export function calculateAdvancedPrice(
 
   // El acabado se suma antes del margen
   const finishCost = 0; // Se sobreescribe en calculatePriceFromDimensions
-  const baseCost = materialCost + machineCost + maintenanceCost + operationCost + consumablesCost + energyCost + finishCost;
+  const baseCost =
+    materialCost +
+    machineCost +
+    maintenanceCost +
+    operationCost +
+    consumablesCost +
+    energyCost +
+    finishCost;
 
   const priceUnit = baseCost * margins.unit;
   const priceMedium = baseCost * margins.medium;
   const priceBulk = baseCost * margins.bulk;
 
-  const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
+  const finalPrice = getPriceByQuantity(
+    priceUnit,
+    priceMedium,
+    priceBulk,
+    quantity,
+  );
 
   return {
     weight: round(weightGrams),
@@ -190,9 +203,9 @@ export function calculatePriceFromDimensions(
     refDimX?: number;
     refDimY?: number;
     refDimZ?: number;
-  }>
+  }>,
 ): PriceCalculation {
-  const quantity   = options?.quantity   ?? 1;
+  const quantity = options?.quantity ?? 1;
   const finishCost = options?.finishCost ?? 0;
   const fillFactor = options?.fillFactor ?? PRICING_CONFIG.infillFactor;
 
@@ -203,21 +216,48 @@ export function calculatePriceFromDimensions(
     options.refDimZ !== undefined
       ? scalePrintTime(
           basePrintTimeMinutes,
-          dimX, dimY, dimZ,
-          options.refDimX, options.refDimY, options.refDimZ
+          dimX,
+          dimY,
+          dimZ,
+          options.refDimX,
+          options.refDimY,
+          options.refDimZ,
         )
       : basePrintTimeMinutes;
 
-  const weightGrams = calculateWeight(dimX, dimY, dimZ, material.density, fillFactor);
+  const weightGrams = calculateWeight(
+    dimX,
+    dimY,
+    dimZ,
+    material.density,
+    fillFactor,
+  );
   // Adaptar: el acabado se suma antes del margen
-  const result = calculateAdvancedPrice(weightGrams, printTimeMinutes, material, quantity);
+  const result = calculateAdvancedPrice(
+    weightGrams,
+    printTimeMinutes,
+    material,
+    quantity,
+  );
   // Recalcular baseCost incluyendo acabado
-  const baseCost = result.materialCost + result.machineCost + result.maintenanceCost + result.operationCost + result.consumablesCost + (result.energyCost ?? 0) + finishCost;
+  const baseCost =
+    result.materialCost +
+    result.machineCost +
+    result.maintenanceCost +
+    result.operationCost +
+    result.consumablesCost +
+    (result.energyCost ?? 0) +
+    finishCost;
   const margins = PRICING_CONFIG.margins;
-  const priceUnit   = baseCost * margins.unit;
+  const priceUnit = baseCost * margins.unit;
   const priceMedium = baseCost * margins.medium;
-  const priceBulk   = baseCost * margins.bulk;
-  const finalPrice  = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
+  const priceBulk = baseCost * margins.bulk;
+  const finalPrice = getPriceByQuantity(
+    priceUnit,
+    priceMedium,
+    priceBulk,
+    quantity,
+  );
 
   return {
     ...result,
@@ -240,7 +280,7 @@ export function getPriceByQuantity(
   priceUnit: number,
   priceMedium: number,
   priceBulk: number,
-  quantity: number
+  quantity: number,
 ): number {
   if (quantity >= 10) return priceBulk;
   if (quantity >= 5) return priceMedium;
@@ -249,81 +289,87 @@ export function getPriceByQuantity(
 
 // ---- Datos de materiales (mantenidos para UI sin BD) ---------
 
-export const MATERIAL_INFO: Record<string, MaterialConfig & {
-  code: string;
-  label: string;
-  color: string;
-  properties: ReadonlyArray<{ readonly name: string; readonly value: string }>;
-  uses: string;
-  basePricePerGram: number;
-}> = {
+export const MATERIAL_INFO: Record<
+  string,
+  MaterialConfig & {
+    code: string;
+    label: string;
+    color: string;
+    properties: ReadonlyArray<{
+      readonly name: string;
+      readonly value: string;
+    }>;
+    uses: string;
+    basePricePerGram: number;
+  }
+> = {
   PLA: {
-    code: 'PLA',
-    label: 'PLA Basic',
+    code: "PLA",
+    label: "PLA Basic",
     density: 1.24,
     pricePerKg: 18,
     basePricePerGram: 0.018,
     maintenanceFactor: 0.03,
-    color: '#00FFFF',
+    color: "#00FFFF",
     properties: [
-      { name: 'Resistencia', value: 'Media' },
-      { name: 'Flexibilidad', value: 'Baja' },
-      { name: 'Temp. Impresión', value: '190–220°C' },
-      { name: 'Durabilidad', value: 'Media' },
-      { name: 'Biodegradable', value: 'Sí' },
+      { name: "Resistencia", value: "Media" },
+      { name: "Flexibilidad", value: "Baja" },
+      { name: "Temp. Impresión", value: "190–220°C" },
+      { name: "Durabilidad", value: "Media" },
+      { name: "Biodegradable", value: "Sí" },
     ],
-    uses: 'Prototipos, figuras decorativas, maquetas, objetos de bajo estrés mecánico',
+    uses: "Prototipos, figuras decorativas, maquetas, objetos de bajo estrés mecánico",
   },
   PETG: {
-    code: 'PETG',
-    label: 'PETG Basic',
+    code: "PETG",
+    label: "PETG Basic",
     density: 1.27,
     pricePerKg: 23,
     basePricePerGram: 0.023,
     maintenanceFactor: 0.04,
-    color: '#FFBF00',
+    color: "#FFBF00",
     properties: [
-      { name: 'Resistencia', value: 'Alta' },
-      { name: 'Flexibilidad', value: 'Media' },
-      { name: 'Temp. Impresión', value: '220–250°C' },
-      { name: 'Durabilidad', value: 'Alta' },
-      { name: 'Biodegradable', value: 'No' },
+      { name: "Resistencia", value: "Alta" },
+      { name: "Flexibilidad", value: "Media" },
+      { name: "Temp. Impresión", value: "220–250°C" },
+      { name: "Durabilidad", value: "Alta" },
+      { name: "Biodegradable", value: "No" },
     ],
-    uses: 'Piezas mecánicas, contenedores, carcasas protectoras, piezas exteriores',
+    uses: "Piezas mecánicas, contenedores, carcasas protectoras, piezas exteriores",
   },
   ASA: {
-    code: 'ASA',
-    label: 'ASA',
+    code: "ASA",
+    label: "ASA",
     density: 1.07,
     pricePerKg: 30,
     basePricePerGram: 0.03,
     maintenanceFactor: 0.05,
-    color: '#FF6B35',
+    color: "#FF6B35",
     properties: [
-      { name: 'Resistencia', value: 'Alta' },
-      { name: 'Flexibilidad', value: 'Baja' },
-      { name: 'Temp. Impresión', value: '230–260°C' },
-      { name: 'Durabilidad', value: 'Muy Alta' },
-      { name: 'UV Resistente', value: 'Sí' },
+      { name: "Resistencia", value: "Alta" },
+      { name: "Flexibilidad", value: "Baja" },
+      { name: "Temp. Impresión", value: "230–260°C" },
+      { name: "Durabilidad", value: "Muy Alta" },
+      { name: "UV Resistente", value: "Sí" },
     ],
-    uses: 'Piezas exteriores, automoción, aplicaciones industriales',
+    uses: "Piezas exteriores, automoción, aplicaciones industriales",
   },
   TPU: {
-    code: 'TPU',
-    label: 'TPU Flexible',
+    code: "TPU",
+    label: "TPU Flexible",
     density: 1.21,
     pricePerKg: 35,
     basePricePerGram: 0.035,
     maintenanceFactor: 0.06,
-    color: '#A855F7',
+    color: "#A855F7",
     properties: [
-      { name: 'Resistencia', value: 'Media' },
-      { name: 'Flexibilidad', value: 'Muy Alta' },
-      { name: 'Temp. Impresión', value: '210–240°C' },
-      { name: 'Durabilidad', value: 'Alta' },
-      { name: 'Abrasión', value: 'Muy Alta' },
+      { name: "Resistencia", value: "Media" },
+      { name: "Flexibilidad", value: "Muy Alta" },
+      { name: "Temp. Impresión", value: "210–240°C" },
+      { name: "Durabilidad", value: "Alta" },
+      { name: "Abrasión", value: "Muy Alta" },
     ],
-    uses: 'Juntas, fundas, rodillos, piezas que requieren flexibilidad',
+    uses: "Juntas, fundas, rodillos, piezas que requieren flexibilidad",
   },
 } as const;
 

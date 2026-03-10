@@ -16,11 +16,21 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
         try {
-          const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
           if (!user?.password) return null;
-          const valid = await bcrypt.compare(credentials.password, user.password);
+          const valid = await bcrypt.compare(
+            credentials.password,
+            user.password,
+          );
           if (!valid) return null;
-          return { id: user.id, email: user.email, name: user.name, role: user.role };
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
         } catch {
           return null;
         }
@@ -32,7 +42,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as unknown as Record<string, unknown>)?.role ?? "user";
+        token.role =
+          (user as unknown as Record<string, unknown>)?.role ?? "user";
       }
       return token;
     },

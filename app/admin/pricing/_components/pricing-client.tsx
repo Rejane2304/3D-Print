@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import {
   DollarSign,
   Settings,
@@ -12,14 +12,14 @@ import {
   Calculator,
   Info,
   Euro,
-} from 'lucide-react';
-import { useToast } from '@/components/toast-provider';
+} from "lucide-react";
+import { useToast } from "@/components/toast-provider";
 import {
   MATERIAL_INFO,
   PRICING_CONFIG,
   calculatePriceFromDimensions,
-} from '@/lib/price-calculator';
-import type { MaterialType } from '@/lib/types';
+} from "@/lib/price-calculator";
+import type { MaterialType } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Local types
@@ -70,14 +70,16 @@ export default function AdminPricingClient() {
 
   // Materials state
   const [materials, setMaterials] = useState<MaterialType[]>([]);
-  const [matEdits, setMatEdits] = useState<Record<string, MaterialEditState>>({});
+  const [matEdits, setMatEdits] = useState<Record<string, MaterialEditState>>(
+    {},
+  );
 
   // Recalculate state
   const [recalculating, setRecalculating] = useState(false);
   const [recalcResult, setRecalcResult] = useState<string | null>(null);
 
   // Simulator state
-  const [simMaterialCode, setSimMaterialCode] = useState<string>('');
+  const [simMaterialCode, setSimMaterialCode] = useState<string>("");
   const [simDimX, setSimDimX] = useState<number>(5);
   const [simDimY, setSimDimY] = useState<number>(5);
   const [simDimZ, setSimDimZ] = useState<number>(5);
@@ -94,12 +96,13 @@ export default function AdminPricingClient() {
       setConfigLoading(true);
       try {
         const [configRes, materialsRes] = await Promise.all([
-          fetch('/api/admin/pricing'),
-          fetch('/api/admin/materials'),
+          fetch("/api/admin/pricing"),
+          fetch("/api/admin/materials"),
         ]);
 
         if (configRes.ok) {
-          const configData: PricingConfig = await configRes.json() as PricingConfig;
+          const configData: PricingConfig =
+            (await configRes.json()) as PricingConfig;
           setConfig(configData);
         }
 
@@ -126,8 +129,8 @@ export default function AdminPricingClient() {
           }
         }
       } catch (err: unknown) {
-        console.error('Error loading pricing data:', err);
-        showToast('error', 'Error al cargar los datos de precios');
+        console.error("Error loading pricing data:", err);
+        showToast("error", "Error al cargar los datos de precios");
       } finally {
         setConfigLoading(false);
       }
@@ -144,9 +147,9 @@ export default function AdminPricingClient() {
     if (!config) return;
     setConfigSaving(true);
     try {
-      const res = await fetch('/api/admin/pricing', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/admin/pricing", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           machineAmortizationPerHour: config.machineAmortizationPerHour,
           operationCostPerHour: config.operationCostPerHour,
@@ -157,12 +160,12 @@ export default function AdminPricingClient() {
         }),
       });
       if (res.ok) {
-        showToast('success', 'Configuración guardada correctamente');
+        showToast("success", "Configuración guardada correctamente");
       } else {
-        showToast('error', 'Error al guardar la configuración');
+        showToast("error", "Error al guardar la configuración");
       }
     } catch {
-      showToast('error', 'Error de conexión al guardar');
+      showToast("error", "Error de conexión al guardar");
     } finally {
       setConfigSaving(false);
     }
@@ -180,8 +183,8 @@ export default function AdminPricingClient() {
 
       try {
         const res = await fetch(`/api/admin/materials/${materialId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             pricePerKg: Number.parseFloat(edit.pricePerKg),
             maintenanceFactor: Number.parseFloat(edit.maintenanceFactor),
@@ -189,12 +192,12 @@ export default function AdminPricingClient() {
           }),
         });
         if (res.ok) {
-          showToast('success', 'Material actualizado correctamente');
+          showToast("success", "Material actualizado correctamente");
         } else {
-          showToast('error', 'Error al actualizar el material');
+          showToast("error", "Error al actualizar el material");
         }
       } catch {
-        showToast('error', 'Error de conexión al actualizar material');
+        showToast("error", "Error de conexión al actualizar material");
       } finally {
         setMatEdits((prev) => ({
           ...prev,
@@ -209,17 +212,19 @@ export default function AdminPricingClient() {
     setRecalculating(true);
     setRecalcResult(null);
     try {
-      const res = await fetch('/api/admin/pricing/recalculate', { method: 'POST' });
-      const data = await res.json() as { success: boolean; updated: number };
+      const res = await fetch("/api/admin/pricing/recalculate", {
+        method: "POST",
+      });
+      const data = (await res.json()) as { success: boolean; updated: number };
       if (res.ok) {
         const msg = `${data.updated ?? 0} productos recalculados`;
         setRecalcResult(msg);
-        showToast('success', msg);
+        showToast("success", msg);
       } else {
-        showToast('error', 'Error al recalcular precios');
+        showToast("error", "Error al recalcular precios");
       }
     } catch {
-      showToast('error', 'Error de conexión al recalcular');
+      showToast("error", "Error de conexión al recalcular");
     } finally {
       setRecalculating(false);
     }
@@ -256,8 +261,12 @@ export default function AdminPricingClient() {
   // Button label helpers (avoids nested ternaries)
   // ---------------------------------------------------------------------------
 
-  const saveConfigLabel = configSaving ? 'Guardando...' : 'Guardar configuración';
-  const recalcLabel = recalculating ? 'Recalculando...' : 'Recalcular todos los precios';
+  const saveConfigLabel = configSaving
+    ? "Guardando..."
+    : "Guardar configuración";
+  const recalcLabel = recalculating
+    ? "Recalculando..."
+    : "Recalcular todos los precios";
 
   // ---------------------------------------------------------------------------
   // Breakdown rows for simulator
@@ -265,12 +274,12 @@ export default function AdminPricingClient() {
 
   const breakdownRows = simResult
     ? [
-        { label: 'Material', value: simResult.materialCost },
-        { label: 'Máquina (amort.)', value: simResult.machineCost },
-        { label: 'Mantenimiento', value: simResult.maintenanceCost },
-        { label: 'Electricidad', value: simResult.operationCost },
-        { label: 'Consumibles', value: simResult.consumablesCost },
-        { label: 'Acabado (fijo)', value: simResult.finishCost },
+        { label: "Material", value: simResult.materialCost },
+        { label: "Máquina (amort.)", value: simResult.machineCost },
+        { label: "Mantenimiento", value: simResult.maintenanceCost },
+        { label: "Electricidad", value: simResult.operationCost },
+        { label: "Consumibles", value: simResult.consumablesCost },
+        { label: "Acabado (fijo)", value: simResult.finishCost },
       ]
     : [];
 
@@ -280,7 +289,6 @@ export default function AdminPricingClient() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-
       {/* ---- Header ---- */}
       <div>
         <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
@@ -314,7 +322,10 @@ export default function AdminPricingClient() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label htmlFor="motor-machine" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="motor-machine"
+                  className="text-xs text-muted block mb-1"
+                >
                   Amortización máquina (€/hora)
                 </label>
                 <input
@@ -337,7 +348,10 @@ export default function AdminPricingClient() {
                 />
               </div>
               <div>
-                <label htmlFor="motor-electricity" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="motor-electricity"
+                  className="text-xs text-muted block mb-1"
+                >
                   Electricidad (€/hora)
                 </label>
                 <input
@@ -360,7 +374,10 @@ export default function AdminPricingClient() {
                 />
               </div>
               <div>
-                <label htmlFor="motor-consumables" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="motor-consumables"
+                  className="text-xs text-muted block mb-1"
+                >
                   Consumibles (€/hora)
                 </label>
                 <input
@@ -398,7 +415,10 @@ export default function AdminPricingClient() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label htmlFor="margin-unit" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="margin-unit"
+                  className="text-xs text-muted block mb-1"
+                >
                   1–4 unidades (×N)
                 </label>
                 <input
@@ -409,21 +429,27 @@ export default function AdminPricingClient() {
                   onChange={(e) =>
                     setConfig((prev) =>
                       prev
-                        ? { ...prev, marginUnit: Number.parseFloat(e.target.value) || 1 }
+                        ? {
+                            ...prev,
+                            marginUnit: Number.parseFloat(e.target.value) || 1,
+                          }
                         : prev,
                     )
                   }
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
                 <p className="text-xs text-muted mt-1">
-                  Margen efectivo:{' '}
+                  Margen efectivo:{" "}
                   <span className="text-cyan font-mono">
                     {marginPct(config?.marginUnit ?? 1)}
                   </span>
                 </p>
               </div>
               <div>
-                <label htmlFor="margin-medium" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="margin-medium"
+                  className="text-xs text-muted block mb-1"
+                >
                   5–9 unidades (×N)
                 </label>
                 <input
@@ -434,21 +460,28 @@ export default function AdminPricingClient() {
                   onChange={(e) =>
                     setConfig((prev) =>
                       prev
-                        ? { ...prev, marginMedium: Number.parseFloat(e.target.value) || 1 }
+                        ? {
+                            ...prev,
+                            marginMedium:
+                              Number.parseFloat(e.target.value) || 1,
+                          }
                         : prev,
                     )
                   }
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
                 <p className="text-xs text-muted mt-1">
-                  Margen efectivo:{' '}
+                  Margen efectivo:{" "}
                   <span className="text-cyan font-mono">
                     {marginPct(config?.marginMedium ?? 1)}
                   </span>
                 </p>
               </div>
               <div>
-                <label htmlFor="margin-bulk" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="margin-bulk"
+                  className="text-xs text-muted block mb-1"
+                >
                   10+ unidades (×N)
                 </label>
                 <input
@@ -459,14 +492,17 @@ export default function AdminPricingClient() {
                   onChange={(e) =>
                     setConfig((prev) =>
                       prev
-                        ? { ...prev, marginBulk: Number.parseFloat(e.target.value) || 1 }
+                        ? {
+                            ...prev,
+                            marginBulk: Number.parseFloat(e.target.value) || 1,
+                          }
                         : prev,
                     )
                   }
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
                 <p className="text-xs text-muted mt-1">
-                  Margen efectivo:{' '}
+                  Margen efectivo:{" "}
                   <span className="text-cyan font-mono">
                     {marginPct(config?.marginBulk ?? 1)}
                   </span>
@@ -489,7 +525,8 @@ export default function AdminPricingClient() {
 
             {materials.length === 0 ? (
               <p className="text-muted text-sm py-4">
-                No hay materiales. Crea materiales desde la sección de Materiales.
+                No hay materiales. Crea materiales desde la sección de
+                Materiales.
               </p>
             ) : (
               <div className="overflow-x-auto">
@@ -508,16 +545,23 @@ export default function AdminPricingClient() {
                     {materials.map((m) => {
                       const edit = matEdits[m.id];
                       if (!edit) return null;
-                      const savingLabel = edit.saving ? 'Guardando...' : 'Guardar';
+                      const savingLabel = edit.saving
+                        ? "Guardando..."
+                        : "Guardar";
                       return (
-                        <tr key={m.id} className="hover:bg-white/[0.02] transition">
+                        <tr
+                          key={m.id}
+                          className="hover:bg-white/[0.02] transition"
+                        >
                           <td className="py-3 px-2">
                             <div className="flex items-center gap-2">
                               <span
                                 className="w-3 h-3 rounded-full inline-block border border-white/20 flex-shrink-0"
-                                style={{ backgroundColor: m.color ?? '#888' }}
+                                style={{ backgroundColor: m.color ?? "#888" }}
                               />
-                              <span className="font-mono font-semibold">{m.code}</span>
+                              <span className="font-mono font-semibold">
+                                {m.code}
+                              </span>
                             </div>
                           </td>
                           <td className="py-3 px-2 text-muted">{m.name}</td>
@@ -529,7 +573,10 @@ export default function AdminPricingClient() {
                               onChange={(e) =>
                                 setMatEdits((prev) => ({
                                   ...prev,
-                                  [m.id]: { ...prev[m.id], pricePerKg: e.target.value },
+                                  [m.id]: {
+                                    ...prev[m.id],
+                                    pricePerKg: e.target.value,
+                                  },
                                 }))
                               }
                               className="w-24 px-2 py-1 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm text-right font-mono"
@@ -543,7 +590,10 @@ export default function AdminPricingClient() {
                               onChange={(e) =>
                                 setMatEdits((prev) => ({
                                   ...prev,
-                                  [m.id]: { ...prev[m.id], density: e.target.value },
+                                  [m.id]: {
+                                    ...prev[m.id],
+                                    density: e.target.value,
+                                  },
                                 }))
                               }
                               className="w-24 px-2 py-1 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm text-right font-mono"
@@ -598,14 +648,20 @@ export default function AdminPricingClient() {
             </h2>
             <p className="text-muted text-xs mb-4 flex items-center gap-1">
               <Info className="w-3 h-3 flex-shrink-0" />
-              Usa los valores del código: amort. €{PRICING_CONFIG.machineAmortizationPerHour}/h
-              · electricidad €{PRICING_CONFIG.operationCostPerHour}/h
-              · consumibles €{PRICING_CONFIG.consumablesCostPerHour}/h
+              Usa los valores del código: amort. €
+              {PRICING_CONFIG.machineAmortizationPerHour}/h · electricidad €
+              {PRICING_CONFIG.operationCostPerHour}/h · consumibles €
+              {PRICING_CONFIG.consumablesCostPerHour}/h
             </p>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
               <div>
-                <label htmlFor="sim-material" className="text-xs text-muted block mb-1">Material</label>
+                <label
+                  htmlFor="sim-material"
+                  className="text-xs text-muted block mb-1"
+                >
+                  Material
+                </label>
                 <select
                   id="sim-material"
                   value={simMaterialCode}
@@ -620,43 +676,69 @@ export default function AdminPricingClient() {
                 </select>
               </div>
               <div>
-                <label htmlFor="sim-dimx" className="text-xs text-muted block mb-1">Dim X (cm)</label>
+                <label
+                  htmlFor="sim-dimx"
+                  className="text-xs text-muted block mb-1"
+                >
+                  Dim X (cm)
+                </label>
                 <input
                   id="sim-dimx"
                   type="number"
                   step="0.1"
                   min="0.1"
                   value={simDimX}
-                  onChange={(e) => setSimDimX(Number.parseFloat(e.target.value) || 1)}
+                  onChange={(e) =>
+                    setSimDimX(Number.parseFloat(e.target.value) || 1)
+                  }
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="sim-dimy" className="text-xs text-muted block mb-1">Dim Y (cm)</label>
+                <label
+                  htmlFor="sim-dimy"
+                  className="text-xs text-muted block mb-1"
+                >
+                  Dim Y (cm)
+                </label>
                 <input
                   id="sim-dimy"
                   type="number"
                   step="0.1"
                   min="0.1"
                   value={simDimY}
-                  onChange={(e) => setSimDimY(Number.parseFloat(e.target.value) || 1)}
+                  onChange={(e) =>
+                    setSimDimY(Number.parseFloat(e.target.value) || 1)
+                  }
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="sim-dimz" className="text-xs text-muted block mb-1">Dim Z (cm)</label>
+                <label
+                  htmlFor="sim-dimz"
+                  className="text-xs text-muted block mb-1"
+                >
+                  Dim Z (cm)
+                </label>
                 <input
                   id="sim-dimz"
                   type="number"
                   step="0.1"
                   min="0.1"
                   value={simDimZ}
-                  onChange={(e) => setSimDimZ(Number.parseFloat(e.target.value) || 1)}
+                  onChange={(e) =>
+                    setSimDimZ(Number.parseFloat(e.target.value) || 1)
+                  }
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="sim-qty" className="text-xs text-muted block mb-1">Cantidad (1–20)</label>
+                <label
+                  htmlFor="sim-qty"
+                  className="text-xs text-muted block mb-1"
+                >
+                  Cantidad (1–20)
+                </label>
                 <input
                   id="sim-qty"
                   type="number"
@@ -664,12 +746,17 @@ export default function AdminPricingClient() {
                   min="1"
                   max="20"
                   value={simQty}
-                  onChange={(e) => setSimQty(Number.parseInt(e.target.value, 10) || 1)}
+                  onChange={(e) =>
+                    setSimQty(Number.parseInt(e.target.value, 10) || 1)
+                  }
                   className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
                 />
               </div>
               <div>
-                <label htmlFor="sim-printtime" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="sim-printtime"
+                  className="text-xs text-muted block mb-1"
+                >
                   Tiempo de impresión (min)
                 </label>
                 <input
@@ -685,7 +772,10 @@ export default function AdminPricingClient() {
                 />
               </div>
               <div>
-                <label htmlFor="sim-finishcost" className="text-xs text-muted block mb-1">
+                <label
+                  htmlFor="sim-finishcost"
+                  className="text-xs text-muted block mb-1"
+                >
                   Acabado / manipulación (€)
                 </label>
                 <input
@@ -708,7 +798,9 @@ export default function AdminPricingClient() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-bg-tertiary rounded-xl p-4 text-center">
                     <p className="text-xs text-muted mb-1">Peso estimado</p>
-                    <p className="text-2xl font-bold font-mono">{simResult.weight} g</p>
+                    <p className="text-2xl font-bold font-mono">
+                      {simResult.weight} g
+                    </p>
                   </div>
                   <div className="bg-bg-tertiary rounded-xl p-4 text-center">
                     <p className="text-xs text-muted mb-1">Coste base</p>
@@ -735,14 +827,22 @@ export default function AdminPricingClient() {
                   </p>
                   <div className="space-y-2">
                     {breakdownRows.map((row) => (
-                      <div key={row.label} className="flex justify-between text-sm">
+                      <div
+                        key={row.label}
+                        className="flex justify-between text-sm"
+                      >
                         <span className="text-muted">{row.label}</span>
-                        <span className="font-mono">€{row.value.toFixed(3)}</span>
+                        <span className="font-mono">
+                          €{row.value.toFixed(3)}
+                        </span>
                       </div>
                     ))}
                     <div className="border-t border-border pt-2 flex justify-between text-sm font-semibold">
                       <span>Coste total</span>
-                      <span className="font-mono">€{(simResult.baseCost + simResult.finishCost).toFixed(3)}</span>
+                      <span className="font-mono">
+                        €
+                        {(simResult.baseCost + simResult.finishCost).toFixed(3)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -750,7 +850,9 @@ export default function AdminPricingClient() {
                 {/* Material info from MATERIAL_INFO (if available) */}
                 {simMaterialInfo && (
                   <p className="text-xs text-muted">
-                    <span className="font-semibold">{simMaterialInfo.label}:</span>{' '}
+                    <span className="font-semibold">
+                      {simMaterialInfo.label}:
+                    </span>{" "}
                     {simMaterialInfo.uses}
                   </p>
                 )}
@@ -777,7 +879,9 @@ export default function AdminPricingClient() {
               disabled={recalculating}
               className="flex items-center gap-2 px-6 py-3 bg-bg-tertiary border border-border text-white font-medium rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={recalculating ? 'w-4 h-4 animate-spin' : 'w-4 h-4'} />
+              <RefreshCw
+                className={recalculating ? "w-4 h-4 animate-spin" : "w-4 h-4"}
+              />
               {recalcLabel}
             </button>
             {recalcResult && (

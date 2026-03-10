@@ -3,7 +3,17 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { MapPin, Package, CreditCard, AlertCircle, ArrowLeft, ArrowRight, Tag, X, CheckCircle } from "lucide-react";
+import {
+  MapPin,
+  Package,
+  CreditCard,
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  Tag,
+  X,
+  CheckCircle,
+} from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useToast } from "@/components/toast-provider";
 import { useLanguage } from "@/lib/language-store";
@@ -43,7 +53,14 @@ export function CheckoutClient() {
   const [couponError, setCouponError] = useState("");
 
   const [shipping, setShipping] = useState({
-    name: "", email: "", phone: "", address: "", city: "", state: "", zip: "", country: language === "es" ? "España" : "Spain",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: language === "es" ? "España" : "Spain",
   });
 
   useEffect(() => {
@@ -54,19 +71,23 @@ export function CheckoutClient() {
     if (!session?.user) return;
 
     // Pre-fill inmediato desde la sesión (sin esperar red)
-    setShipping(prev => ({
+    setShipping((prev) => ({
       ...prev,
-      name: (session.user as Record<string, unknown>)?.name as string ?? prev.name,
-      email: (session.user as Record<string, unknown>)?.email as string ?? prev.email,
+      name:
+        ((session.user as Record<string, unknown>)?.name as string) ??
+        prev.name,
+      email:
+        ((session.user as Record<string, unknown>)?.email as string) ??
+        prev.email,
     }));
 
     // Pre-fill completo desde la base de datos (dirección guardada)
     const loadProfile = async () => {
       try {
-        const res = await fetch('/api/profile');
+        const res = await fetch("/api/profile");
         if (!res.ok) return;
-        const profile = await res.json() as Record<string, unknown>;
-        setShipping(prev => ({
+        const profile = (await res.json()) as Record<string, unknown>;
+        setShipping((prev) => ({
           ...prev,
           name: (profile.name as string) || prev.name,
           email: (profile.email as string) || prev.email,
@@ -77,7 +98,9 @@ export function CheckoutClient() {
           zip: (profile.zipCode as string) || prev.zip,
           country: (profile.country as string) || prev.country,
         }));
-      } catch { /* silently fail */ }
+      } catch {
+        /* silently fail */
+      }
     };
     loadProfile();
   }, [session]);
@@ -127,7 +150,8 @@ export function CheckoutClient() {
       couponRemove: "Quitar",
       shippingAddressTitle: "Dirección de envío:",
       paymentTitle: "Método de Pago",
-      paymentInfo: "Serás redirigido a Stripe para completar el pago de forma segura.",
+      paymentInfo:
+        "Serás redirigido a Stripe para completar el pago de forma segura.",
       payButton: "Confirmar y Pagar",
       processing: "Procesando...",
       prev: "Anterior",
@@ -176,7 +200,8 @@ export function CheckoutClient() {
       couponRemove: "Remove",
       shippingAddressTitle: "Shipping address:",
       paymentTitle: "Payment Method",
-      paymentInfo: "You will be redirected to Stripe to complete your payment securely.",
+      paymentInfo:
+        "You will be redirected to Stripe to complete your payment securely.",
       payButton: "Confirm and Pay",
       processing: "Processing...",
       prev: "Back",
@@ -243,12 +268,22 @@ export function CheckoutClient() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: (items ?? []).map(i => ({
-            productId: i?.productId, name: i?.name, material: i?.material,
-            color: i?.color, quantity: i?.quantity, dimX: i?.dimX,
-            dimY: i?.dimY, dimZ: i?.dimZ, unitPrice: i?.unitPrice,
+          items: (items ?? []).map((i) => ({
+            productId: i?.productId,
+            name: i?.name,
+            material: i?.material,
+            color: i?.color,
+            quantity: i?.quantity,
+            dimX: i?.dimX,
+            dimY: i?.dimY,
+            dimZ: i?.dimZ,
+            unitPrice: i?.unitPrice,
           })),
-          shipping, subtotal, tax, shippingCost, total,
+          shipping,
+          subtotal,
+          tax,
+          shippingCost,
+          total,
           couponCode: couponCode || undefined,
         }),
       });
@@ -258,21 +293,32 @@ export function CheckoutClient() {
       } else {
         showToast("error", data?.error ?? t.paymentErrorFallback);
       }
-    } catch { showToast("error", t.connectionError); }
+    } catch {
+      showToast("error", t.connectionError);
+    }
     setLoading(false);
   };
 
-  if (status === "loading") return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" /></div>;
-  if ((items?.length ?? 0) === 0) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-zinc-400 mb-4">{t.emptyCart}</p>
-        <a href="/catalog" className="text-cyan hover:underline">{t.goCatalog}</a>
+  if (status === "loading")
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
       </div>
-    </div>
-  );
+    );
+  if ((items?.length ?? 0) === 0)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-zinc-400 mb-4">{t.emptyCart}</p>
+          <a href="/catalog" className="text-cyan hover:underline">
+            {t.goCatalog}
+          </a>
+        </div>
+      </div>
+    );
 
-  const fieldClass = (field: string) => `w-full bg-white/5 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-1 placeholder-zinc-500 ${errors?.[field] ? "ring-1 ring-red-400" : "focus:ring-cyan"}`;
+  const fieldClass = (field: string) =>
+    `w-full bg-white/5 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-1 placeholder-zinc-500 ${errors?.[field] ? "ring-1 ring-red-400" : "focus:ring-cyan"}`;
 
   return (
     <div className="min-h-screen py-8">
@@ -283,58 +329,187 @@ export function CheckoutClient() {
         <div className="flex items-center gap-4 mb-10">
           {STEPS[language].map((s, i) => (
             <React.Fragment key={s.label}>
-              <div className={`flex items-center gap-2 ${i <= step ? "text-cyan" : "text-zinc-500"}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i <= step ? "bg-cyan text-black" : "bg-white/10"}`}>{i + 1}</div>
-                <span className="text-sm font-medium hidden sm:inline">{s.label}</span>
+              <div
+                className={`flex items-center gap-2 ${i <= step ? "text-cyan" : "text-zinc-500"}`}
+              >
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i <= step ? "bg-cyan text-black" : "bg-white/10"}`}
+                >
+                  {i + 1}
+                </div>
+                <span className="text-sm font-medium hidden sm:inline">
+                  {s.label}
+                </span>
               </div>
-              {i < 2 && <div className={`flex-1 h-0.5 ${i < step ? "bg-cyan" : "bg-white/10"}`} />}
+              {i < 2 && (
+                <div
+                  className={`flex-1 h-0.5 ${i < step ? "bg-cyan" : "bg-white/10"}`}
+                />
+              )}
             </React.Fragment>
           ))}
         </div>
 
         {/* Step 1: Shipping */}
         {step === 0 && (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-bg-card rounded-xl p-6 border border-white/5">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-bg-card rounded-xl p-6 border border-white/5"
+          >
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
               <MapPin className="w-5 h-5 text-cyan" /> {t.shippingStepTitle}
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">{t.fullName}</label>
-                <input type="text" value={shipping.name} onChange={e => setShipping({ ...shipping, name: e.target.value })} placeholder={t.fullNamePlaceholder} className={fieldClass("name")} />
-                {errors?.name && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.name}</p>}
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.fullName}
+                </label>
+                <input
+                  type="text"
+                  value={shipping.name}
+                  onChange={(e) =>
+                    setShipping({ ...shipping, name: e.target.value })
+                  }
+                  placeholder={t.fullNamePlaceholder}
+                  className={fieldClass("name")}
+                />
+                {errors?.name && (
+                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.name}
+                  </p>
+                )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">{t.email}</label>
-                <input type="email" value={shipping.email} onChange={e => setShipping({ ...shipping, email: e.target.value })} placeholder={t.emailPlaceholder} className={fieldClass("email")} />
-                {errors?.email && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.email}</p>}
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.email}
+                </label>
+                <input
+                  type="email"
+                  value={shipping.email}
+                  onChange={(e) =>
+                    setShipping({ ...shipping, email: e.target.value })
+                  }
+                  placeholder={t.emailPlaceholder}
+                  className={fieldClass("email")}
+                />
+                {errors?.email && (
+                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">{t.phone}</label>
-                <input type="tel" value={shipping.phone} onChange={e => setShipping({ ...shipping, phone: e.target.value })} placeholder={t.phonePlaceholder} className={fieldClass("phone")} />
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.phone}
+                </label>
+                <input
+                  type="tel"
+                  value={shipping.phone}
+                  onChange={(e) =>
+                    setShipping({ ...shipping, phone: e.target.value })
+                  }
+                  placeholder={t.phonePlaceholder}
+                  className={fieldClass("phone")}
+                />
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">{t.country}</label>
-                <input type="text" value={shipping.country} onChange={e => setShipping({ ...shipping, country: e.target.value })} className={fieldClass("country")} />
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.country}
+                </label>
+                <input
+                  type="text"
+                  value={shipping.country}
+                  onChange={(e) =>
+                    setShipping({ ...shipping, country: e.target.value })
+                  }
+                  className={fieldClass("country")}
+                />
               </div>
               <div className="md:col-span-2">
-                <label className="text-sm text-zinc-400 mb-1 block">{t.address}</label>
-                <input type="text" value={shipping.address} onChange={e => setShipping({ ...shipping, address: capitalizeFirst(e.target.value) })} placeholder={t.addressPlaceholder} className={fieldClass("address")} />
-                {errors?.address && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.address}</p>}
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.address}
+                </label>
+                <input
+                  type="text"
+                  value={shipping.address}
+                  onChange={(e) =>
+                    setShipping({
+                      ...shipping,
+                      address: capitalizeFirst(e.target.value),
+                    })
+                  }
+                  placeholder={t.addressPlaceholder}
+                  className={fieldClass("address")}
+                />
+                {errors?.address && (
+                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.address}
+                  </p>
+                )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">{t.city}</label>
-                <input type="text" value={shipping.city} onChange={e => setShipping({ ...shipping, city: capitalizeFirst(e.target.value) })} placeholder={t.cityPlaceholder} className={fieldClass("city")} />
-                {errors?.city && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.city}</p>}
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.city}
+                </label>
+                <input
+                  type="text"
+                  value={shipping.city}
+                  onChange={(e) =>
+                    setShipping({
+                      ...shipping,
+                      city: capitalizeFirst(e.target.value),
+                    })
+                  }
+                  placeholder={t.cityPlaceholder}
+                  className={fieldClass("city")}
+                />
+                {errors?.city && (
+                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.city}
+                  </p>
+                )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">{t.state}</label>
-                <input type="text" value={shipping.state} onChange={e => setShipping({ ...shipping, state: capitalizeFirst(e.target.value) })} placeholder={t.statePlaceholder} className={fieldClass("state")} />
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.state}
+                </label>
+                <input
+                  type="text"
+                  value={shipping.state}
+                  onChange={(e) =>
+                    setShipping({
+                      ...shipping,
+                      state: capitalizeFirst(e.target.value),
+                    })
+                  }
+                  placeholder={t.statePlaceholder}
+                  className={fieldClass("state")}
+                />
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">{t.zip}</label>
-                <input type="text" value={shipping.zip} onChange={e => setShipping({ ...shipping, zip: e.target.value })} placeholder={t.zipPlaceholder} className={fieldClass("zip")} />
-                {errors?.zip && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{errors.zip}</p>}
+                <label className="text-sm text-zinc-400 mb-1 block">
+                  {t.zip}
+                </label>
+                <input
+                  type="text"
+                  value={shipping.zip}
+                  onChange={(e) =>
+                    setShipping({ ...shipping, zip: e.target.value })
+                  }
+                  placeholder={t.zipPlaceholder}
+                  className={fieldClass("zip")}
+                />
+                {errors?.zip && (
+                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.zip}
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>
@@ -342,44 +517,91 @@ export function CheckoutClient() {
 
         {/* Step 2: Summary */}
         {step === 1 && (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-bg-card rounded-xl p-6 border border-white/5">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-bg-card rounded-xl p-6 border border-white/5"
+          >
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
               <Package className="w-5 h-5 text-cyan" /> {t.summaryTitle}
             </h2>
             <div className="space-y-3 mb-6">
               {(items ?? []).map((item, i) => (
-                <div key={item?.id ?? i} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                <div
+                  key={item?.id ?? i}
+                  className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
+                >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{item?.name ?? ""}</p>
-                    <p className="text-xs text-zinc-400">{item?.material ?? ""} · {item?.color ?? ""} · {((item?.dimX ?? 0)/10).toFixed(1)}×{((item?.dimY ?? 0)/10).toFixed(1)}×{((item?.dimZ ?? 0)/10).toFixed(1)} cm · x{item?.quantity ?? 1}</p>
+                    <p className="text-sm font-medium truncate">
+                      {item?.name ?? ""}
+                    </p>
+                    <p className="text-xs text-zinc-400">
+                      {item?.material ?? ""} · {item?.color ?? ""} ·{" "}
+                      {((item?.dimX ?? 0) / 10).toFixed(1)}×
+                      {((item?.dimY ?? 0) / 10).toFixed(1)}×
+                      {((item?.dimZ ?? 0) / 10).toFixed(1)} cm · x
+                      {item?.quantity ?? 1}
+                    </p>
                   </div>
-                  <span className="font-mono text-sm">€{((item?.unitPrice ?? 0) * (item?.quantity ?? 1)).toFixed(2)}</span>
+                  <span className="font-mono text-sm">
+                    €
+                    {((item?.unitPrice ?? 0) * (item?.quantity ?? 1)).toFixed(
+                      2,
+                    )}
+                  </span>
                 </div>
               ))}
             </div>
 
             {/* Coupon input */}
             <div className="mb-4">
-              <label className="text-sm text-zinc-400 mb-2 flex items-center gap-1"><Tag className="w-3.5 h-3.5" />{t.couponLabel}</label>
+              <label className="text-sm text-zinc-400 mb-2 flex items-center gap-1">
+                <Tag className="w-3.5 h-3.5" />
+                {t.couponLabel}
+              </label>
               {couponCode ? (
                 <div className="flex items-center gap-2 p-2.5 bg-green-500/10 border border-green-500/30 rounded-lg">
                   <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  <span className="text-sm font-mono font-semibold text-green-400 flex-1">{couponCode}</span>
-                  <span className="text-sm text-green-400">-€{couponDiscount.toFixed(2)}</span>
-                  <button onClick={handleRemoveCoupon} className="p-0.5 hover:text-red-400 transition text-zinc-400"><X className="w-4 h-4" /></button>
+                  <span className="text-sm font-mono font-semibold text-green-400 flex-1">
+                    {couponCode}
+                  </span>
+                  <span className="text-sm text-green-400">
+                    -€{couponDiscount.toFixed(2)}
+                  </span>
+                  <button
+                    onClick={handleRemoveCoupon}
+                    className="p-0.5 hover:text-red-400 transition text-zinc-400"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <input type="text" value={couponInput} onChange={e => setCouponInput(e.target.value.toUpperCase())}
-                    onKeyDown={e => e.key === "Enter" && handleApplyCoupon()}
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) =>
+                      setCouponInput(e.target.value.toUpperCase())
+                    }
+                    onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
                     placeholder={t.couponPlaceholder}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono uppercase outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-600" />
-                  <button onClick={handleApplyCoupon} disabled={couponValidating || !couponInput.trim()} className="px-4 py-2 bg-white/10 rounded-lg text-sm hover:bg-white/15 transition disabled:opacity-50">
+                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono uppercase outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-600"
+                  />
+                  <button
+                    onClick={handleApplyCoupon}
+                    disabled={couponValidating || !couponInput.trim()}
+                    className="px-4 py-2 bg-white/10 rounded-lg text-sm hover:bg-white/15 transition disabled:opacity-50"
+                  >
                     {couponValidating ? "..." : t.couponApply}
                   </button>
                 </div>
               )}
-              {couponError && <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{couponError}</p>}
+              {couponError && (
+                <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {couponError}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2 text-sm">
@@ -393,29 +615,47 @@ export function CheckoutClient() {
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">{t.shippingLabel}</span>
-                <span className="font-mono">{shippingCost === 0 ? t.shippingFree : `€${shippingCost.toFixed(2)}`}</span>
+                <span className="font-mono">
+                  {shippingCost === 0
+                    ? t.shippingFree
+                    : `€${shippingCost.toFixed(2)}`}
+                </span>
               </div>
               {couponDiscount > 0 && (
                 <div className="flex justify-between text-green-400">
-                  <span className="flex items-center gap-1"><Tag className="w-3 h-3" />{t.discountLabel} ({couponCode})</span>
-                  <span className="font-mono">-€{couponDiscount.toFixed(2)}</span>
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
+                    {t.discountLabel} ({couponCode})
+                  </span>
+                  <span className="font-mono">
+                    -€{couponDiscount.toFixed(2)}
+                  </span>
                 </div>
               )}
               <div className="border-t border-white/10 pt-2 flex justify-between font-semibold text-base">
                 <span>{t.totalLabel}</span>
-                <span className="font-mono text-cyan">€{Math.max(0, total).toFixed(2)}</span>
+                <span className="font-mono text-cyan">
+                  €{Math.max(0, total).toFixed(2)}
+                </span>
               </div>
             </div>
             <div className="mt-6 p-4 bg-white/5 rounded-lg text-sm">
               <p className="font-medium mb-1">{t.shippingAddressTitle}</p>
-              <p className="text-zinc-400">{shipping.name} · {shipping.address}, {shipping.zip} {shipping.city}, {shipping.country}</p>
+              <p className="text-zinc-400">
+                {shipping.name} · {shipping.address}, {shipping.zip}{" "}
+                {shipping.city}, {shipping.country}
+              </p>
             </div>
           </motion.div>
         )}
 
         {/* Step 3: Payment */}
         {step === 2 && (
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-bg-card rounded-xl p-6 border border-white/5">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-bg-card rounded-xl p-6 border border-white/5"
+          >
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-cyan" /> {t.paymentTitle}
             </h2>
@@ -424,11 +664,18 @@ export function CheckoutClient() {
               <p className="text-sm text-zinc-400 mb-4">{t.paymentInfo}</p>
               {couponDiscount > 0 && (
                 <p className="text-sm text-green-400 mb-2 flex items-center justify-center gap-1">
-                  <Tag className="w-3.5 h-3.5" /> {t.discountLabel}: -€{couponDiscount.toFixed(2)}
+                  <Tag className="w-3.5 h-3.5" /> {t.discountLabel}: -€
+                  {couponDiscount.toFixed(2)}
                 </p>
               )}
-              <p className="font-mono text-2xl font-bold text-cyan mb-6">€{Math.max(0, total).toFixed(2)}</p>
-              <button onClick={handlePayment} disabled={loading} className="px-8 py-3 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition disabled:opacity-50 text-sm">
+              <p className="font-mono text-2xl font-bold text-cyan mb-6">
+                €{Math.max(0, total).toFixed(2)}
+              </p>
+              <button
+                onClick={handlePayment}
+                disabled={loading}
+                className="px-8 py-3 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition disabled:opacity-50 text-sm"
+              >
                 {loading ? t.processing : t.payButton}
               </button>
             </div>
@@ -437,11 +684,18 @@ export function CheckoutClient() {
 
         {/* Navigation */}
         <div className="flex justify-between mt-8">
-          <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="flex items-center gap-2 px-4 py-2 bg-bg-card border border-white/5 rounded-lg text-sm hover:bg-bg-hover transition disabled:opacity-30">
+          <button
+            onClick={() => setStep(Math.max(0, step - 1))}
+            disabled={step === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-bg-card border border-white/5 rounded-lg text-sm hover:bg-bg-hover transition disabled:opacity-30"
+          >
             <ArrowLeft className="w-4 h-4" /> {t.prev}
           </button>
           {step < 2 && (
-            <button onClick={handleNext} className="flex items-center gap-2 px-6 py-2 bg-cyan text-black rounded-lg text-sm font-medium hover:bg-cyan-dim transition">
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-2 px-6 py-2 bg-cyan text-black rounded-lg text-sm font-medium hover:bg-cyan-dim transition"
+            >
               {t.next} <ArrowRight className="w-4 h-4" />
             </button>
           )}

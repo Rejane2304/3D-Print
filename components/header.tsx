@@ -1,10 +1,26 @@
 "use client";
+// Handler para scroll (dummy)
+const handleScroll = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { ShoppingCart, User, Menu, X, Search, LogOut, Package, Heart, Settings, Globe, ChevronDown } from "lucide-react";
+import {
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  Search,
+  LogOut,
+  Package,
+  Heart,
+  Settings,
+  Globe,
+  ChevronDown,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/lib/cart-store";
 import { useLanguage } from "@/lib/language-store";
@@ -29,10 +45,13 @@ export function Header() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
-  const cartCount = useCartStore(s => s?.items?.length ?? 0);
+  const cartCount = useCartStore((s) => s?.items?.length ?? 0);
   const { language, setLanguage } = useLanguage();
-  const isAdmin = (session?.user as { role?: string })?.role === 'admin';
-  const userName = (session?.user as { name?: string; email?: string })?.name || (session?.user as { email?: string })?.email || "";
+  const isAdmin = (session?.user as { role?: string })?.role === "admin";
+  const userName =
+    (session?.user as { name?: string; email?: string })?.name ||
+    (session?.user as { email?: string })?.email ||
+    "";
   const userInitial = userName.trim().split(" ")[0]?.[0]?.toUpperCase() || "U";
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
@@ -45,66 +64,65 @@ export function Header() {
     e.preventDefault();
     setShowResults(true);
   };
-  const selectResult = (id: string) => {
+  const selectResult = () => {
     setShowResults(false);
     setSearchQuery("");
   };
 
   // Translations
   const t = {
-
     es: {
-      home: 'Inicio',
-      catalog: 'Catálogo',
-      wishlist: 'Favoritos',
-      search: 'Buscar productos...',
-      admin: 'Admin',
-      adminPanel: 'Admin',
-      adminDashboard: 'Panel',
-      adminProducts: 'Productos',
-      adminClients: 'Clientes',
-      adminOrders: 'Pedidos',
-      adminInventory: 'Inventario',
-      adminPrintQueue: 'Cola de impresión',
-      adminPayments: 'Pagos',
-      adminSettings: 'Configuración',
-      orders: 'Mis Pedidos',
-      profile: 'Mi Perfil',
-      logout: 'Cerrar Sesión',
-      login: 'Iniciar Sesión',
-      searchBtn: 'Buscar',
-      from: 'desde',
-      cartAria: 'Carrito',
-      menuAria: 'Menú',
-      searchAria: 'Buscar',
-      changeLanguageAria: 'Cambiar idioma',
+      home: "Inicio",
+      catalog: "Catálogo",
+      wishlist: "Favoritos",
+      search: "Buscar productos...",
+      admin: "Admin",
+      adminPanel: "Admin",
+      adminDashboard: "Panel",
+      adminProducts: "Productos",
+      adminClients: "Clientes",
+      adminOrders: "Pedidos",
+      adminInventory: "Inventario",
+      adminPrintQueue: "Cola de impresión",
+      adminPayments: "Pagos",
+      adminSettings: "Configuración",
+      orders: "Mis Pedidos",
+      profile: "Mi Perfil",
+      logout: "Cerrar Sesión",
+      login: "Iniciar Sesión",
+      searchBtn: "Buscar",
+      from: "desde",
+      cartAria: "Carrito",
+      menuAria: "Menú",
+      searchAria: "Buscar",
+      changeLanguageAria: "Cambiar idioma",
     },
     en: {
-      home: 'Home',
-      catalog: 'Catalog',
-      wishlist: 'Wishlist',
-      search: 'Search products...',
-      admin: 'Admin',
-      adminPanel: 'Admin',
-      adminDashboard: 'Dashboard',
-      adminProducts: 'Products',
-      adminClients: 'Customers',
-      adminOrders: 'Orders',
-      adminInventory: 'Inventory',
-      adminPrintQueue: 'Print queue',
-      adminPayments: 'Payments',
-      adminSettings: 'Settings',
-      orders: 'My Orders',
-      profile: 'My Profile',
-      logout: 'Logout',
-      login: 'Login',
-      searchBtn: 'Search',
-      from: 'from',
-      cartAria: 'Cart',
-      menuAria: 'Menu',
-      searchAria: 'Search',
-      changeLanguageAria: 'Change language',
-    }
+      home: "Home",
+      catalog: "Catalog",
+      wishlist: "Wishlist",
+      search: "Search products...",
+      admin: "Admin",
+      adminPanel: "Admin",
+      adminDashboard: "Dashboard",
+      adminProducts: "Products",
+      adminClients: "Customers",
+      adminOrders: "Orders",
+      adminInventory: "Inventory",
+      adminPrintQueue: "Print queue",
+      adminPayments: "Payments",
+      adminSettings: "Settings",
+      orders: "My Orders",
+      profile: "My Profile",
+      logout: "Logout",
+      login: "Login",
+      searchBtn: "Search",
+      from: "from",
+      cartAria: "Cart",
+      menuAria: "Menu",
+      searchAria: "Search",
+      changeLanguageAria: "Change language",
+    },
   };
 
   const navLinks = [
@@ -113,25 +131,35 @@ export function Header() {
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "glassmorphism shadow-lg" : "bg-[#0d0d0d]"}`}>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "glassmorphism shadow-lg" : "bg-[#0d0d0d]"}`}
+    >
       <div className="max-w-site mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <Package className="w-7 h-7 text-cyan" />
-          <span className="font-bold text-lg text-gradient-cyan hidden sm:inline">3D Print</span>
+          <span className="font-bold text-lg text-gradient-cyan hidden sm:inline">
+            3D Print
+          </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map(l => (
-            <Link key={l.href} href={l.href} className={`text-sm font-medium transition-colors hover:text-cyan ${
-              pathname === l.href ? "text-cyan" : "text-zinc-300"
-            }`}>{l.label}</Link>
+          {navLinks.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={`text-sm font-medium transition-colors hover:text-cyan ${
+                pathname === l.href ? "text-cyan" : "text-zinc-300"
+              }`}
+            >
+              {l.label}
+            </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
           {/* Language Toggle */}
-          <button 
-            onClick={() => setLanguage(language === 'es' ? 'en' : 'es')} 
+          <button
+            onClick={() => setLanguage(language === "es" ? "en" : "es")}
             className="p-2 rounded-lg hover:bg-white/5 transition flex items-center gap-1 text-xs font-medium text-zinc-300"
             aria-label={t[language].changeLanguageAria}
           >
@@ -139,19 +167,31 @@ export function Header() {
             <span className="hidden sm:inline">{language.toUpperCase()}</span>
           </button>
 
-          <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 rounded-lg hover:bg-white/5 transition" aria-label={t[language].searchAria}>
+          <button
+            onClick={() => setSearchOpen(!searchOpen)}
+            className="p-2 rounded-lg hover:bg-white/5 transition"
+            aria-label={t[language].searchAria}
+          >
             <Search className="w-5 h-5 text-zinc-300" />
           </button>
 
           {session?.user && !isAdmin && (
-            <Link href="/wishlist" className="p-2 rounded-lg hover:bg-white/5 transition relative" aria-label={t[language].wishlist}>
+            <Link
+              href="/wishlist"
+              className="p-2 rounded-lg hover:bg-white/5 transition relative"
+              aria-label={t[language].wishlist}
+            >
               <Heart className="w-5 h-5 text-zinc-300" />
             </Link>
           )}
 
           {/* Hide cart for admin users */}
           {!isAdmin && (
-            <Link href="/cart" className="p-2 rounded-lg hover:bg-white/5 transition relative" aria-label={t[language].cartAria}>
+            <Link
+              href="/cart"
+              className="p-2 rounded-lg hover:bg-white/5 transition relative"
+              aria-label={t[language].cartAria}
+            >
               <ShoppingCart className="w-5 h-5 text-zinc-300" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-cyan text-black text-xs font-bold flex items-center justify-center">
@@ -169,7 +209,7 @@ export function Header() {
                   type="button"
                   onClick={() => setAdminMenuOpen((v) => !v)}
                   className="flex items-center gap-2 rounded-full bg-cyan/15 px-2 py-1 hover:bg-cyan/25 transition"
-                                    aria-label={t[language].profile}
+                  aria-label={t[language].profile}
                 >
                   <div className="w-8 h-8 rounded-full bg-cyan/25 flex items-center justify-center text-cyan text-sm font-bold">
                     {userInitial}
@@ -185,14 +225,26 @@ export function Header() {
                       className="absolute right-0 mt-2 w-56 bg-bg-secondary border border-border rounded-lg shadow-xl z-50"
                     >
                       <nav className="py-2 text-xs">
-                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-cyan" onClick={() => setAdminMenuOpen(false)}>
+                        <Link
+                          href="/profile"
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-cyan"
+                          onClick={() => setAdminMenuOpen(false)}
+                        >
                           <User className="w-4 h-4 text-cyan" />
-                          <span className="text-cyan">{t[language].profile}</span>
+                          <span className="text-cyan">
+                            {t[language].profile}
+                          </span>
                         </Link>
                         {isAdmin && (
-                          <Link href="/admin" className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-cyan" onClick={() => setAdminMenuOpen(false)}>
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-cyan"
+                            onClick={() => setAdminMenuOpen(false)}
+                          >
                             <Settings className="w-4 h-4 text-cyan" />
-                            <span className="text-cyan">{t[language].adminDashboard}</span>
+                            <span className="text-cyan">
+                              {t[language].adminDashboard}
+                            </span>
                           </Link>
                         )}
                         <button
@@ -203,7 +255,9 @@ export function Header() {
                           className="w-full flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-left"
                         >
                           <LogOut className="w-4 h-4 text-cyan" />
-                          <span className="text-cyan">{t[language].logout}</span>
+                          <span className="text-cyan">
+                            {t[language].logout}
+                          </span>
                         </button>
                       </nav>
                     </motion.div>
@@ -212,13 +266,25 @@ export function Header() {
               </div>
             </div>
           ) : (
-            <Link href="/login" className="p-2 rounded-lg hover:bg-white/5 transition" aria-label={t[language].login}>
+            <Link
+              href="/login"
+              className="p-2 rounded-lg hover:bg-white/5 transition"
+              aria-label={t[language].login}
+            >
               <User className="w-5 h-5 text-zinc-300" />
             </Link>
           )}
 
-          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-white/5 transition md:hidden" aria-label={t[language].menuAria}>
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 rounded-lg hover:bg-white/5 transition md:hidden"
+            aria-label={t[language].menuAria}
+          >
+            {menuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>
@@ -226,24 +292,27 @@ export function Header() {
       {/* Search Bar with Autocomplete */}
       <AnimatePresence>
         {searchOpen && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }} 
-            animate={{ height: "auto", opacity: 1 }} 
-            exit={{ height: 0, opacity: 0 }} 
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
             className="overflow-visible border-t border-white/5 bg-bg-secondary"
           >
-            <div ref={searchRef} className="max-w-site mx-auto px-4 py-3 relative">
+            <div
+              ref={searchRef}
+              className="max-w-site mx-auto px-4 py-3 relative"
+            >
               <form onSubmit={handleSearch} className="flex gap-2">
                 <div className="flex-1 relative">
-                  <input 
-                    type="text" 
-                    value={searchQuery} 
-                    onChange={e => handleSearchInput(e?.target?.value ?? "")} 
-                                    placeholder={t[language].search} 
-                    className="w-full bg-bg-tertiary rounded-lg px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-500" 
-                    autoFocus 
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearchInput(e?.target?.value ?? "")}
+                    placeholder={t[language].search}
+                    className="w-full bg-bg-tertiary rounded-lg px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-500"
+                    autoFocus
                   />
-                  
+
                   {/* Search Results Dropdown */}
                   <AnimatePresence>
                     {showResults && searchResults.length > 0 && (
@@ -257,7 +326,7 @@ export function Header() {
                           <button
                             key={result.id}
                             type="button"
-                            onClick={() => selectResult(result.id)}
+                            onClick={() => selectResult()}
                             className="w-full flex items-center gap-3 p-3 hover:bg-bg-tertiary transition-colors text-left"
                           >
                             <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-bg-tertiary flex-shrink-0">
@@ -271,16 +340,21 @@ export function Header() {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium truncate">{result.name}</div>
+                              <div className="font-medium truncate">
+                                {result.name}
+                              </div>
                               <div className="text-sm text-muted flex items-center gap-2">
-                                <span className={`px-1.5 py-0.5 rounded text-xs ${result.material === 'PLA' ? 'bg-cyan/20 text-cyan' : 'bg-amber/20 text-amber'}`}>
+                                <span
+                                  className={`px-1.5 py-0.5 rounded text-xs ${result.material === "PLA" ? "bg-cyan/20 text-cyan" : "bg-amber/20 text-amber"}`}
+                                >
                                   {result.material}
                                 </span>
                                 <span>{result.category}</span>
                               </div>
                             </div>
                             <div className="text-sm text-cyan font-medium">
-                              {t[language].from} €{(result.basePricePerGram * 10 + 2.5).toFixed(2)}
+                              {t[language].from} €
+                              {(result.basePricePerGram * 10 + 2.5).toFixed(2)}
                             </div>
                           </button>
                         ))}
@@ -288,7 +362,10 @@ export function Header() {
                     )}
                   </AnimatePresence>
                 </div>
-                <button type="submit" className="px-4 py-2 bg-cyan text-black rounded-lg text-sm font-medium hover:bg-cyan-dark transition">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-cyan text-black rounded-lg text-sm font-medium hover:bg-cyan-dark transition"
+                >
                   {t[language].searchBtn}
                 </button>
               </form>
@@ -300,26 +377,38 @@ export function Header() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }} 
-            animate={{ height: "auto", opacity: 1 }} 
-            exit={{ height: 0, opacity: 0 }} 
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden md:hidden glassmorphism border-t border-white/5"
           >
             <nav className="max-w-site mx-auto px-4 py-4 flex flex-col gap-3">
-              {navLinks.map(l => (
-                <Link key={l.href} href={l.href} className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2">{l.label}</Link>
+              {navLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2"
+                >
+                  {l.label}
+                </Link>
               ))}
               {session?.user && !isAdmin && (
                 <>
-                  <Link href="/wishlist" className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2 flex items-center gap-2">
+                  <Link
+                    href="/wishlist"
+                    className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2 flex items-center gap-2"
+                  >
                     <Heart className="w-4 h-4" />
                     {t[language].wishlist}
                   </Link>
-                  <Link href="/profile" className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2 flex items-center gap-2">
+                  <button
+                    onClick={() => handleScroll()}
+                    className="text-sm font-medium text-zinc-300 hover:text-cyan transition py-2 flex items-center gap-2"
+                  >
                     <User className="w-4 h-4" />
                     {t[language].profile}
-                  </Link>
+                  </button>
                 </>
               )}
             </nav>
@@ -329,4 +418,3 @@ export function Header() {
     </header>
   );
 }
-

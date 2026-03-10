@@ -12,7 +12,8 @@ export function Footer() {
 
   const t = {
     es: {
-      about: "Productos impresos en 3D de alta calidad con materiales PLA y PETG. Personaliza cada pieza a tu medida.",
+      about:
+        "Productos impresos en 3D de alta calidad con materiales PLA y PETG. Personaliza cada pieza a tu medida.",
       contact: "Contacto",
       newsletter: "Suscríbete",
       newsletterDesc: "Recibe novedades y ofertas exclusivas.",
@@ -27,7 +28,8 @@ export function Footer() {
       location: "Barcelona, España",
     },
     en: {
-      about: "High-quality 3D printed products with PLA and PETG materials. Customize every piece to your needs.",
+      about:
+        "High-quality 3D printed products with PLA and PETG materials. Customize every piece to your needs.",
       contact: "Contact",
       newsletter: "Newsletter",
       newsletterDesc: "Receive news and exclusive offers.",
@@ -47,10 +49,21 @@ export function Footer() {
     e.preventDefault();
     if (!email?.trim()) return;
     try {
-      const res = await fetch("/api/newsletter", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
-      if (res?.ok) { showToast("success", t.subscribed); setEmail(""); }
-      else { const d = await res?.json().catch(() => ({})); showToast("error", d?.error ?? t.errorSubscribe); }
-    } catch { showToast("error", t.errorConnection); }
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (res?.ok) {
+        showToast("success", t.subscribed);
+        setEmail("");
+      } else {
+        const d = await res?.json().catch(() => ({}));
+        showToast("error", d?.error ?? t.errorSubscribe);
+      }
+    } catch {
+      showToast("error", t.errorConnection);
+    }
   };
 
   return (
@@ -66,20 +79,41 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-zinc-300">{t.contact}</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-zinc-300">
+              {t.contact}
+            </h4>
             <div className="space-y-3 text-sm text-zinc-400">
-              <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-cyan" /> info@3dprint.com</div>
-              <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-cyan" /> +34 612 345 678</div>
-              <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-cyan" /> {t.location}</div>
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-cyan" /> info@3dprint.com
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-cyan" /> +34 612 345 678
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-cyan" /> {t.location}
+              </div>
             </div>
           </div>
 
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-zinc-300">{t.newsletter}</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-zinc-300">
+              {t.newsletter}
+            </h4>
             <p className="text-sm text-zinc-400 mb-3">{t.newsletterDesc}</p>
             <form onSubmit={handleNewsletter} className="flex gap-2">
-              <input type="email" value={email} onChange={e => setEmail(e?.target?.value ?? "")} placeholder={t.placeholder} className="flex-1 bg-white/5 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-500" />
-              <button type="submit" className="px-4 py-2 bg-cyan text-black rounded-lg text-sm font-semibold hover:bg-cyan-dim transition">{t.send}</button>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e?.target?.value ?? "")}
+                placeholder={t.placeholder}
+                className="flex-1 bg-white/5 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-500"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-cyan text-black rounded-lg text-sm font-semibold hover:bg-cyan-dim transition"
+              >
+                {t.send}
+              </button>
             </form>
           </div>
         </div>
@@ -87,8 +121,18 @@ export function Footer() {
         <div className="mt-10 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-zinc-500">{t.rights}</p>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-zinc-500 hover:text-cyan transition">{t.home}</Link>
-            <Link href="/catalog" className="text-xs text-zinc-500 hover:text-cyan transition">{t.catalog}</Link>
+            <Link
+              href="/"
+              className="text-xs text-zinc-500 hover:text-cyan transition"
+            >
+              {t.home}
+            </Link>
+            <Link
+              href="/catalog"
+              className="text-xs text-zinc-500 hover:text-cyan transition"
+            >
+              {t.catalog}
+            </Link>
           </div>
         </div>
       </div>

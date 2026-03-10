@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from "vitest";
 /**
  * Integration tests for Stripe webhook
  * Verifica que el backend actualiza pedidos y puntos
@@ -109,4 +109,3 @@ describe("Stripe Webhook API Integration", () => {
     expect(mockPointsCreate).not.toHaveBeenCalled();
   });
 });
-
