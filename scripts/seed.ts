@@ -1126,9 +1126,8 @@ async function main() {
 
   const createdProducts = [];
   for (const p of products) {
-    // Eliminar propiedad colors si existe
-    const { /* colors, */ ...productData } = p as any;
-    const product = await prisma.product.create({ data: productData });
+    // Usar el campo colors si existe
+    const product = await prisma.product.create({ data: p });
     createdProducts.push(product);
   }
   console.log(`✅ ${createdProducts.length} productos creados`);
@@ -1162,7 +1161,7 @@ async function main() {
         name: p.name,
         quantity: qty,
         material: p.material,
-        color: "N/A", // Sin color directo, usar relación MaterialColor en el futuro
+        color: "N/A",
         dimX: p.defaultDimX,
         dimY: p.defaultDimY,
         dimZ: p.defaultDimZ,

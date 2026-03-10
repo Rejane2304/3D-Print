@@ -150,6 +150,7 @@ model Product {
   stock            Int            @default(100)
   rating           Float          @default(0)
   reviewCount      Int            @default(0)
+  colors           String[]
   isActive         Boolean        @default(true)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
@@ -224,6 +225,7 @@ model CartItem {
   productId  String
   materialId String?
   colorId    String?
+  color      String?
   material   String
   quantity   Int      @default(1)
   dimX       Float
@@ -233,7 +235,7 @@ model CartItem {
   cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   materialRef Material? @relation(fields: [materialId], references: [id])
-  color      Color?   @relation(fields: [colorId], references: [id])
+  colorRef   Color?   @relation(fields: [colorId], references: [id])
 }
 
 // ===== PEDIDOS =====
@@ -271,6 +273,7 @@ model OrderItem {
   productId  String
   materialId String?
   colorId    String?
+  color      String?
   name       String
   material   String
   quantity   Int
@@ -281,7 +284,7 @@ model OrderItem {
   order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   materialRef Material? @relation(fields: [materialId], references: [id])
-  color      Color?   @relation(fields: [colorId], references: [id])
+  colorRef   Color?   @relation(fields: [colorId], references: [id])
   printerId  String?
   printer    Printer? @relation(fields: [printerId], references: [id])
 }

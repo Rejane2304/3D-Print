@@ -23,7 +23,7 @@ function getBarColor(len: number): string {
 }
 
 export function LoginClient() {
-  const { status } = useSession() || {};
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { showToast } = useToast();
   const { language } = useLanguage();
@@ -91,7 +91,14 @@ export function LoginClient() {
   }[language];
 
   useEffect(() => {
-    if (status === "authenticated") router.replace("/");
+    if (status === "authenticated") {
+      // Redirige admin directamente al panel
+      if ((session?.user as any)?.role === "admin") {
+        router.replace("/admin");
+      } else {
+        router.replace("/");
+      }
+    }
   }, [status, router]);
 
   const validate = (): boolean => {

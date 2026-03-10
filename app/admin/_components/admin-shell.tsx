@@ -10,8 +10,8 @@ export default function AdminShell({ children }: Readonly<{ children: React.Reac
 
   return (
     <div className="min-h-screen bg-bg">
-      {/* Mobile sticky top bar — hidden on lg+ */}
-      <div className="lg:hidden sticky top-16 z-40 flex items-center gap-3 px-4 py-3 bg-bg-secondary border-b border-border">
+      {/* Top bar siempre visible */}
+      <div className="sticky top-16 z-40 flex items-center gap-3 px-4 py-3 bg-bg-secondary border-b border-border">
         <button
           onClick={() => setIsOpen((v) => !v)}
           className="p-2 rounded-lg hover:bg-bg-tertiary transition-colors"
@@ -24,7 +24,7 @@ export default function AdminShell({ children }: Readonly<{ children: React.Reac
 
       <div className="flex">
         <AdminSidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-        <main className="flex-1 p-6 lg:p-8 ml-0 lg:ml-64">
+        <main className="flex-1 p-6 ml-0">
           {children}
         </main>
       </div>
