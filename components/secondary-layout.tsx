@@ -4,7 +4,7 @@ export default function SecondaryLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#181a24" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#2d3148" }}>
       {children}
     </div>
   );

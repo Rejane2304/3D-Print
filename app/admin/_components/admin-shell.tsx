@@ -42,7 +42,7 @@ export default function AdminShell({
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#181a24" }}>
+    <div className="min-h-screen">
       {/* Top bar siempre visible */}
       <div className="sticky top-16 z-40 flex items-center gap-3 px-4 py-3 bg-bg-secondary border-b border-border">
         <button

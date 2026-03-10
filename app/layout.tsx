@@ -4,6 +4,7 @@ import { Providers } from "@/components/providers";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/toast-provider";
+import { BodyClassController } from "@/components/body-class-controller";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
             : "")
         }
       >
+        <BodyClassController />
         <Providers>
           <Header />
           <main className="flex-1 pt-16">{children}</main>
