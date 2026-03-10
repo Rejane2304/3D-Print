@@ -1,4 +1,9 @@
-import { OrdersClient } from "./_components/orders-client";
+import SecondaryLayout from "@/components/secondary-layout";
 export default function OrdersPage() {
-  return <OrdersClient />;
+  return (
+    <SecondaryLayout>
+      <OrdersClient />
+    </SecondaryLayout>
+  );
+}
 }

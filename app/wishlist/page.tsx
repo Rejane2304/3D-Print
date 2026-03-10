@@ -1,5 +1,10 @@
+import SecondaryLayout from "@/components/secondary-layout";
 import WishlistClient from "./_components/wishlist-client";
-
 export default function WishlistPage() {
-  return <WishlistClient />;
+  return (
+    <SecondaryLayout>
+      <WishlistClient />
+    </SecondaryLayout>
+  );
+}
 }
