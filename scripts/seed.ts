@@ -717,9 +717,7 @@ async function main() {
       maxDimY: 12,
       minDimZ: 8,
       maxDimZ: 15,
-      images: [
-        "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600",
-      ],
+      images: ["acesorio1.png"],
       colors: ["Blanco", "Negro", "Azul Medianoche"],
       stock: 47,
       rating: 4.8,
@@ -1125,9 +1123,21 @@ async function main() {
   ];
 
   const createdProducts = [];
-  for (const p of products) {
-    // Usar el campo colors si existe
-    const product = await prisma.product.create({ data: p });
+  const imageBuckets = [
+    "/images/product-01.png",
+    "/images/product-02.jpg",
+    "/images/product-03.webp",
+  ];
+  for (const [index, productTemplate] of products.entries()) {
+    const product = await prisma.product.create({
+      data: {
+        ...productTemplate,
+        images: [
+          imageBuckets[index % imageBuckets.length],
+          imageBuckets[(index + 1) % imageBuckets.length],
+        ],
+      },
+    });
     createdProducts.push(product);
   }
   console.log(`✅ ${createdProducts.length} productos creados`);
