@@ -120,10 +120,15 @@ export function LoginClient() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-      // eslint-disable-next-line no-console
-      console.log("[LoginClient] handleSubmit", { email, isLogin, status, session });
-      // eslint-disable-next-line no-console
-      console.log("[LoginClient] useEffect status:", status, "session:", session);
+    // eslint-disable-next-line no-console
+    console.log("[LoginClient] handleSubmit", {
+      email,
+      isLogin,
+      status,
+      session,
+    });
+    // eslint-disable-next-line no-console
+    console.log("[LoginClient] useEffect status:", status, "session:", session);
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);

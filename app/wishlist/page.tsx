@@ -6,5 +6,5 @@ export default function WishlistPage() {
       <WishlistClient />
     </SecondaryLayout>
   );
-// ...fin del archivo
+  // ...fin del archivo
 }

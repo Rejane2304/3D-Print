@@ -6,5 +6,5 @@ export default function LoginPage() {
       <LoginClient />
     </SecondaryLayout>
   );
-// ...fin del archivo
+  // ...fin del archivo
 }

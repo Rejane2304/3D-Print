@@ -6,5 +6,5 @@ export default function CatalogPage() {
       <CatalogClient />
     </SecondaryLayout>
   );
-// ...fin del archivo
+  // ...fin del archivo
 }

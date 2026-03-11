@@ -70,15 +70,14 @@ export default function AdminInventoryClient() {
                     Cargando inventario...
                   </td>
                 </tr>
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-muted">
+                    No hay productos en inventario.
+                  </td>
+                </tr>
               ) : (
-                products.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-muted">
-                      No hay productos en inventario.
-                    </td>
-                  </tr>
-                ) : (
-                  products.map((p) => (
+                products.map((p) => (
                   <tr key={p.id} className="border-t border-border/60">
                     <td className="px-4 py-2">{p.name}</td>
                     <td className="px-4 py-2 text-muted">{p.category}</td>
@@ -90,7 +89,7 @@ export default function AdminInventoryClient() {
                     </td>
                   </tr>
                 ))
-              ))}
+              )}
             </tbody>
           </table>
         </div>

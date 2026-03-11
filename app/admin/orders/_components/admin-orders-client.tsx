@@ -241,7 +241,6 @@ export default function AdminOrdersClient() {
   }
 
   useEffect(() => {
-    
     console.log("[AdminOrdersClient] render h1 Panel de control");
   }, []);
   return (

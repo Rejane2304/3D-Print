@@ -252,7 +252,12 @@ export default function AdminUsersClient() {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Rol</label>
-                    <label htmlFor="role" className="block text-sm font-medium mb-2">Rol</label>
+                  <label
+                    htmlFor="role"
+                    className="block text-sm font-medium mb-2"
+                  >
+                    Rol
+                  </label>
                   <select
                     value={userDetails?.role || selectedUser.role}
                     onChange={(e) =>
