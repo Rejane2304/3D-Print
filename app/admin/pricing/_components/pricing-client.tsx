@@ -22,7 +22,7 @@ import {
 import type { MaterialType } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
-// Local types
+// Tipos locales
 // ---------------------------------------------------------------------------
 
 interface PricingConfig {
@@ -44,7 +44,7 @@ interface MaterialEditState {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Ayudantes
 // ---------------------------------------------------------------------------
 
 function marginPct(value: number): string {
@@ -57,28 +57,28 @@ function isMaterialKey(key: string): key is keyof typeof MATERIAL_INFO {
 }
 
 // ---------------------------------------------------------------------------
-// Component
+// Componente
 // ---------------------------------------------------------------------------
 
 export default function AdminPricingClient() {
   const { showToast } = useToast();
 
-  // Config state
+  // Estado de configuración
   const [config, setConfig] = useState<PricingConfig | null>(null);
   const [configLoading, setConfigLoading] = useState(true);
   const [configSaving, setConfigSaving] = useState(false);
 
-  // Materials state
+  // Estado de materiales
   const [materials, setMaterials] = useState<MaterialType[]>([]);
   const [matEdits, setMatEdits] = useState<Record<string, MaterialEditState>>(
     {},
   );
 
-  // Recalculate state
+  // Estado del recálculo
   const [recalculating, setRecalculating] = useState(false);
   const [recalcResult, setRecalcResult] = useState<string | null>(null);
 
-  // Simulator state
+  // Estado del simulador
   const [simMaterialCode, setSimMaterialCode] = useState<string>("");
   const [simDimX, setSimDimX] = useState<number>(5);
   const [simDimY, setSimDimY] = useState<number>(5);
@@ -88,7 +88,7 @@ export default function AdminPricingClient() {
   const [simFinishCost, setSimFinishCost] = useState<number>(2.5);
 
   // ---------------------------------------------------------------------------
-  // Data loading
+  // Carga de datos
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
@@ -140,7 +140,7 @@ export default function AdminPricingClient() {
   }, [showToast]);
 
   // ---------------------------------------------------------------------------
-  // Handlers
+  // Controladores de acciones
   // ---------------------------------------------------------------------------
 
   const handleSaveConfig = useCallback(async () => {
@@ -231,7 +231,7 @@ export default function AdminPricingClient() {
   }, [showToast]);
 
   // ---------------------------------------------------------------------------
-  // Simulator
+  // Simulador
   // ---------------------------------------------------------------------------
 
   const simMaterial = materials.find((m) => m.code === simMaterialCode);
@@ -258,7 +258,7 @@ export default function AdminPricingClient() {
     : null;
 
   // ---------------------------------------------------------------------------
-  // Button label helpers (avoids nested ternaries)
+  // Ayudas para etiquetas de botones (evita ternarios anidados)
   // ---------------------------------------------------------------------------
 
   const saveConfigLabel = configSaving
@@ -269,7 +269,7 @@ export default function AdminPricingClient() {
     : "Recalcular todos los precios";
 
   // ---------------------------------------------------------------------------
-  // Breakdown rows for simulator
+  // Filas de desglose para el simulador
   // ---------------------------------------------------------------------------
 
   const breakdownRows = simResult
@@ -284,7 +284,7 @@ export default function AdminPricingClient() {
     : [];
 
   // ---------------------------------------------------------------------------
-  // Render
+  // Renderizado
   // ---------------------------------------------------------------------------
 
   return (

@@ -619,9 +619,9 @@ export default function AdminProductsClient() {
                         className="mt-2 h-12 rounded-2xl border border-border shadow-inner"
                         style={{
                           background: selectedColor?.hex ?? "#0f172a",
-                          border:
-                            selectedColor &&
-                            (selectedColor ? "2px solid #0ea5e9" : ""),
+                          border: selectedColor
+                            ? "2px solid #0ea5e9"
+                            : undefined,
                         }}
                       />
                     </div>

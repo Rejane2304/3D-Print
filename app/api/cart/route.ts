@@ -1,8 +1,20 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/db";
+
+const CartItemSchema = z.object({
+  productId: z.string().min(1, "productId is required"),
+  material: z.string().min(1, "material is required"),
+  color: z.string().min(1, "color is required"),
+  quantity: z.number().int().min(1).max(99).default(1),
+  dimX: z.number().positive("dimX must be positive"),
+  dimY: z.number().positive("dimY must be positive"),
+  dimZ: z.number().positive("dimZ must be positive"),
+  unitPrice: z.number().nonnegative("unitPrice must be non-negative"),
+});
 
 export async function GET() {
   try {
@@ -27,6 +39,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const userId = (session.user as Record<string, unknown>)?.id as string;
     const body = await req.json();
+    const parsed = CartItemSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.errors[0].message },
+        { status: 400 },
+      );
+    }
     const {
       productId,
       material,
@@ -36,7 +55,7 @@ export async function POST(req: NextRequest) {
       dimY,
       dimZ,
       unitPrice,
-    } = body ?? {};
+    } = parsed.data;
     let cart = await prisma.cart.findUnique({ where: { userId } });
     if (!cart) cart = await prisma.cart.create({ data: { userId } });
     const item = await prisma.cartItem.create({
@@ -45,7 +64,7 @@ export async function POST(req: NextRequest) {
         productId,
         material,
         color,
-        quantity: quantity ?? 1,
+        quantity,
         dimX,
         dimY,
         dimZ,

@@ -1,5 +1,5 @@
 "use client";
-// Handler para scroll (dummy)
+// Manejador para scroll (de prueba)
 const handleScroll = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
@@ -69,7 +69,7 @@ export function Header() {
     setSearchQuery("");
   };
 
-  // Translations
+  // Traducciones
   const t = {
     es: {
       home: "Inicio",
@@ -185,7 +185,7 @@ export function Header() {
             </Link>
           )}
 
-          {/* Hide cart for admin users */}
+          {/* Oculta el carrito para administradores */}
           {!isAdmin && (
             <Link
               href="/cart"

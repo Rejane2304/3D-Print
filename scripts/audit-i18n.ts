@@ -1,13 +1,13 @@
 /**
  * scripts/audit-i18n.ts
  *
- * Audits public client-facing pages for i18n issues:
- *   1. Files without i18n (useLanguage) that have visible JSX text
- *   2. Files with i18n but missing keys between ES and EN translation objects
- *   3. Calls to toLocaleDateString() / toLocaleString() without a locale argument
- *   4. Hardcoded English UI strings in JSX bypassing the `t` object
+ * Audita páginas públicas orientadas al cliente para detectar incidencias de i18n:
+ *   1. Archivos sin i18n (`useLanguage`) que contienen texto visible en JSX.
+ *   2. Archivos con i18n pero con claves faltantes entre los objetos `es` y `en`.
+ *   3. Llamadas a `toLocaleDateString()` / `toLocaleString()` sin argumento de locale.
+ *   4. Cadenas en inglés codificadas en JSX que no usan el objeto `t`.
  *
- * Run: npx tsx scripts/audit-i18n.ts
+ * Ejecutar: npx tsx scripts/audit-i18n.ts
  */
 
 import fs from "node:fs";
@@ -90,7 +90,7 @@ const ENGLISH_ATTR_PATTERNS: Array<{ pattern: RegExp; description: string }> = [
   },
 ];
 
-// ── Filesystem helpers ────────────────────────────────────────────────────────
+// ── Utilidades del sistema de archivos ────────────────────────────────────────
 
 function* walkDir(dir: string): Generator<string> {
   if (!fs.existsSync(dir)) return;
@@ -114,7 +114,7 @@ function collectFiles(scanDirs: string[]): string[] {
   return files;
 }
 
-// ── Translation block parsing ─────────────────────────────────────────────────
+// ── Análisis de bloques de traducción ─────────────────────────────────────────
 
 function findClosingBrace(text: string, start: number): number {
   let depth = 0;
@@ -196,7 +196,7 @@ function computeTranslationRanges(source: string): Array<[number, number]> {
   return ranges;
 }
 
-// ── Issue type ────────────────────────────────────────────────────────────────
+// ── Tipo de incidencia ────────────────────────────────────────────────────────
 
 interface Issue {
   file: string;
@@ -205,7 +205,7 @@ interface Issue {
   message: string;
 }
 
-// ── Individual checks ─────────────────────────────────────────────────────────
+// ── Comprobaciones individuales ───────────────────────────────────────────────
 
 function checkMissingKeys(
   source: string,
@@ -313,7 +313,7 @@ function checkFile(filePath: string): Issue[] {
   return issues;
 }
 
-// ── Reporting helpers ─────────────────────────────────────────────────────────
+// ── Utilitarios de reporte ─────────────────────────────────────────────────────
 
 function severityPrefix(severity: Issue["severity"]): string {
   if (severity === "error") return "  ❌ ";
@@ -352,7 +352,7 @@ function printReport(allIssues: Issue[]): void {
   console.log("──────────────────────────────────────────────────────\n");
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+// ── Función principal ──────────────────────────────────────────────────────────
 
 function main() {
   console.log("\n🔍  Auditing i18n for public client-facing pages…\n");

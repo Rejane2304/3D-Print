@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
   test: {
@@ -18,7 +19,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": "/Users/rejanerodrigues/MASTER/ecommerce_3d_print",
+      "@": path.resolve(__dirname),
     },
   },
 });

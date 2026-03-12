@@ -9,38 +9,41 @@ import { BodyClassController } from "@/components/body-class-controller";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "3D Print — Productos Impresos en 3D",
+  title: {
+    default: "3D Print — Productos Impresos en 3D",
+    template: "%s | 3D Print",
+  },
   description:
     "Ecommerce de productos personalizados impresos en 3D con materiales PLA y PETG de alta calidad.",
   metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
+  keywords: [
+    "impresión 3D",
+    "productos personalizados",
+    "PLA",
+    "PETG",
+    "ecommerce",
+  ],
+  authors: [{ name: "3D Print" }],
+  robots: { index: true, follow: true },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
   },
   openGraph: {
-    images: ["/og-image.png"],
+    type: "website",
+    locale: "es_ES",
+    siteName: "3D Print",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Detecta si es la página de inicio usando pathname de Next.js
-  const isHome =
-    globalThis.window === undefined
-      ? require("next/navigation").usePathname?.() === "/"
-      : globalThis.window.location.pathname === "/";
   return (
     <html lang="es">
-      <head></head>
-      <body
-        className={
-          `min-h-screen flex flex-col` +
-          (isHome
-            ? " bg-gradient-to-br from-[#050712] via-[#181a24] to-[#00FFFF]"
-            : "")
-        }
-      >
+      <head />
+      <body className="min-h-screen flex flex-col">
         <BodyClassController />
         <Providers>
           <Header />

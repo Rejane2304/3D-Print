@@ -19,6 +19,7 @@ pnpm-debug.log*
 .next
 out
 next-env.d.ts
+dist
 
 # TypeScript
 *.tsbuildinfo
@@ -57,5 +58,14 @@ prisma/*.sqlite
 # Misc
 .cache
 .turbo
+
+# Agent / tooling dirs
+.agents
+engram
+
+# Go caches
+.go-cache
+.gomodcache
+.gopath
 
 private/

@@ -159,6 +159,11 @@ model Product {
   reviews          Review[]
   wishlist         Wishlist[]
   prices           ProductPrice[]
+
+  @@index([category])
+  @@index([material])
+  @@index([featured])
+  @@index([isActive])
 }
 
 // ===== PRECIOS CALCULADOS (caché por producto × material) =====
@@ -265,6 +270,10 @@ model Order {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   coupon          Coupon?   @relation(fields: [couponId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {

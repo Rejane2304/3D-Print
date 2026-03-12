@@ -1,7 +1,7 @@
 // =============================================================
-// Pricing Service — isomórfico (server-side con Prisma)
+// Servicio de precios — isomórfico (server-side con Prisma)
 // Persiste y recalcula la tabla ProductPrice en BD.
-// Usar sólo en API routes / Server Components (accede a Prisma).
+// Usar sólo en rutas API o en Componentes de servidor (accede a Prisma).
 // =============================================================
 
 import prisma from "./db";
@@ -116,7 +116,7 @@ export async function getProductPrices(productId: string) {
   });
 }
 
-// ---- Helpers privados ----------------------------------------
+// ---- Ayudantes privados ----------------------------------------
 
 /**
  * Calcula el peso en gramos a partir de las dimensiones por defecto del producto.

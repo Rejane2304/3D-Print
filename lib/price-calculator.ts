@@ -1,12 +1,3 @@
-// =============================================================
-// Motor de precios unificado — Bambu Lab P2S
-// Combina la lógica original (dimensiones→peso→precio) con el
-// motor avanzado del p2s-pricing-system (amortización de máquina,
-// mantenimiento, electricidad, precios escalonados por volumen).
-// =============================================================
-
-// ---- Configuración del motor --------------------------------
-
 export const PRICING_CONFIG = {
   /** Amortización: P2S ~€750 / 6000 h vida útil (mercado ES, 2025) */
   machineAmortizationPerHour: 0.12,
@@ -14,11 +5,7 @@ export const PRICING_CONFIG = {
   operationCostPerHour: 0.04,
   /** Consumibles: boquilla E6 / ~300h + lubricación ≈ €0.02/h */
   consumablesCostPerHour: 0.02,
-  /**
-   * Factor de relleno por defecto (15 %).
-   * Cada producto puede calibrar su propio valor desde el laminador:
-   * modelFillFactor = pesoLaminador_g / (X × Y × Z / 1000 × densidad)
-   */
+
   infillFactor: 0.15,
   margins: {
     unit: 2.5, // ×250% para 1–4 uds.
@@ -51,19 +38,7 @@ export interface PriceCalculation {
   priceBulk: number;
   finalPrice: number;
 }
-// ...existing code...
 
-// ---- Funciones core -----------------------------------------
-
-/**
- * Calcula el peso en gramos a partir de dimensiones en mm.
- *
- * @param fillFactor  Factor de relleno calibrado desde el laminador.
- *   - Valor por defecto: PRICING_CONFIG.infillFactor (0.15)
- *   - Fórmula de calibración: peso_laminador_g / (X*Y*Z/1000 * densidad)
- *   - Ejemplo British Soldier (PLA, 56×56×140mm, 35.23 g):
- *       35.23 / (440 * 1.24) ≈ 0.0646
- */
 export function calculateWeight(
   dimX: number,
   dimY: number,
@@ -373,7 +348,7 @@ export const MATERIAL_INFO: Record<
   },
 } as const;
 
-// ---- Helpers privados ----------------------------------------
+// ---- Ayudantes privados ----------------------------------------
 
 function round(n: number): number {
   return Math.round(n * 100) / 100;
