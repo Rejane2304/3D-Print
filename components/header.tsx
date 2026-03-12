@@ -137,9 +137,7 @@ export function Header() {
       <div className="max-w-site mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <Package className="w-7 h-7 text-cyan" />
-          <span className="font-bold text-lg text-gradient-cyan hidden sm:inline">
-            3D Print
-          </span>
+          <span className="font-bold text-lg text-gradient-cyan hidden sm:inline">3D Print</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -231,9 +229,7 @@ export function Header() {
                           onClick={() => setAdminMenuOpen(false)}
                         >
                           <User className="w-4 h-4 text-cyan" />
-                          <span className="text-cyan">
-                            {t[language].profile}
-                          </span>
+                          <span className="text-cyan">{t[language].profile}</span>
                         </Link>
                         {isAdmin && (
                           <Link
@@ -242,9 +238,7 @@ export function Header() {
                             onClick={() => setAdminMenuOpen(false)}
                           >
                             <Settings className="w-4 h-4 text-cyan" />
-                            <span className="text-cyan">
-                              {t[language].adminDashboard}
-                            </span>
+                            <span className="text-cyan">{t[language].adminDashboard}</span>
                           </Link>
                         )}
                         <button
@@ -255,9 +249,7 @@ export function Header() {
                           className="w-full flex items-center gap-2 px-3 py-2 hover:bg-bg-tertiary text-left"
                         >
                           <LogOut className="w-4 h-4 text-cyan" />
-                          <span className="text-cyan">
-                            {t[language].logout}
-                          </span>
+                          <span className="text-cyan">{t[language].logout}</span>
                         </button>
                       </nav>
                     </motion.div>
@@ -280,11 +272,7 @@ export function Header() {
             className="p-2 rounded-lg hover:bg-white/5 transition md:hidden"
             aria-label={t[language].menuAria}
           >
-            {menuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -298,10 +286,7 @@ export function Header() {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-visible border-t border-white/5 bg-bg-secondary"
           >
-            <div
-              ref={searchRef}
-              className="max-w-site mx-auto px-4 py-3 relative"
-            >
+            <div ref={searchRef} className="max-w-site mx-auto px-4 py-3 relative">
               <form onSubmit={handleSearch} className="flex gap-2">
                 <div className="flex-1 relative">
                   <input
@@ -340,9 +325,7 @@ export function Header() {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium truncate">
-                                {result.name}
-                              </div>
+                              <div className="font-medium truncate">{result.name}</div>
                               <div className="text-sm text-muted flex items-center gap-2">
                                 <span
                                   className={`px-1.5 py-0.5 rounded text-xs ${result.material === "PLA" ? "bg-cyan/20 text-cyan" : "bg-amber/20 text-amber"}`}
@@ -353,8 +336,7 @@ export function Header() {
                               </div>
                             </div>
                             <div className="text-sm text-cyan font-medium">
-                              {t[language].from} €
-                              {(result.basePricePerGram * 10 + 2.5).toFixed(2)}
+                              {t[language].from} €{(result.basePricePerGram * 10 + 2.5).toFixed(2)}
                             </div>
                           </button>
                         ))}

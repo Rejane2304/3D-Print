@@ -25,9 +25,7 @@ export async function POST(req: NextRequest) {
               where: { id: couponId },
               data: { usedCount: { increment: 1 } },
             })
-            .catch((err: unknown) =>
-              console.error("Error updating coupon usedCount:", err),
-            );
+            .catch((err: unknown) => console.error("Error updating coupon usedCount:", err));
         }
 
         // Otorgar puntos de fidelidad (1 punto por euro gastado, sobre total con descuento)

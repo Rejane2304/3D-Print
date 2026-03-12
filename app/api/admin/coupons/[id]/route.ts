@@ -7,21 +7,15 @@ import prisma from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 function isAdmin(session: Session | null): boolean {
-  return !!(
-    session?.user && (session.user as { role?: string }).role === "admin"
-  );
+  return !!(session?.user && (session.user as { role?: string }).role === "admin");
 }
 
 /** PUT /api/admin/coupons/[id] */
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const paramsObj = await context.params;
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await request.json();
 
@@ -30,8 +24,7 @@ export async function PUT(
       data: {
         discountType: data.discountType,
         discountValue:
-          typeof data.discountValue === "string" &&
-          data.discountValue.length > 0
+          typeof data.discountValue === "string" && data.discountValue.length > 0
             ? Number.parseFloat(data.discountValue)
             : undefined,
         minPurchase: (() => {
@@ -60,23 +53,16 @@ export async function PUT(
       return NextResponse.json({ error: "Coupon not found" }, { status: 404 });
     }
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 /** DELETE /api/admin/coupons/[id] */
-export async function DELETE(
-  _req: NextRequest,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const paramsObj = await context.params;
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     await prisma.coupon.delete({ where: { id: paramsObj.id } });
     return NextResponse.json({ success: true });
@@ -85,9 +71,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Coupon not found" }, { status: 404 });
     }
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

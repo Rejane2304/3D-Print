@@ -9,35 +9,21 @@ import { useRouter } from "next/navigation";
 
 import type { UserType } from "@/lib/types";
 
-export default function AdminShell({
-  children,
-}: {
-  readonly children: React.ReactNode;
-}) {
+export default function AdminShell({ children }: { readonly children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   const { data: session, status } = useSession();
   const router = useRouter();
   const userRole = (session?.user as UserType)?.role;
   useEffect(() => {
-    if (
-      status === "unauthenticated" ||
-      (status === "authenticated" && userRole !== "admin")
-    ) {
+    if (status === "unauthenticated" || (status === "authenticated" && userRole !== "admin")) {
       router.replace("/login");
     }
   }, [status, userRole, router]);
 
   if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        Cargando...
-      </div>
-    );
+    return <div className="flex items-center justify-center min-h-screen">Cargando...</div>;
   }
-  if (
-    status === "unauthenticated" ||
-    (status === "authenticated" && userRole !== "admin")
-  ) {
+  if (status === "unauthenticated" || (status === "authenticated" && userRole !== "admin")) {
     return null;
   }
 

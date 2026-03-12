@@ -47,9 +47,7 @@ export default function AdminSettingsPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold">Materiales</h2>
-              <p className="text-sm text-muted">
-                Precios y densidades por material
-              </p>
+              <p className="text-sm text-muted">Precios y densidades por material</p>
             </div>
           </div>
 
@@ -57,10 +55,7 @@ export default function AdminSettingsPage() {
             <div className="space-y-4">
               <h3 className="font-medium text-cyan">PLA</h3>
               <div>
-                <label
-                  htmlFor="pla-pricePerGram"
-                  className="block text-sm text-muted mb-1"
-                >
+                <label htmlFor="pla-pricePerGram" className="block text-sm text-muted mb-1">
                   Precio por Gramo (€)
                 </label>
                 <input
@@ -78,10 +73,7 @@ export default function AdminSettingsPage() {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="pla-density"
-                  className="block text-sm text-muted mb-1"
-                >
+                <label htmlFor="pla-density" className="block text-sm text-muted mb-1">
                   Densidad (g/cm³)
                 </label>
                 <input
@@ -103,10 +95,7 @@ export default function AdminSettingsPage() {
             <div className="space-y-4">
               <h3 className="font-medium text-amber">PETG</h3>
               <div>
-                <label
-                  htmlFor="petg-pricePerGram"
-                  className="block text-sm text-muted mb-1"
-                >
+                <label htmlFor="petg-pricePerGram" className="block text-sm text-muted mb-1">
                   Precio por Gramo (€)
                 </label>
                 <input
@@ -124,10 +113,7 @@ export default function AdminSettingsPage() {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="petg-density"
-                  className="block text-sm text-muted mb-1"
-                >
+                <label htmlFor="petg-density" className="block text-sm text-muted mb-1">
                   Densidad (g/cm³)
                 </label>
                 <input
@@ -161,8 +147,7 @@ export default function AdminSettingsPage() {
             <div>
               <h2 className="text-xl font-bold">Ficha técnica de materiales</h2>
               <p className="text-sm text-muted">
-                Propiedades avanzadas visibles solo en el panel de
-                administración.
+                Propiedades avanzadas visibles solo en el panel de administración.
               </p>
             </div>
           </div>
@@ -171,15 +156,9 @@ export default function AdminSettingsPage() {
             <table className="w-full text-sm">
               <thead className="bg-bg-tertiary/60">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-muted">
-                    Propiedad
-                  </th>
-                  <th className="px-4 py-2 text-center text-xs font-semibold text-cyan">
-                    PLA
-                  </th>
-                  <th className="px-4 py-2 text-center text-xs font-semibold text-amber">
-                    PETG
-                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-muted">Propiedad</th>
+                  <th className="px-4 py-2 text-center text-xs font-semibold text-cyan">PLA</th>
+                  <th className="px-4 py-2 text-center text-xs font-semibold text-amber">PETG</th>
                 </tr>
               </thead>
               <tbody>
@@ -192,7 +171,7 @@ export default function AdminSettingsPage() {
                         {MATERIAL_INFO.PETG.properties[index]?.value ?? ""}
                       </td>
                     </tr>
-                  ),
+                  )
                 )}
               </tbody>
             </table>
@@ -218,27 +197,19 @@ export default function AdminSettingsPage() {
 
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
-              <label
-                htmlFor="taxRate"
-                className="block text-sm text-muted mb-1"
-              >
+              <label htmlFor="taxRate" className="block text-sm text-muted mb-1">
                 IVA (%)
               </label>
               <input
                 id="taxRate"
                 type="number"
                 value={settings.taxRate}
-                onChange={(e) =>
-                  setSettings({ ...settings, taxRate: e.target.value })
-                }
+                onChange={(e) => setSettings({ ...settings, taxRate: e.target.value })}
                 className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="freeShippingThreshold"
-                className="block text-sm text-muted mb-1"
-              >
+              <label htmlFor="freeShippingThreshold" className="block text-sm text-muted mb-1">
                 Envío Gratis desde (€)
               </label>
               <input
@@ -255,10 +226,7 @@ export default function AdminSettingsPage() {
               />
             </div>
             <div>
-              <label
-                htmlFor="shippingCost"
-                className="block text-sm text-muted mb-1"
-              >
+              <label htmlFor="shippingCost" className="block text-sm text-muted mb-1">
                 Costo de Envío (€)
               </label>
               <input
@@ -266,9 +234,7 @@ export default function AdminSettingsPage() {
                 type="number"
                 step="0.01"
                 value={settings.shippingCost}
-                onChange={(e) =>
-                  setSettings({ ...settings, shippingCost: e.target.value })
-                }
+                onChange={(e) => setSettings({ ...settings, shippingCost: e.target.value })}
                 className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
               />
             </div>
@@ -294,27 +260,19 @@ export default function AdminSettingsPage() {
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label
-                htmlFor="pointsPerEuro"
-                className="block text-sm text-muted mb-1"
-              >
+              <label htmlFor="pointsPerEuro" className="block text-sm text-muted mb-1">
                 Puntos por Euro Gastado
               </label>
               <input
                 id="pointsPerEuro"
                 type="number"
                 value={settings.pointsPerEuro}
-                onChange={(e) =>
-                  setSettings({ ...settings, pointsPerEuro: e.target.value })
-                }
+                onChange={(e) => setSettings({ ...settings, pointsPerEuro: e.target.value })}
                 className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="pointsValue"
-                className="block text-sm text-muted mb-1"
-              >
+              <label htmlFor="pointsValue" className="block text-sm text-muted mb-1">
                 Valor por Punto (€)
               </label>
               <input
@@ -322,17 +280,14 @@ export default function AdminSettingsPage() {
                 type="number"
                 step="0.01"
                 value={settings.pointsValue}
-                onChange={(e) =>
-                  setSettings({ ...settings, pointsValue: e.target.value })
-                }
+                onChange={(e) => setSettings({ ...settings, pointsValue: e.target.value })}
                 className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
               />
             </div>
           </div>
           <p className="text-sm text-muted mt-4">
             Con esta configuración: 100 puntos = €
-            {(100 * Number.parseFloat(settings.pointsValue || "0")).toFixed(2)}{" "}
-            de descuento
+            {(100 * Number.parseFloat(settings.pointsValue || "0")).toFixed(2)} de descuento
           </p>
         </motion.div>
       </div>

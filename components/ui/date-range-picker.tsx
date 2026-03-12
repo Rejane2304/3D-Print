@@ -5,11 +5,7 @@ import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface DateRangePickerProps {
   value: DateRange;
@@ -17,11 +13,7 @@ interface DateRangePickerProps {
   className?: string;
 }
 
-export function DateRangePicker({
-  value,
-  onChange,
-  className,
-}: DateRangePickerProps) {
+export function DateRangePicker({ value, onChange, className }: DateRangePickerProps) {
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -31,15 +23,14 @@ export function DateRangePicker({
             variant={"outline"}
             className={cn(
               "w-[300px] justify-start text-left font-normal",
-              !value && "text-muted-foreground",
+              !value && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {value?.from ? (
               value.to ? (
                 <>
-                  {format(value.from, "LLL dd, y")} -{" "}
-                  {format(value.to, "LLL dd, y")}
+                  {format(value.from, "LLL dd, y")} - {format(value.to, "LLL dd, y")}
                 </>
               ) : (
                 format(value.from, "LLL dd, y")

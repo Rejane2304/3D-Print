@@ -4,9 +4,7 @@ import AdminShell from "./_components/admin-shell";
 
 import { useEffect } from "react";
 
-export default function AdminLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   useEffect(() => {
     document.body.classList.add("admin-panel");
     return () => {

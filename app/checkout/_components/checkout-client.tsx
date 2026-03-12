@@ -73,12 +73,8 @@ export function CheckoutClient() {
     // Pre-fill inmediato desde la sesión (sin esperar red)
     setShipping((prev) => ({
       ...prev,
-      name:
-        ((session.user as Record<string, unknown>)?.name as string) ??
-        prev.name,
-      email:
-        ((session.user as Record<string, unknown>)?.email as string) ??
-        prev.email,
+      name: ((session.user as Record<string, unknown>)?.name as string) ?? prev.name,
+      email: ((session.user as Record<string, unknown>)?.email as string) ?? prev.email,
     }));
 
     // Pre-fill completo desde la base de datos (dirección guardada)
@@ -150,8 +146,7 @@ export function CheckoutClient() {
       couponRemove: "Quitar",
       shippingAddressTitle: "Dirección de envío:",
       paymentTitle: "Método de Pago",
-      paymentInfo:
-        "Serás redirigido a Stripe para completar el pago de forma segura.",
+      paymentInfo: "Serás redirigido a Stripe para completar el pago de forma segura.",
       payButton: "Confirmar y Pagar",
       processing: "Procesando...",
       prev: "Anterior",
@@ -200,8 +195,7 @@ export function CheckoutClient() {
       couponRemove: "Remove",
       shippingAddressTitle: "Shipping address:",
       paymentTitle: "Payment Method",
-      paymentInfo:
-        "You will be redirected to Stripe to complete your payment securely.",
+      paymentInfo: "You will be redirected to Stripe to complete your payment securely.",
       payButton: "Confirm and Pay",
       processing: "Processing...",
       prev: "Back",
@@ -337,15 +331,9 @@ export function CheckoutClient() {
                 >
                   {i + 1}
                 </div>
-                <span className="text-sm font-medium hidden sm:inline">
-                  {s.label}
-                </span>
+                <span className="text-sm font-medium hidden sm:inline">{s.label}</span>
               </div>
-              {i < 2 && (
-                <div
-                  className={`flex-1 h-0.5 ${i < step ? "bg-cyan" : "bg-white/10"}`}
-                />
-              )}
+              {i < 2 && <div className={`flex-1 h-0.5 ${i < step ? "bg-cyan" : "bg-white/10"}`} />}
             </React.Fragment>
           ))}
         </div>
@@ -362,15 +350,11 @@ export function CheckoutClient() {
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.fullName}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.fullName}</label>
                 <input
                   type="text"
                   value={shipping.name}
-                  onChange={(e) =>
-                    setShipping({ ...shipping, name: e.target.value })
-                  }
+                  onChange={(e) => setShipping({ ...shipping, name: e.target.value })}
                   placeholder={t.fullNamePlaceholder}
                   className={fieldClass("name")}
                 />
@@ -382,15 +366,11 @@ export function CheckoutClient() {
                 )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.email}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.email}</label>
                 <input
                   type="email"
                   value={shipping.email}
-                  onChange={(e) =>
-                    setShipping({ ...shipping, email: e.target.value })
-                  }
+                  onChange={(e) => setShipping({ ...shipping, email: e.target.value })}
                   placeholder={t.emailPlaceholder}
                   className={fieldClass("email")}
                 />
@@ -402,36 +382,26 @@ export function CheckoutClient() {
                 )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.phone}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.phone}</label>
                 <input
                   type="tel"
                   value={shipping.phone}
-                  onChange={(e) =>
-                    setShipping({ ...shipping, phone: e.target.value })
-                  }
+                  onChange={(e) => setShipping({ ...shipping, phone: e.target.value })}
                   placeholder={t.phonePlaceholder}
                   className={fieldClass("phone")}
                 />
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.country}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.country}</label>
                 <input
                   type="text"
                   value={shipping.country}
-                  onChange={(e) =>
-                    setShipping({ ...shipping, country: e.target.value })
-                  }
+                  onChange={(e) => setShipping({ ...shipping, country: e.target.value })}
                   className={fieldClass("country")}
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.address}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.address}</label>
                 <input
                   type="text"
                   value={shipping.address}
@@ -452,9 +422,7 @@ export function CheckoutClient() {
                 )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.city}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.city}</label>
                 <input
                   type="text"
                   value={shipping.city}
@@ -475,9 +443,7 @@ export function CheckoutClient() {
                 )}
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.state}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.state}</label>
                 <input
                   type="text"
                   value={shipping.state}
@@ -492,15 +458,11 @@ export function CheckoutClient() {
                 />
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.zip}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.zip}</label>
                 <input
                   type="text"
                   value={shipping.zip}
-                  onChange={(e) =>
-                    setShipping({ ...shipping, zip: e.target.value })
-                  }
+                  onChange={(e) => setShipping({ ...shipping, zip: e.target.value })}
                   placeholder={t.zipPlaceholder}
                   className={fieldClass("zip")}
                 />
@@ -532,22 +494,15 @@ export function CheckoutClient() {
                   className="flex items-center gap-3 p-3 bg-white/5 rounded-lg"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {item?.name ?? ""}
-                    </p>
+                    <p className="text-sm font-medium truncate">{item?.name ?? ""}</p>
                     <p className="text-xs text-zinc-400">
                       {item?.material ?? ""} · {item?.color ?? ""} ·{" "}
-                      {((item?.dimX ?? 0) / 10).toFixed(1)}×
-                      {((item?.dimY ?? 0) / 10).toFixed(1)}×
-                      {((item?.dimZ ?? 0) / 10).toFixed(1)} cm · x
-                      {item?.quantity ?? 1}
+                      {((item?.dimX ?? 0) / 10).toFixed(1)}×{((item?.dimY ?? 0) / 10).toFixed(1)}×
+                      {((item?.dimZ ?? 0) / 10).toFixed(1)} cm · x{item?.quantity ?? 1}
                     </p>
                   </div>
                   <span className="font-mono text-sm">
-                    €
-                    {((item?.unitPrice ?? 0) * (item?.quantity ?? 1)).toFixed(
-                      2,
-                    )}
+                    €{((item?.unitPrice ?? 0) * (item?.quantity ?? 1)).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -565,9 +520,7 @@ export function CheckoutClient() {
                   <span className="text-sm font-mono font-semibold text-green-400 flex-1">
                     {couponCode}
                   </span>
-                  <span className="text-sm text-green-400">
-                    -€{couponDiscount.toFixed(2)}
-                  </span>
+                  <span className="text-sm text-green-400">-€{couponDiscount.toFixed(2)}</span>
                   <button
                     onClick={handleRemoveCoupon}
                     className="p-0.5 hover:text-red-400 transition text-zinc-400"
@@ -580,9 +533,7 @@ export function CheckoutClient() {
                   <input
                     type="text"
                     value={couponInput}
-                    onChange={(e) =>
-                      setCouponInput(e.target.value.toUpperCase())
-                    }
+                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                     onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
                     placeholder={t.couponPlaceholder}
                     className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono uppercase outline-none focus:ring-1 focus:ring-cyan placeholder-zinc-600"
@@ -616,9 +567,7 @@ export function CheckoutClient() {
               <div className="flex justify-between">
                 <span className="text-zinc-400">{t.shippingLabel}</span>
                 <span className="font-mono">
-                  {shippingCost === 0
-                    ? t.shippingFree
-                    : `€${shippingCost.toFixed(2)}`}
+                  {shippingCost === 0 ? t.shippingFree : `€${shippingCost.toFixed(2)}`}
                 </span>
               </div>
               {couponDiscount > 0 && (
@@ -627,23 +576,19 @@ export function CheckoutClient() {
                     <Tag className="w-3 h-3" />
                     {t.discountLabel} ({couponCode})
                   </span>
-                  <span className="font-mono">
-                    -€{couponDiscount.toFixed(2)}
-                  </span>
+                  <span className="font-mono">-€{couponDiscount.toFixed(2)}</span>
                 </div>
               )}
               <div className="border-t border-white/10 pt-2 flex justify-between font-semibold text-base">
                 <span>{t.totalLabel}</span>
-                <span className="font-mono text-cyan">
-                  €{Math.max(0, total).toFixed(2)}
-                </span>
+                <span className="font-mono text-cyan">€{Math.max(0, total).toFixed(2)}</span>
               </div>
             </div>
             <div className="mt-6 p-4 bg-white/5 rounded-lg text-sm">
               <p className="font-medium mb-1">{t.shippingAddressTitle}</p>
               <p className="text-zinc-400">
-                {shipping.name} · {shipping.address}, {shipping.zip}{" "}
-                {shipping.city}, {shipping.country}
+                {shipping.name} · {shipping.address}, {shipping.zip} {shipping.city},{" "}
+                {shipping.country}
               </p>
             </div>
           </motion.div>

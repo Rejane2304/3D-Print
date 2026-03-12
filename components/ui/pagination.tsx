@@ -17,24 +17,16 @@ const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
 );
 Pagination.displayName = "Pagination";
 
-const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<"ul">
->(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
-    {...props}
-  />
-));
+const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProps<"ul">>(
+  ({ className, ...props }, ref) => (
+    <ul ref={ref} className={cn("flex flex-row items-center gap-1", className)} {...props} />
+  )
+);
 PaginationContent.displayName = "PaginationContent";
 
-const PaginationItem = React.forwardRef<
-  HTMLLIElement,
-  React.ComponentProps<"li">
->(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn("", className)} {...props} />
-));
+const PaginationItem = React.forwardRef<HTMLLIElement, React.ComponentProps<"li">>(
+  ({ className, ...props }, ref) => <li ref={ref} className={cn("", className)} {...props} />
+);
 PaginationItem.displayName = "PaginationItem";
 
 type PaginationLinkProps = {
@@ -42,12 +34,7 @@ type PaginationLinkProps = {
 } & Pick<ButtonProps, "size"> &
   React.ComponentProps<"a">;
 
-const PaginationLink = ({
-  className,
-  isActive,
-  size = "icon",
-  ...props
-}: PaginationLinkProps) => (
+const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
   <a
     aria-current={isActive ? "page" : undefined}
     className={cn(
@@ -55,21 +42,17 @@ const PaginationLink = ({
         variant: isActive ? "outline" : "ghost",
         size,
       }),
-      className,
+      className
     )}
     {...props}
   />
 );
 PaginationLink.displayName = "PaginationLink";
 
-function PaginationPrevious({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
   const { language } = useLanguage();
   const label = language === "es" ? "Anterior" : "Previous";
-  const ariaLabel =
-    language === "es" ? "Ir a la página anterior" : "Go to previous page";
+  const ariaLabel = language === "es" ? "Ir a la página anterior" : "Go to previous page";
   return (
     <PaginationLink
       aria-label={ariaLabel}
@@ -84,14 +67,10 @@ function PaginationPrevious({
 }
 PaginationPrevious.displayName = "PaginationPrevious";
 
-function PaginationNext({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
   const { language } = useLanguage();
   const label = language === "es" ? "Siguiente" : "Next";
-  const ariaLabel =
-    language === "es" ? "Ir a la página siguiente" : "Go to next page";
+  const ariaLabel = language === "es" ? "Ir a la página siguiente" : "Go to next page";
   return (
     <PaginationLink
       aria-label={ariaLabel}
@@ -106,10 +85,7 @@ function PaginationNext({
 }
 PaginationNext.displayName = "PaginationNext";
 
-function PaginationEllipsis({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
+function PaginationEllipsis({ className, ...props }: React.ComponentProps<"span">) {
   const { language } = useLanguage();
   return (
     <span
@@ -118,9 +94,7 @@ function PaginationEllipsis({
       {...props}
     >
       <MoreHorizontal className="h-4 w-4" />
-      <span className="sr-only">
-        {language === "es" ? "Más páginas" : "More pages"}
-      </span>
+      <span className="sr-only">{language === "es" ? "Más páginas" : "More pages"}</span>
     </span>
   );
 }

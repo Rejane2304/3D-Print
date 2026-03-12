@@ -18,15 +18,13 @@ const resources = {
 
       // Home
       "home.hero.title": "Impresión 3D de Alta Calidad",
-      "home.hero.subtitle":
-        "Diseños únicos fabricados con precisión en PLA y PETG",
+      "home.hero.subtitle": "Diseños únicos fabricados con precisión en PLA y PETG",
       "home.hero.cta": "Explorar Catálogo",
       "home.featured": "Productos Destacados",
       "home.materials": "Nuestros Materiales",
       "home.benefits": "Por Qué Elegirnos",
       "home.cta.title": "¿Listo para Crear?",
-      "home.cta.subtitle":
-        "Explora nuestro catálogo y configura tu producto perfecto",
+      "home.cta.subtitle": "Explora nuestro catálogo y configura tu producto perfecto",
 
       // Catalog
       "catalog.title": "Catálogo de Productos",
@@ -166,8 +164,7 @@ const resources = {
       "admin.addProduct": "Añadir Producto",
       "admin.editProduct": "Editar Producto",
       "admin.deleteProduct": "Eliminar Producto",
-      "admin.confirmDelete":
-        "¿Estás seguro de que quieres eliminar este producto?",
+      "admin.confirmDelete": "¿Estás seguro de que quieres eliminar este producto?",
 
       // Common
       "common.loading": "Cargando...",
@@ -192,8 +189,7 @@ const resources = {
         "3D Print es tu tienda especializada en productos impresos en 3D de alta calidad.",
       "footer.contact": "Contacto",
       "footer.newsletter": "Newsletter",
-      "footer.newsletterText":
-        "Suscríbete para recibir novedades y ofertas exclusivas.",
+      "footer.newsletterText": "Suscríbete para recibir novedades y ofertas exclusivas.",
       "footer.subscribe": "Suscribirse",
       "footer.rights": "Todos los derechos reservados.",
     },
@@ -220,8 +216,7 @@ const resources = {
       "home.materials": "Our Materials",
       "home.benefits": "Why Choose Us",
       "home.cta.title": "Ready to Create?",
-      "home.cta.subtitle":
-        "Explore our catalog and configure your perfect product",
+      "home.cta.subtitle": "Explore our catalog and configure your perfect product",
 
       // Catalog
       "catalog.title": "Product Catalog",
@@ -386,8 +381,7 @@ const resources = {
         "3D Print is your specialized store for high-quality 3D printed products.",
       "footer.contact": "Contact",
       "footer.newsletter": "Newsletter",
-      "footer.newsletterText":
-        "Subscribe to receive news and exclusive offers.",
+      "footer.newsletterText": "Subscribe to receive news and exclusive offers.",
       "footer.subscribe": "Subscribe",
       "footer.rights": "All rights reserved.",
     },

@@ -114,9 +114,7 @@ export function CartClient() {
             {t.back}
           </button>
         </div>
-        <p className="text-zinc-400 text-sm mb-8">
-          {t.items(items?.length ?? 0)}
-        </p>
+        <p className="text-zinc-400 text-sm mb-8">{t.items(items?.length ?? 0)}</p>
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
@@ -138,9 +136,7 @@ export function CartClient() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm mb-1 truncate">
-                    {item?.name ?? ""}
-                  </h3>
+                  <h3 className="font-semibold text-sm mb-1 truncate">{item?.name ?? ""}</h3>
                   <div className="flex flex-wrap gap-2 text-xs text-zinc-400 mb-2">
                     <span
                       className={`px-2 py-0.5 rounded-full ${item?.material === "PLA" ? "bg-cyan/10 text-cyan" : "bg-amber/10 text-amber"}`}
@@ -149,20 +145,14 @@ export function CartClient() {
                     </span>
                     <span>{item?.color ?? ""}</span>
                     <span className="font-mono">
-                      {((item?.dimX ?? 0) / 10).toFixed(1)}×
-                      {((item?.dimY ?? 0) / 10).toFixed(1)}×
+                      {((item?.dimX ?? 0) / 10).toFixed(1)}×{((item?.dimY ?? 0) / 10).toFixed(1)}×
                       {((item?.dimZ ?? 0) / 10).toFixed(1)} cm
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() =>
-                          updateQuantity?.(
-                            item?.id ?? "",
-                            (item?.quantity ?? 1) - 1,
-                          )
-                        }
+                        onClick={() => updateQuantity?.(item?.id ?? "", (item?.quantity ?? 1) - 1)}
                         className="w-7 h-7 rounded bg-white/5 flex items-center justify-center hover:bg-white/10 transition"
                         aria-label={t.reduceQty}
                       >
@@ -172,12 +162,7 @@ export function CartClient() {
                         {item?.quantity ?? 1}
                       </span>
                       <button
-                        onClick={() =>
-                          updateQuantity?.(
-                            item?.id ?? "",
-                            (item?.quantity ?? 1) + 1,
-                          )
-                        }
+                        onClick={() => updateQuantity?.(item?.id ?? "", (item?.quantity ?? 1) + 1)}
                         className="w-7 h-7 rounded bg-white/5 flex items-center justify-center hover:bg-white/10 transition"
                         aria-label={t.increaseQty}
                       >
@@ -186,10 +171,7 @@ export function CartClient() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-sm text-cyan">
-                        €
-                        {(
-                          (item?.unitPrice ?? 0) * (item?.quantity ?? 1)
-                        ).toFixed(2)}
+                        €{((item?.unitPrice ?? 0) * (item?.quantity ?? 1)).toFixed(2)}
                       </span>
                       <button
                         onClick={() => {
@@ -227,14 +209,10 @@ export function CartClient() {
                     {shipping === 0 ? t.free : `€${shipping.toFixed(2)}`}
                   </span>
                 </div>
-                {subtotal <= 50 && (
-                  <p className="text-xs text-zinc-500">{t.freeShipping}</p>
-                )}
+                {subtotal <= 50 && <p className="text-xs text-zinc-500">{t.freeShipping}</p>}
                 <div className="border-t border-white/10 pt-3 flex justify-between font-semibold">
                   <span>{t.total}</span>
-                  <span className="font-mono text-lg text-cyan">
-                    €{total.toFixed(2)}
-                  </span>
+                  <span className="font-mono text-lg text-cyan">€{total.toFixed(2)}</span>
                 </div>
               </div>
               {session?.user ? (

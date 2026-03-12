@@ -39,10 +39,7 @@ export async function GET() {
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error fetching profile:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -88,9 +85,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(user);
   } catch (error) {
     console.error("Error updating profile:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

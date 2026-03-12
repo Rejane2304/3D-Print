@@ -11,16 +11,11 @@ const PRINTER_STATUSES = ["available", "busy", "maintenance"] as const;
 type PrinterStatus = (typeof PRINTER_STATUSES)[number];
 
 function isAdmin(session: Session | null) {
-  return !!(
-    session?.user && (session.user as { role?: string }).role === "admin"
-  );
+  return !!(session?.user && (session.user as { role?: string }).role === "admin");
 }
 
 function parseStatus(value: unknown): PrinterStatus | undefined {
-  if (
-    typeof value === "string" &&
-    PRINTER_STATUSES.includes(value as PrinterStatus)
-  ) {
+  if (typeof value === "string" && PRINTER_STATUSES.includes(value as PrinterStatus)) {
     return value as PrinterStatus;
   }
   return undefined;
@@ -32,10 +27,7 @@ function parseString(value: unknown) {
   return trimmed.length ? trimmed : undefined;
 }
 
-export async function PATCH(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   const session = await getServerSession(authOptions);
   if (!isAdmin(session)) {
@@ -52,10 +44,7 @@ export async function PATCH(
   if (status) data.status = status;
 
   if (!Object.keys(data).length) {
-    return NextResponse.json(
-      { error: "No se proporcionaron campos válidos" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "No se proporcionaron campos válidos" }, { status: 400 });
   }
 
   try {
@@ -66,20 +55,14 @@ export async function PATCH(
     return NextResponse.json(printer);
   } catch (error: unknown) {
     if ((error as { code?: string }).code === "P2025") {
-      return NextResponse.json(
-        { error: "Impresora no encontrada" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Impresora no encontrada" }, { status: 404 });
     }
     console.error("Error actualizando impresora:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  _request: NextRequest,
-  context: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   const session = await getServerSession(authOptions);
   if (!isAdmin(session)) {
@@ -91,10 +74,7 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     if ((error as { code?: string }).code === "P2025") {
-      return NextResponse.json(
-        { error: "Impresora no encontrada" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Impresora no encontrada" }, { status: 404 });
     }
     console.error("Error eliminando impresora:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

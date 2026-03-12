@@ -52,7 +52,7 @@ function useFetchable<T>(url: string, initialData: T): FetchResult<T> {
         setStatus({ loading: false, error: (error as Error).message });
       }
     },
-    [url],
+    [url]
   );
 
   const reload = useCallback(() => fetcher(undefined), [fetcher]);
@@ -67,19 +67,12 @@ function useFetchable<T>(url: string, initialData: T): FetchResult<T> {
 }
 
 export function useAdminCatalog() {
-  const materialsResult = useFetchable<MaterialType[]>(
-    "/api/admin/materials",
-    [],
-  );
+  const materialsResult = useFetchable<MaterialType[]>("/api/admin/materials", []);
   const colorsResult = useFetchable<ColorSummary[]>("/api/admin/colors", []);
-  const printersResult = useFetchable<{ printers: PrinterType[] }>(
-    "/api/admin/printers",
-    { printers: [] },
-  );
-  const pricingResult = useFetchable<PricingConfig | null>(
-    "/api/admin/pricing",
-    null,
-  );
+  const printersResult = useFetchable<{ printers: PrinterType[] }>("/api/admin/printers", {
+    printers: [],
+  });
+  const pricingResult = useFetchable<PricingConfig | null>("/api/admin/pricing", null);
 
   const aggregatedLoading = useMemo(
     () =>
@@ -92,7 +85,7 @@ export function useAdminCatalog() {
       colorsResult.status.loading,
       printersResult.status.loading,
       pricingResult.status.loading,
-    ],
+    ]
   );
 
   const { reload: reloadMaterials } = materialsResult;
@@ -101,12 +94,7 @@ export function useAdminCatalog() {
   const { reload: reloadPricing } = pricingResult;
 
   const reloadAll = useCallback(async () => {
-    await Promise.all([
-      reloadMaterials(),
-      reloadColors(),
-      reloadPrinters(),
-      reloadPricing(),
-    ]);
+    await Promise.all([reloadMaterials(), reloadColors(), reloadPrinters(), reloadPricing()]);
   }, [reloadMaterials, reloadColors, reloadPrinters, reloadPricing]);
 
   return {

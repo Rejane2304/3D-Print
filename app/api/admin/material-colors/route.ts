@@ -6,10 +6,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const materialId = searchParams.get("materialId");
   if (!materialId) {
-    return NextResponse.json(
-      { error: "materialId requerido" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "materialId requerido" }, { status: 400 });
   }
   const materialColors = await prisma.materialColor.findMany({
     where: { materialId },
@@ -23,10 +20,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const data = await req.json();
   if (!data.materialId || !data.colorId) {
-    return NextResponse.json(
-      { error: "materialId y colorId requeridos" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "materialId y colorId requeridos" }, { status: 400 });
   }
   const materialColor = await prisma.materialColor.create({
     data: {

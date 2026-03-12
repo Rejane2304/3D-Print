@@ -45,8 +45,7 @@ interface CalcResult {
 }
 
 function calcPrice(product: ProductInput, material: MaterialInput): CalcResult {
-  const vol =
-    (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
+  const vol = (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
   const weightKg = (vol * material.density * INFILL_FACTOR) / 1000;
   const hours = product.printTimeMinutes / 60;
 
@@ -55,11 +54,7 @@ function calcPrice(product: ProductInput, material: MaterialInput): CalcResult {
   const maintenanceCost = hours * material.maintenanceFactor;
   const operationCost = hours * OPERATION_COST;
   const baseCost =
-    materialCost +
-    machineCost +
-    maintenanceCost +
-    operationCost +
-    product.finishCost;
+    materialCost + machineCost + maintenanceCost + operationCost + product.finishCost;
 
   const r = (n: number) => Math.round(n * 100) / 100;
   return {
@@ -112,8 +107,7 @@ self.onmessage = (event: MessageEvent) => {
   } catch (error) {
     self.postMessage({
       type: "ERROR",
-      message:
-        error instanceof Error ? error.message : "Worker calculation failed",
+      message: error instanceof Error ? error.message : "Worker calculation failed",
     });
   }
 };

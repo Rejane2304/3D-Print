@@ -42,8 +42,7 @@ async function main() {
         pricePerKg: 20,
         maintenanceFactor: 0.03,
         density: 1.24,
-        description:
-          "Ideal para prototipos, figuras y objetos decorativos. Biodegradable.",
+        description: "Ideal para prototipos, figuras y objetos decorativos. Biodegradable.",
         inStock: true,
       },
     }),
@@ -54,8 +53,7 @@ async function main() {
         pricePerKg: 25,
         maintenanceFactor: 0.04,
         density: 1.27,
-        description:
-          "Alta resistencia y durabilidad. Perfecto para piezas mecánicas y exteriores.",
+        description: "Alta resistencia y durabilidad. Perfecto para piezas mecánicas y exteriores.",
         inStock: true,
       },
     }),
@@ -66,8 +64,7 @@ async function main() {
         pricePerKg: 30,
         maintenanceFactor: 0.05,
         density: 1.07,
-        description:
-          "Resistente a UV. Ideal para aplicaciones industriales y automoción.",
+        description: "Resistente a UV. Ideal para aplicaciones industriales y automoción.",
         inStock: true,
       },
     }),
@@ -78,8 +75,7 @@ async function main() {
         pricePerKg: 35,
         maintenanceFactor: 0.06,
         density: 1.21,
-        description:
-          "Material flexible. Para juntas, fundas y piezas que requieren elasticidad.",
+        description: "Material flexible. Para juntas, fundas y piezas que requieren elasticidad.",
         inStock: true,
       },
     }),
@@ -235,15 +231,7 @@ async function main() {
     "Alberto Gil",
   ];
 
-  const cities = [
-    "Barcelona",
-    "Madrid",
-    "Valencia",
-    "Sevilla",
-    "Bilbao",
-    "Málaga",
-    "Zaragoza",
-  ];
+  const cities = ["Barcelona", "Madrid", "Valencia", "Sevilla", "Bilbao", "Málaga", "Zaragoza"];
 
   const clients = [];
   for (let i = 0; i < clientNames.length; i++) {
@@ -643,8 +631,7 @@ async function main() {
     },
     {
       name: "Gancho de Pared Minimalista (Pack 4)",
-      description:
-        "Set de 4 ganchos adhesivos de diseño discreto. Soportan hasta 3kg cada uno.",
+      description: "Set de 4 ganchos adhesivos de diseño discreto. Soportan hasta 3kg cada uno.",
       category: "Funcional",
       material: "PETG",
       basePricePerGram: 0.05,
@@ -775,8 +762,7 @@ async function main() {
     },
     {
       name: "Caja de Cambios Demostrativa",
-      description:
-        "Modelo de transmisión de 3 velocidades transparente. Educativo y fascinante.",
+      description: "Modelo de transmisión de 3 velocidades transparente. Educativo y fascinante.",
       category: "Articulados",
       material: "PETG",
       basePricePerGram: 0.062,
@@ -1039,8 +1025,7 @@ async function main() {
     },
     {
       name: "Escultura de león",
-      description:
-        "Escultura de león de diseño impresa con efecto de piel afelpada.",
+      description: "Escultura de león de diseño impresa con efecto de piel afelpada.",
       category: "Decoracion",
       material: "PLA",
       basePricePerGram: 0.05,
@@ -1088,9 +1073,7 @@ async function main() {
   // PRECIOS CALCULADOS (motor avanzado)
   // ========================================
   const priceResult = await updateAllProductPrices();
-  console.log(
-    `✅ ${priceResult.updated} precios calculados con el motor avanzado (p2s)`,
-  );
+  console.log(`✅ ${priceResult.updated} precios calculados con el motor avanzado (p2s)`);
 
   // ========================================
   // PEDIDOS FICTICIOS (15 pedidos)
@@ -1121,10 +1104,7 @@ async function main() {
       };
     });
 
-    const subtotal = orderItems.reduce(
-      (acc, item) => acc + item.unitPrice * item.quantity,
-      0,
-    );
+    const subtotal = orderItems.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
     const tax = subtotal * 0.21;
     const shipping = subtotal > 50 ? 0 : 4.95;
     const total = subtotal + tax + shipping;
@@ -1212,9 +1192,7 @@ async function main() {
   console.log("   Admin: john@doe.com / johndoe123");
   console.log("   Cliente: cliente@test.com / cliente123");
   console.log("\n Materiales disponibles: PLA, PETG, ASA, TPU");
-  console.log(
-    " Cupones de prueba: BIENVENIDO10 (10%), PROMO5EUR (-5€), VERANO20 (20%)",
-  );
+  console.log(" Cupones de prueba: BIENVENIDO10 (10%), PROMO5EUR (-5€), VERANO20 (20%)");
 }
 
 main() // NOSONAR

@@ -11,16 +11,11 @@ const PRINTER_STATUSES = ["available", "busy", "maintenance"] as const;
 type PrinterStatus = (typeof PRINTER_STATUSES)[number];
 
 function isAdmin(session: Session | null) {
-  return !!(
-    session?.user && (session.user as { role?: string }).role === "admin"
-  );
+  return !!(session?.user && (session.user as { role?: string }).role === "admin");
 }
 
 function parseStatus(value: unknown): PrinterStatus {
-  if (
-    typeof value === "string" &&
-    PRINTER_STATUSES.includes(value as PrinterStatus)
-  ) {
+  if (typeof value === "string" && PRINTER_STATUSES.includes(value as PrinterStatus)) {
     return value as PrinterStatus;
   }
   return "available";
@@ -43,7 +38,7 @@ export async function POST(request: NextRequest) {
   if (!name) {
     return NextResponse.json(
       { error: "El nombre de la impresora es obligatorio" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 

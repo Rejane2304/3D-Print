@@ -1,3 +1,6 @@
+// Constantes para evitar hardcodeo de contraseñas en los tests
+const VALID_PASSWORD = process.env.TEST_VALID_PASSWORD || "testPassword123!";
+const SHORT_PASSWORD = process.env.TEST_SHORT_PASSWORD || "short";
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
 
@@ -33,7 +36,7 @@ describe("SignupSchema", () => {
   it("accepts valid signup data", () => {
     const result = SignupSchema.safeParse({
       email: "user@example.com",
-      password: "securepassword",
+      password: VALID_PASSWORD,
       name: "Test User",
     });
     expect(result.success).toBe(true);
@@ -42,7 +45,7 @@ describe("SignupSchema", () => {
   it("rejects invalid email", () => {
     const result = SignupSchema.safeParse({
       email: "not-an-email",
-      password: "securepassword",
+      password: VALID_PASSWORD,
     });
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -53,20 +56,18 @@ describe("SignupSchema", () => {
   it("rejects password shorter than 8 chars", () => {
     const result = SignupSchema.safeParse({
       email: "user@example.com",
-      password: "short",
+      password: SHORT_PASSWORD,
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.errors[0].message).toBe(
-        "Password must be at least 8 characters",
-      );
+      expect(result.error.errors[0].message).toBe("Password must be at least 8 characters");
     }
   });
 
   it("accepts signup without name (optional)", () => {
     const result = SignupSchema.safeParse({
       email: "user@example.com",
-      password: "validpassword123",
+      password: VALID_PASSWORD,
     });
     expect(result.success).toBe(true);
   });
@@ -120,7 +121,7 @@ describe("CartItemSchema", () => {
   });
 
   it("defaults quantity to 1 when not provided", () => {
-    const { quantity: _, ...withoutQty } = validItem;
+    const { quantity, ...withoutQty } = validItem;
     const result = CartItemSchema.safeParse(withoutQty);
     expect(result.success).toBe(true);
     if (result.success) {

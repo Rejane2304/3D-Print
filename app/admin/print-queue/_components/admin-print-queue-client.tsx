@@ -45,11 +45,7 @@ export default function AdminPrintQueueClient() {
   useEffect(() => {
     fetchQueue();
   }, [fetchQueue]);
-  async function assignPrinter(
-    orderId: string,
-    printerId: string,
-    orderItemId?: string,
-  ) {
+  async function assignPrinter(orderId: string, printerId: string, orderItemId?: string) {
     try {
       const res = await fetch("/api/admin/printers", {
         method: "PATCH",
@@ -106,12 +102,8 @@ export default function AdminPrintQueueClient() {
     }
     return orders.map((o) => (
       <tr key={o.id} className="border-t border-border/60">
-        <td className="px-4 py-2 font-mono text-xs">
-          #{o.id.slice(-8).toUpperCase()}
-        </td>
-        <td className="px-4 py-2 text-muted">
-          {o.user?.name || o.user?.email || "Cliente"}
-        </td>
+        <td className="px-4 py-2 font-mono text-xs">#{o.id.slice(-8).toUpperCase()}</td>
+        <td className="px-4 py-2 text-muted">{o.user?.name || o.user?.email || "Cliente"}</td>
         <td className="px-4 py-2 text-muted">
           {new Date(o.createdAt).toLocaleDateString("es-ES")}
         </td>
@@ -134,10 +126,7 @@ export default function AdminPrintQueueClient() {
           )}
         </td>
         <td className="px-4 py-2 text-right">
-          <button
-            className="mr-2 text-cyan underline text-xs"
-            onClick={() => setSelectedOrder(o)}
-          >
+          <button className="mr-2 text-cyan underline text-xs" onClick={() => setSelectedOrder(o)}>
             Detalles
           </button>
           <button
@@ -145,9 +134,7 @@ export default function AdminPrintQueueClient() {
             disabled={actionLoading === o.id + "printed"}
             onClick={() => updateOrderStatus(o.id, "printed")}
           >
-            {actionLoading === o.id + "printed"
-              ? "Guardando..."
-              : "Marcar impreso"}
+            {actionLoading === o.id + "printed" ? "Guardando..." : "Marcar impreso"}
           </button>
           <button
             className="text-red-600 underline text-xs"
@@ -167,8 +154,7 @@ export default function AdminPrintQueueClient() {
         <div>
           <h1 className="text-2xl font-bold">Panel de control</h1>
           <p className="text-muted text-sm">
-            Pedidos en estado &quot;procesando&quot; listos para planificar en
-            impresoras.
+            Pedidos en estado &quot;procesando&quot; listos para planificar en impresoras.
           </p>
         </div>
         <button
@@ -196,9 +182,7 @@ export default function AdminPrintQueueClient() {
             <select
               id="filter-estado"
               value={filters.status}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, status: e.target.value }))
-              }
+              onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
               className="border rounded px-2 py-1"
             >
               <option value="">Todos</option>
@@ -215,9 +199,7 @@ export default function AdminPrintQueueClient() {
               id="filter-cliente"
               type="text"
               value={filters.client}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, client: e.target.value }))
-              }
+              onChange={(e) => setFilters((f) => ({ ...f, client: e.target.value }))}
               className="border rounded px-2 py-1"
               placeholder="Nombre o email"
             />
@@ -229,9 +211,7 @@ export default function AdminPrintQueueClient() {
             <select
               id="filter-impresora"
               value={filters.printer}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, printer: e.target.value }))
-              }
+              onChange={(e) => setFilters((f) => ({ ...f, printer: e.target.value }))}
               className="border rounded px-2 py-1"
             >
               <option value="">Todas</option>
@@ -271,8 +251,7 @@ export default function AdminPrintQueueClient() {
               <h2 className="text-xl font-bold mb-2">Asignar impresora</h2>
               <div className="mb-4">
                 <div>
-                  <b>Pedido:</b> #
-                  {printerModalOrder.current.id.slice(-8).toUpperCase()}
+                  <b>Pedido:</b> #{printerModalOrder.current.id.slice(-8).toUpperCase()}
                 </div>
                 <div>
                   <b>Cliente:</b>{" "}
@@ -288,9 +267,7 @@ export default function AdminPrintQueueClient() {
                 <select
                   id="modal-impresora"
                   className="border rounded px-2 py-1 w-full"
-                  onChange={(e) =>
-                    assignPrinter(printerModalOrder.current!.id, e.target.value)
-                  }
+                  onChange={(e) => assignPrinter(printerModalOrder.current!.id, e.target.value)}
                   defaultValue=""
                 >
                   <option value="">Selecciona...</option>
@@ -321,20 +298,14 @@ export default function AdminPrintQueueClient() {
                 </div>
                 <div>
                   <b>Cliente:</b>{" "}
-                  {selectedOrder.user?.name ||
-                    selectedOrder.user?.email ||
-                    "Cliente"}
+                  {selectedOrder.user?.name || selectedOrder.user?.email || "Cliente"}
                 </div>
                 <div>
-                  <b>Fecha:</b>{" "}
-                  {new Date(selectedOrder.createdAt).toLocaleString("es-ES")}
+                  <b>Fecha:</b> {new Date(selectedOrder.createdAt).toLocaleString("es-ES")}
                 </div>
                 <div>
                   <b>Piezas:</b>{" "}
-                  {selectedOrder.items?.reduce(
-                    (sum, i) => sum + (i.quantity || 0),
-                    0,
-                  ) ?? 0}
+                  {selectedOrder.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0}
                 </div>
                 <div>
                   <b>Estado:</b> {selectedOrder.status}
@@ -349,19 +320,11 @@ export default function AdminPrintQueueClient() {
                         {item.productName} x {item.quantity}
                       </span>
                       {item.printer?.name ? (
-                        <span className="text-cyan text-xs">
-                          {item.printer.name}
-                        </span>
+                        <span className="text-cyan text-xs">{item.printer.name}</span>
                       ) : (
                         <select
                           className="border rounded px-2 py-1 text-xs"
-                          onChange={(e) =>
-                            assignPrinter(
-                              selectedOrder.id,
-                              e.target.value,
-                              item.id,
-                            )
-                          }
+                          onChange={(e) => assignPrinter(selectedOrder.id, e.target.value, item.id)}
                           defaultValue=""
                         >
                           <option value="">Asignar impresora...</option>

@@ -32,9 +32,7 @@ export default function AdminInventoryClient() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Panel de control</h1>
-          <p className="text-muted text-sm">
-            Controla el stock de tus productos impresos en 3D.
-          </p>
+          <p className="text-muted text-sm">Controla el stock de tus productos impresos en 3D.</p>
         </div>
         <button
           onClick={fetchInventory}
@@ -83,9 +81,7 @@ export default function AdminInventoryClient() {
                     <td className="px-4 py-2 text-muted">{p.category}</td>
                     <td className="px-4 py-2 text-muted">{p.material}</td>
                     <td className="px-4 py-2 text-right">
-                      <span className={p.stock < 10 ? "text-red-400" : ""}>
-                        {p.stock}
-                      </span>
+                      <span className={p.stock < 10 ? "text-red-400" : ""}>{p.stock}</span>
                     </td>
                   </tr>
                 ))

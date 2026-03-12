@@ -15,14 +15,12 @@ import {
   CreditCard,
   Layers,
   Tag,
-  DollarSign,
 } from "lucide-react";
 
 const menuItems = [
   { href: "/admin", label: "Panel", icon: LayoutDashboard },
   { href: "/admin/products", label: "Productos", icon: Package },
-  { href: "/admin/materials", label: "Materiales", icon: Layers },
-  { href: "/admin/pricing", label: "Precios", icon: DollarSign },
+  { href: "/admin/materials-pricing", label: "Materiales y Precios", icon: Layers },
   { href: "/admin/users", label: "Clientes", icon: Users },
   { href: "/admin/orders", label: "Pedidos", icon: ShoppingCart },
   { href: "/admin/inventory", label: "Inventario", icon: Boxes },
@@ -38,10 +36,7 @@ interface AdminSidebarProps {
   setIsOpen: (v: boolean) => void;
 }
 
-export default function AdminSidebar({
-  isOpen,
-  setIsOpen,
-}: Readonly<AdminSidebarProps>) {
+export default function AdminSidebar({ isOpen, setIsOpen }: Readonly<AdminSidebarProps>) {
   const pathname = usePathname();
 
   return (
@@ -90,9 +85,7 @@ export default function AdminSidebar({
                   >
                     <item.icon className="w-5 h-5 shrink-0" />
                     <span className="font-medium">{item.label}</span>
-                    {isActive && (
-                      <ChevronRight className="w-4 h-4 ml-auto shrink-0" />
-                    )}
+                    {isActive && <ChevronRight className="w-4 h-4 ml-auto shrink-0" />}
                   </Link>
                 );
               })}

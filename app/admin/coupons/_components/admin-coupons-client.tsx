@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Tag,
-  CheckCircle,
-  AlertTriangle,
-} from "lucide-react";
+import { Plus, Edit, Trash2, Tag, CheckCircle, AlertTriangle } from "lucide-react";
 import type { CouponType } from "@/lib/types";
 
 function getSaveLabel(saving: boolean, editing: string | null): string {
@@ -63,9 +56,7 @@ export default function AdminCouponsClient() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const url = editing
-        ? `/api/admin/coupons/${editing}`
-        : "/api/admin/coupons";
+      const url = editing ? `/api/admin/coupons/${editing}` : "/api/admin/coupons";
       const method = editing ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -111,10 +102,8 @@ export default function AdminCouponsClient() {
     } else notify("error", "Error al eliminar");
   };
 
-  const isExpired = (c: CouponType) =>
-    c.validUntil && new Date(c.validUntil) < new Date();
-  const isExhausted = (c: CouponType) =>
-    c.maxUses !== null && c.usedCount >= (c.maxUses ?? 0);
+  const isExpired = (c: CouponType) => c.validUntil && new Date(c.validUntil) < new Date();
+  const isExhausted = (c: CouponType) => c.maxUses !== null && c.usedCount >= (c.maxUses ?? 0);
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -154,15 +143,10 @@ export default function AdminCouponsClient() {
 
       {showForm && (
         <div className="bg-bg-card border border-white/10 rounded-xl p-6 mb-6">
-          <h2 className="font-semibold mb-4">
-            {editing ? "Editar cupón" : "Nuevo cupón"}
-          </h2>
+          <h2 className="font-semibold mb-4">{editing ? "Editar cupón" : "Nuevo cupón"}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label
-                htmlFor="couponCode"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="couponCode" className="text-xs text-zinc-400 block mb-1">
                 Código
               </label>
               <input
@@ -171,25 +155,18 @@ export default function AdminCouponsClient() {
                 placeholder="VERANO20"
                 disabled={!!editing}
                 value={form.code}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan disabled:opacity-40 uppercase"
               />
             </div>
             <div>
-              <label
-                htmlFor="couponDiscountType"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="couponDiscountType" className="text-xs text-zinc-400 block mb-1">
                 Tipo de descuento
               </label>
               <select
                 id="couponDiscountType"
                 value={form.discountType}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, discountType: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, discountType: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               >
                 <option value="percentage">Porcentaje (%)</option>
@@ -197,10 +174,7 @@ export default function AdminCouponsClient() {
               </select>
             </div>
             <div>
-              <label
-                htmlFor="couponDiscountValue"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="couponDiscountValue" className="text-xs text-zinc-400 block mb-1">
                 Valor {form.discountType === "percentage" ? "(%)" : "(€)"}
               </label>
               <input
@@ -209,17 +183,12 @@ export default function AdminCouponsClient() {
                 placeholder={form.discountType === "percentage" ? "10" : "5"}
                 min="0"
                 value={form.discountValue}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, discountValue: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, discountValue: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="couponMinPurchase"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="couponMinPurchase" className="text-xs text-zinc-400 block mb-1">
                 Compra mínima (€)
               </label>
               <input
@@ -228,17 +197,12 @@ export default function AdminCouponsClient() {
                 placeholder="0 (sin límite)"
                 min="0"
                 value={form.minPurchase}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, minPurchase: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, minPurchase: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="couponMaxUses"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="couponMaxUses" className="text-xs text-zinc-400 block mb-1">
                 Usos máximos
               </label>
               <input
@@ -247,43 +211,31 @@ export default function AdminCouponsClient() {
                 placeholder="Ilimitado"
                 min="1"
                 value={form.maxUses}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, maxUses: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, maxUses: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="couponValidFrom"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="couponValidFrom" className="text-xs text-zinc-400 block mb-1">
                 Válido desde
               </label>
               <input
                 id="couponValidFrom"
                 type="date"
                 value={form.validFrom}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, validFrom: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, validFrom: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="couponValidUntil"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="couponValidUntil" className="text-xs text-zinc-400 block mb-1">
                 Válido hasta (opcional)
               </label>
               <input
                 id="couponValidUntil"
                 type="date"
                 value={form.validUntil}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, validUntil: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, validUntil: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
@@ -292,9 +244,7 @@ export default function AdminCouponsClient() {
                 type="checkbox"
                 id="couponActive"
                 checked={form.isActive}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, isActive: e.target.checked }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
                 className="accent-cyan"
               />
               <label htmlFor="couponActive" className="text-sm">
@@ -343,17 +293,13 @@ export default function AdminCouponsClient() {
             <tbody className="divide-y divide-white/5">
               {coupons.map((c) => (
                 <tr key={c.id} className="hover:bg-white/[0.02] transition">
-                  <td className="px-4 py-3 font-mono font-semibold tracking-wide">
-                    {c.code}
-                  </td>
+                  <td className="px-4 py-3 font-mono font-semibold tracking-wide">{c.code}</td>
                   <td className="px-4 py-3">
                     {c.discountType === "percentage"
                       ? `${c.discountValue}%`
                       : `€${c.discountValue.toFixed(2)}`}
                     {c.minPurchase ? (
-                      <span className="text-zinc-500 text-xs ml-1">
-                        (min €{c.minPurchase})
-                      </span>
+                      <span className="text-zinc-500 text-xs ml-1">(min €{c.minPurchase})</span>
                     ) : null}
                   </td>
                   <td className="px-4 py-3 text-right font-mono">
@@ -361,9 +307,7 @@ export default function AdminCouponsClient() {
                     {c.maxUses ? `/${c.maxUses}` : ""}
                   </td>
                   <td className="px-4 py-3 text-zinc-400 text-xs">
-                    {c.validUntil
-                      ? new Date(c.validUntil).toLocaleDateString("es-ES")
-                      : "—"}
+                    {c.validUntil ? new Date(c.validUntil).toLocaleDateString("es-ES") : "—"}
                   </td>
                   <td className="px-4 py-3 text-center">
                     {!c.isActive && (
@@ -407,10 +351,7 @@ export default function AdminCouponsClient() {
               ))}
               {coupons.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-8 text-center text-zinc-500 text-sm"
-                  >
+                  <td colSpan={6} className="px-4 py-8 text-center text-zinc-500 text-sm">
                     No hay cupones. Crea el primero.
                   </td>
                 </tr>

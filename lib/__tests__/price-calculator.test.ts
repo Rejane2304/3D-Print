@@ -24,7 +24,7 @@ describe("price calculator helpers", () => {
       20,
       60,
       { pricePerKg: 20, density: 1.24, maintenanceFactor: 0.03 },
-      1,
+      1
     );
 
     expect(result.weight).toBe(20);
@@ -48,18 +48,13 @@ describe("price calculator helpers", () => {
         refDimX: 80,
         refDimY: 40,
         refDimZ: 20,
-      },
+      }
     );
 
     const expectedMedium = result.baseCost * PRICING_CONFIG.margins.medium;
     expect(result.priceMedium).toBeCloseTo(expectedMedium, 2);
     expect(result.finalPrice).toBe(
-      getPriceByQuantity(
-        result.priceUnit,
-        result.priceMedium,
-        result.priceBulk,
-        5,
-      ),
+      getPriceByQuantity(result.priceUnit, result.priceMedium, result.priceBulk, 5)
     );
   });
 });

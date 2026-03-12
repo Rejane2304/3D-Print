@@ -62,7 +62,7 @@ export async function updateProductPrices(productId: string): Promise<void> {
         maintenanceFactor: mat.maintenanceFactor,
       },
       1,
-      config,
+      config
     );
 
     await prisma.productPrice.upsert({
@@ -129,10 +129,9 @@ function getDefaultWeight(
     defaultDimZ: number;
     density: number;
     modelFillFactor?: number;
-  }>,
+  }>
 ): number {
-  const volumeCm3 =
-    (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
+  const volumeCm3 = (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
   const fillFactor = product.modelFillFactor ?? 0.15;
   return volumeCm3 * product.density * fillFactor;
 }

@@ -23,9 +23,7 @@ export default function AdminUsersClient() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
-  const [userDetails, setUserDetails] = useState<
-    (UserData & { orders: unknown[] }) | null
-  >(null);
+  const [userDetails, setUserDetails] = useState<(UserData & { orders: unknown[] }) | null>(null);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -111,41 +109,24 @@ export default function AdminUsersClient() {
             <table className="w-full">
               <thead className="bg-bg-tertiary">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Usuario
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Rol
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Puntos
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Pedidos
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Registro
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted">
-                    Acciones
-                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Usuario</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Rol</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Puntos</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Pedidos</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Registro</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-t border-border hover:bg-bg-tertiary/50"
-                  >
+                  <tr key={user.id} className="border-t border-border hover:bg-bg-tertiary/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-cyan to-amber rounded-full flex items-center justify-center text-black font-bold">
                           {(user.name || user.email)[0].toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-medium">
-                            {user.name || "Sin nombre"}
-                          </div>
+                          <div className="font-medium">{user.name || "Sin nombre"}</div>
                           <div className="text-sm text-muted">{user.email}</div>
                         </div>
                       </div>
@@ -243,26 +224,19 @@ export default function AdminUsersClient() {
                     {(selectedUser.name || selectedUser.email)[0].toUpperCase()}
                   </div>
                   <div>
-                    <div className="text-xl font-bold">
-                      {selectedUser.name || "Sin nombre"}
-                    </div>
+                    <div className="text-xl font-bold">{selectedUser.name || "Sin nombre"}</div>
                     <div className="text-muted">{selectedUser.email}</div>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Rol</label>
-                  <label
-                    htmlFor="role"
-                    className="block text-sm font-medium mb-2"
-                  >
+                  <label htmlFor="role" className="block text-sm font-medium mb-2">
                     Rol
                   </label>
                   <select
                     value={userDetails?.role || selectedUser.role}
-                    onChange={(e) =>
-                      updateUserRole(selectedUser.id, e.target.value)
-                    }
+                    onChange={(e) => updateUserRole(selectedUser.id, e.target.value)}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   >
                     <option value="user">Usuario</option>
@@ -273,18 +247,12 @@ export default function AdminUsersClient() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-bg-tertiary rounded-lg p-4 text-center">
                     <Star className="w-8 h-8 text-amber mx-auto mb-2" />
-                    <div className="text-2xl font-bold">
-                      {selectedUser.loyaltyPoints}
-                    </div>
-                    <div className="text-sm text-muted">
-                      Puntos de Fidelidad
-                    </div>
+                    <div className="text-2xl font-bold">{selectedUser.loyaltyPoints}</div>
+                    <div className="text-sm text-muted">Puntos de Fidelidad</div>
                   </div>
                   <div className="bg-bg-tertiary rounded-lg p-4 text-center">
                     <ShoppingBag className="w-8 h-8 text-cyan mx-auto mb-2" />
-                    <div className="text-2xl font-bold">
-                      {selectedUser._count?.orders || 0}
-                    </div>
+                    <div className="text-2xl font-bold">{selectedUser._count?.orders || 0}</div>
                     <div className="text-sm text-muted">Pedidos Totales</div>
                   </div>
                 </div>
@@ -292,10 +260,11 @@ export default function AdminUsersClient() {
                 <div>
                   <div className="text-sm text-muted">Miembro desde</div>
                   <div>
-                    {new Date(selectedUser.createdAt).toLocaleDateString(
-                      "es-ES",
-                      { year: "numeric", month: "long", day: "numeric" },
-                    )}
+                    {new Date(selectedUser.createdAt).toLocaleDateString("es-ES", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </div>
                 </div>
               </div>

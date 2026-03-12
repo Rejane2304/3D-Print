@@ -70,8 +70,7 @@ export default function AdminPrintersClient() {
     setMode("edit");
     setEditingId(printer.id);
     const statusMatch =
-      PRINTER_STATUS_OPTIONS.find((option) => option.key === printer.status)
-        ?.key ?? "available";
+      PRINTER_STATUS_OPTIONS.find((option) => option.key === printer.status)?.key ?? "available";
     setForm({
       name: printer.name,
       location: printer.location ?? "",
@@ -95,9 +94,7 @@ export default function AdminPrintersClient() {
     try {
       const isEditing = mode === "edit" && editingId;
       const response = await fetch(
-        isEditing
-          ? `/api/admin/printers/manage/${editingId}`
-          : "/api/admin/printers/manage",
+        isEditing ? `/api/admin/printers/manage/${editingId}` : "/api/admin/printers/manage",
         {
           method: isEditing ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -106,16 +103,13 @@ export default function AdminPrintersClient() {
             location: form.location.trim() || null,
             status: form.status,
           }),
-        },
+        }
       );
       const payload = await response.json();
       if (!response.ok) {
         throw new Error(payload?.error ?? "No se pudo guardar");
       }
-      showToast?.(
-        "success",
-        isEditing ? "Impresora actualizada" : "Impresora creada",
-      );
+      showToast?.("success", isEditing ? "Impresora actualizada" : "Impresora creada");
       resetForm();
       loadPrinters();
     } catch (error) {
@@ -127,9 +121,7 @@ export default function AdminPrintersClient() {
   };
 
   const handleDelete = async (id: string) => {
-    if (
-      !confirm("¿Eliminar esta impresora? Esta acción no se puede deshacer.")
-    ) {
+    if (!confirm("¿Eliminar esta impresora? Esta acción no se puede deshacer.")) {
       return;
     }
     setDeletingId(id);
@@ -179,21 +171,14 @@ export default function AdminPrintersClient() {
     const baseStyles =
       "inline-flex items-center gap-1 px-3 py-0.5 text-[0.7rem] font-semibold rounded-full";
     if (!option) {
-      return (
-        <span className={`${baseStyles} bg-white/5 text-white`}>{status}</span>
-      );
+      return <span className={`${baseStyles} bg-white/5 text-white`}>{status}</span>;
     }
     const colorMap: Record<PrinterStatusKey, string> = {
-      available:
-        "bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20",
+      available: "bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/20",
       busy: "bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20",
       maintenance: "bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/20",
     };
-    return (
-      <span className={`${baseStyles} ${colorMap[option.key] ?? ""}`}>
-        {option.label}
-      </span>
-    );
+    return <span className={`${baseStyles} ${colorMap[option.key] ?? ""}`}>{option.label}</span>;
   };
 
   return (
@@ -215,9 +200,7 @@ export default function AdminPrintersClient() {
             key={item.label}
             className="rounded-2xl border border-border bg-bg-secondary/30 p-4 shadow-sm"
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-muted">
-              {item.label}
-            </p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted">{item.label}</p>
             <p className="text-3xl font-bold">{item.value}</p>
             <p className="text-xs text-muted">{item.helper}</p>
           </article>
@@ -231,9 +214,7 @@ export default function AdminPrintersClient() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-muted">
-                Formulario
-              </p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted">Formulario</p>
               <h2 className="text-lg font-semibold">
                 {mode === "edit" ? "Editar impresora" : "Nueva impresora"}
               </h2>
@@ -249,23 +230,17 @@ export default function AdminPrintersClient() {
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="text-xs text-muted">
-              <span className="block text-[0.7rem] uppercase tracking-[0.3em]">
-                Nombre
-              </span>
+              <span className="block text-[0.7rem] uppercase tracking-[0.3em]">Nombre</span>
               <input
                 type="text"
                 value={form.name}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, name: event.target.value }))
-                }
+                onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
                 className="mt-1 w-full rounded-2xl border border-border bg-bg-main px-3 py-2 text-sm"
                 placeholder="Ej. Form 4+"
               />
             </label>
             <label className="text-xs text-muted">
-              <span className="block text-[0.7rem] uppercase tracking-[0.3em]">
-                Ubicación
-              </span>
+              <span className="block text-[0.7rem] uppercase tracking-[0.3em]">Ubicación</span>
               <input
                 type="text"
                 value={form.location}
@@ -281,9 +256,7 @@ export default function AdminPrintersClient() {
             </label>
           </div>
           <label className="text-xs text-muted">
-            <span className="block text-[0.7rem] uppercase tracking-[0.3em]">
-              Estado
-            </span>
+            <span className="block text-[0.7rem] uppercase tracking-[0.3em]">Estado</span>
             <select
               value={form.status}
               onChange={(event) =>
@@ -359,10 +332,7 @@ export default function AdminPrintersClient() {
                       </p>
                       <div className="mt-2">{statusBadge(printer.status)}</div>
                       <p className="text-[0.65rem] text-muted">
-                        Actualizado{" "}
-                        {new Date(printer.updatedAt).toLocaleDateString(
-                          "es-ES",
-                        )}
+                        Actualizado {new Date(printer.updatedAt).toLocaleDateString("es-ES")}
                       </p>
                     </div>
                     <div className="flex flex-col gap-2">
@@ -379,9 +349,7 @@ export default function AdminPrintersClient() {
                         disabled={deletingId === printer.id}
                         className="rounded-2xl border border-rose-500/60 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-rose-300 transition hover:border-rose-400 disabled:opacity-40"
                       >
-                        {deletingId === printer.id
-                          ? "Eliminando..."
-                          : "Eliminar"}
+                        {deletingId === printer.id ? "Eliminando..." : "Eliminar"}
                       </button>
                     </div>
                   </div>

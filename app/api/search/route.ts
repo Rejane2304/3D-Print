@@ -35,9 +35,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(products);
   } catch (error) {
     console.error("Error searching products:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

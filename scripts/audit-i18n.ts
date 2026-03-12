@@ -72,8 +72,7 @@ const ENGLISH_UI_WORDS = new Set([
 ]);
 
 const JSX_WORD_RE = />\s*([A-Z][a-z]+)\s*</;
-const LOCALE_METHODS_RE =
-  /\.toLocaleDateString\(\)|\.toLocaleString\(\)|\.toLocaleTimeString\(\)/;
+const LOCALE_METHODS_RE = /\.toLocaleDateString\(\)|\.toLocaleString\(\)|\.toLocaleTimeString\(\)/;
 
 const ENGLISH_ATTR_PATTERNS: Array<{ pattern: RegExp; description: string }> = [
   {
@@ -170,12 +169,8 @@ function extractLangKeys(block: string, lang: "es" | "en"): string[] {
   return extractTopLevelKeys(block.slice(braceStart + 1, closingIdx));
 }
 
-function extractTranslationKeys(
-  source: string,
-): { es: string[]; en: string[] } | null {
-  const blockMatch = /const\s+t\w*\s*=\s*\{([\s\S]*?)\}\s*\[language\]/.exec(
-    source,
-  );
+function extractTranslationKeys(source: string): { es: string[]; en: string[] } | null {
+  const blockMatch = /const\s+t\w*\s*=\s*\{([\s\S]*?)\}\s*\[language\]/.exec(source);
   if (!blockMatch) return null;
   const block = blockMatch[1];
   return { es: extractLangKeys(block, "es"), en: extractLangKeys(block, "en") };
@@ -207,11 +202,7 @@ interface Issue {
 
 // ── Comprobaciones individuales ───────────────────────────────────────────────
 
-function checkMissingKeys(
-  source: string,
-  rel: string,
-  usesI18n: boolean,
-): Issue[] {
+function checkMissingKeys(source: string, rel: string, usesI18n: boolean): Issue[] {
   if (!usesI18n) return [];
   const keys = extractTranslationKeys(source);
   if (!keys) return [];
@@ -252,11 +243,10 @@ function checkLocaleMethods(lines: string[], rel: string): Issue[] {
 function checkEnglishStrings(
   lines: string[],
   rel: string,
-  ranges: Array<[number, number]>,
+  ranges: Array<[number, number]>
 ): Issue[] {
   const issues: Issue[] = [];
-  const inBlock = (idx: number) =>
-    ranges.some(([s, e]) => idx >= s && idx <= e);
+  const inBlock = (idx: number) => ranges.some(([s, e]) => idx >= s && idx <= e);
   lines.forEach((line, idx) => {
     if (/^\s*(\/\/|\/\*|\*|import )/.test(line) || inBlock(idx)) return;
     const wordMatch = JSX_WORD_RE.exec(line);
@@ -289,15 +279,10 @@ function checkFile(filePath: string): Issue[] {
   const rel = path.relative(ROOT, filePath);
   const lines = source.split("\n");
   const usesI18n = source.includes("useLanguage");
-  const isClient =
-    source.startsWith("'use client'") || source.startsWith('"use client"');
+  const isClient = source.startsWith("'use client'") || source.startsWith('"use client"');
 
   const issues: Issue[] = [];
-  if (
-    isClient &&
-    !usesI18n &&
-    />([A-Z][a-z]{3,}|[\u00C0-\u017E]{3,})/.test(source)
-  ) {
+  if (isClient && !usesI18n && />([A-Z][a-z]{3,}|[\u00C0-\u017E]{3,})/.test(source)) {
     issues.push({
       file: rel,
       severity: "warning",
@@ -308,7 +293,7 @@ function checkFile(filePath: string): Issue[] {
   issues.push(
     ...checkMissingKeys(source, rel, usesI18n),
     ...checkLocaleMethods(lines, rel),
-    ...checkEnglishStrings(lines, rel, computeTranslationRanges(source)),
+    ...checkEnglishStrings(lines, rel, computeTranslationRanges(source))
   );
   return issues;
 }
@@ -337,18 +322,14 @@ function printReport(allIssues: Issue[]): void {
     console.log(`\n  📄  ${file}`);
     for (const issue of issues) {
       const location = issue.line ? `(line ${issue.line}) ` : "";
-      console.log(
-        `${severityPrefix(issue.severity)}${location}${issue.message}`,
-      );
+      console.log(`${severityPrefix(issue.severity)}${location}${issue.message}`);
     }
   }
   const errors = allIssues.filter((i) => i.severity === "error").length;
   const warnings = allIssues.filter((i) => i.severity === "warning").length;
   const infos = allIssues.filter((i) => i.severity === "info").length;
   console.log("\n──────────────────────────────────────────────────────");
-  console.log(
-    `  Summary: ${errors} error(s)   ${warnings} warning(s)   ${infos} info(s)`,
-  );
+  console.log(`  Summary: ${errors} error(s)   ${warnings} warning(s)   ${infos} info(s)`);
   console.log("──────────────────────────────────────────────────────\n");
 }
 
@@ -372,9 +353,7 @@ function main() {
   printReport(allIssues);
 
   if (allIssues.some((i) => i.severity === "error")) {
-    console.log(
-      "  Errors must be fixed — translation keys are out of sync between ES and EN.\n",
-    );
+    console.log("  Errors must be fixed — translation keys are out of sync between ES and EN.\n");
     process.exit(1);
   }
 }

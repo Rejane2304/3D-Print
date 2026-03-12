@@ -254,7 +254,4 @@ export interface WorkerErrorMessage {
   message: string;
 }
 
-export type WorkerMessage =
-  | WorkerProgressMessage
-  | WorkerResultMessage
-  | WorkerErrorMessage;
+export type WorkerMessage = WorkerProgressMessage | WorkerResultMessage | WorkerErrorMessage;

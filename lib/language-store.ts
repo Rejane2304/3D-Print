@@ -22,8 +22,8 @@ export const useLanguageStore = create<LanguageState>()(
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
-    },
-  ),
+    }
+  )
 );
 
 // Hook to safely use language with hydration handling

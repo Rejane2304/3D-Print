@@ -18,10 +18,7 @@ import {
 import { useToast } from "@/components/toast-provider";
 import type { OrderType } from "@/lib/types";
 
-const statusConfig: Record<
-  string,
-  { label: string; color: string; icon: React.ElementType }
-> = {
+const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
   pending: {
     label: "Pendiente",
     color: "bg-yellow-500/20 text-yellow-400",
@@ -66,19 +63,9 @@ const workflowNext: Record<string, { status: string; label: string }> = {
   shipped: { status: "delivered", label: "Marcar como Entregado" },
 };
 
-const WORKFLOW_STEPS = [
-  "paid",
-  "processing",
-  "ready",
-  "shipped",
-  "delivered",
-] as const;
+const WORKFLOW_STEPS = ["paid", "processing", "ready", "shipped", "delivered"] as const;
 
-function stepBadgeClass(
-  isActive: boolean,
-  isDone: boolean,
-  activeColor: string,
-): string {
+function stepBadgeClass(isActive: boolean, isDone: boolean, activeColor: string): string {
   if (isActive) return activeColor;
   if (isDone) return "bg-white/5 text-zinc-400";
   return "bg-white/5 text-zinc-600";
@@ -165,24 +152,12 @@ export default function AdminOrdersClient() {
         <table className="w-full">
           <thead className="bg-bg-tertiary">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                Pedido
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                Cliente
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                Fecha
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                Total
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                Estado
-              </th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-muted">
-                Acciones
-              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Pedido</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Cliente</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Fecha</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Total</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted">Estado</th>
+              <th className="px-4 py-3 text-right text-sm font-medium text-muted">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -190,10 +165,7 @@ export default function AdminOrdersClient() {
               const config = statusConfig[order.status] || statusConfig.pending;
               const StatusIcon = config.icon;
               return (
-                <tr
-                  key={order.id}
-                  className="border-t border-border hover:bg-bg-tertiary/50"
-                >
+                <tr key={order.id} className="border-t border-border hover:bg-bg-tertiary/50">
                   <td className="px-4 py-3">
                     <span className="font-mono font-medium">
                       #{order.id.slice(-8).toUpperCase()}
@@ -210,9 +182,7 @@ export default function AdminOrdersClient() {
                   <td className="px-4 py-3 text-muted">
                     {new Date(order.createdAt).toLocaleDateString("es-ES")}
                   </td>
-                  <td className="px-4 py-3 font-medium">
-                    €{order.total.toFixed(2)}
-                  </td>
+                  <td className="px-4 py-3 font-medium">€{order.total.toFixed(2)}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${config.color}`}
@@ -331,21 +301,14 @@ export default function AdminOrdersClient() {
               <div className="p-6 space-y-6">
                 {/* Production Workflow */}
                 <div>
-                  <p className="text-sm font-medium mb-3">
-                    Flujo de Producción
-                  </p>
+                  <p className="text-sm font-medium mb-3">Flujo de Producción</p>
                   <div className="flex items-center gap-1 flex-wrap mb-4">
                     {WORKFLOW_STEPS.map((s, i, arr) => {
                       const cfg = statusConfig[s];
                       const StepIcon = cfg.icon;
                       const isActive = selectedOrder.status === s;
-                      const isDone =
-                        arr.indexOf(selectedOrder.status as typeof s) > i;
-                      const badgeClass = stepBadgeClass(
-                        isActive,
-                        isDone,
-                        cfg.color,
-                      );
+                      const isDone = arr.indexOf(selectedOrder.status as typeof s) > i;
+                      const badgeClass = stepBadgeClass(isActive, isDone, cfg.color);
                       return (
                         <div key={s} className="flex items-center gap-1">
                           <div
@@ -367,27 +330,20 @@ export default function AdminOrdersClient() {
                       disabled={advancing}
                       className="w-full py-2.5 bg-cyan text-black font-semibold rounded-lg hover:bg-cyan-dim transition text-sm disabled:opacity-50"
                     >
-                      {advancing
-                        ? "Actualizando..."
-                        : workflowNext[selectedOrder.status].label}
+                      {advancing ? "Actualizando..." : workflowNext[selectedOrder.status].label}
                     </button>
                   )}
                 </div>
 
                 {/* Status override */}
                 <div>
-                  <label
-                    htmlFor="status-select"
-                    className="block text-sm font-medium mb-2"
-                  >
+                  <label htmlFor="status-select" className="block text-sm font-medium mb-2">
                     Estado manual
                   </label>
                   <select
                     id="status-select"
                     value={selectedOrder.status}
-                    onChange={(e) =>
-                      updateStatus(selectedOrder.id, e.target.value)
-                    }
+                    onChange={(e) => updateStatus(selectedOrder.id, e.target.value)}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   >
                     {Object.entries(statusConfig).map(([key, { label }]) => (
@@ -441,9 +397,8 @@ export default function AdminOrdersClient() {
                         <div>
                           <div className="font-medium">{item.name}</div>
                           <div className="text-sm text-muted">
-                            {item.material} • {item.color} •{" "}
-                            {item.dimX.toFixed(2)}×{item.dimY.toFixed(2)}×
-                            {item.dimZ.toFixed(2)} mm • x{item.quantity}
+                            {item.material} • {item.color} • {item.dimX.toFixed(2)}×
+                            {item.dimY.toFixed(2)}×{item.dimZ.toFixed(2)} mm • x{item.quantity}
                           </div>
                         </div>
                         <div className="font-medium">
@@ -474,9 +429,7 @@ export default function AdminOrdersClient() {
                   </div>
                   <div className="flex justify-between font-bold pt-2 border-t border-border">
                     <span>Total</span>
-                    <span className="text-cyan">
-                      €{selectedOrder.total.toFixed(2)}
-                    </span>
+                    <span className="text-cyan">€{selectedOrder.total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

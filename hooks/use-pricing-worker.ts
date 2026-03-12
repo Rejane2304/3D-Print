@@ -47,66 +47,61 @@ export function usePricingWorker() {
     };
   }, []);
 
-  const calculate = useCallback(
-    (products: ProductType[], materials: MaterialType[]) => {
-      // Terminar worker previo si existe
-      workerRef.current?.terminate();
+  const calculate = useCallback((products: ProductType[], materials: MaterialType[]) => {
+    // Terminar worker previo si existe
+    workerRef.current?.terminate();
 
-      setState({ status: "calculating", progress: 0, prices: {}, error: null });
+    setState({ status: "calculating", progress: 0, prices: {}, error: null });
 
-      const worker = new Worker(
-        new URL("../workers/pricing.worker.ts", import.meta.url),
-      );
-      workerRef.current = worker;
+    const worker = new Worker(new URL("../workers/pricing.worker.ts", import.meta.url));
+    workerRef.current = worker;
 
-      worker.onmessage = (e: MessageEvent) => {
-        const msg = e.data as { type: string; [key: string]: unknown };
+    worker.onmessage = (e: MessageEvent) => {
+      const msg = e.data as { type: string; [key: string]: unknown };
 
-        if (msg.type === "PROGRESS") {
-          setState((prev) => ({
-            ...prev,
-            progress: msg.percentage as number,
-          }));
-        } else if (msg.type === "RESULT") {
-          setState({
-            status: "done",
-            progress: 100,
-            prices: msg.prices as PricesMatrix,
-            error: null,
-          });
-          worker.terminate();
-          workerRef.current = null;
-        } else if (msg.type === "ERROR") {
-          setState({
-            status: "error",
-            progress: 0,
-            prices: {},
-            error: msg.message as string,
-          });
-          worker.terminate();
-          workerRef.current = null;
-        }
-      };
-
-      worker.onerror = (err) => {
+      if (msg.type === "PROGRESS") {
+        setState((prev) => ({
+          ...prev,
+          progress: msg.percentage as number,
+        }));
+      } else if (msg.type === "RESULT") {
+        setState({
+          status: "done",
+          progress: 100,
+          prices: msg.prices as PricesMatrix,
+          error: null,
+        });
+        worker.terminate();
+        workerRef.current = null;
+      } else if (msg.type === "ERROR") {
         setState({
           status: "error",
           progress: 0,
           prices: {},
-          error: err.message,
+          error: msg.message as string,
         });
         worker.terminate();
         workerRef.current = null;
-      };
+      }
+    };
 
-      worker.postMessage({
-        type: "CALCULATE_PRICES",
-        products,
-        materials,
+    worker.onerror = (err) => {
+      setState({
+        status: "error",
+        progress: 0,
+        prices: {},
+        error: err.message,
       });
-    },
-    [],
-  );
+      worker.terminate();
+      workerRef.current = null;
+    };
+
+    worker.postMessage({
+      type: "CALCULATE_PRICES",
+      products,
+      materials,
+    });
+  }, []);
 
   const reset = useCallback(() => {
     workerRef.current?.terminate();

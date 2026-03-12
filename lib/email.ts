@@ -19,16 +19,10 @@ function getTransporter() {
   });
 }
 
-export async function sendEmail(
-  to: string,
-  subject: string,
-  html: string,
-): Promise<void> {
+export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
   const transporter = getTransporter();
   if (!transporter) {
-    console.log(
-      `[EMAIL] To: ${to} | Subject: ${subject} (EMAIL_SERVER_HOST no configurado)`,
-    );
+    console.log(`[EMAIL] To: ${to} | Subject: ${subject} (EMAIL_SERVER_HOST no configurado)`);
     return;
   }
   await transporter.sendMail({
@@ -41,11 +35,7 @@ export async function sendEmail(
 
 // ---- Plantillas ----------------------------------------------
 
-export function tplReadyToShip(
-  name: string,
-  orderId: string,
-  total: number,
-): string {
+export function tplReadyToShip(name: string, orderId: string, total: number): string {
   const ref = orderId.slice(-8).toUpperCase();
   return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e5e5e5;border-radius:12px;overflow:hidden">
@@ -73,11 +63,7 @@ export function tplReadyToShip(
 </div>`;
 }
 
-export function tplShipped(
-  name: string,
-  orderId: string,
-  address: string,
-): string {
+export function tplShipped(name: string, orderId: string, address: string): string {
   const ref = orderId.slice(-8).toUpperCase();
   return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#0a0a0a;color:#e5e5e5;border-radius:12px;overflow:hidden">

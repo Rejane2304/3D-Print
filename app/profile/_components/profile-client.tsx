@@ -4,18 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Lock,
-  Star,
-  Save,
-  Eye,
-  EyeOff,
-  History,
-} from "lucide-react";
+import { User, Mail, Phone, MapPin, Lock, Star, Save, Eye, EyeOff, History } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/toast-provider";
 import { useLanguage } from "@/lib/language-store";
@@ -33,9 +22,7 @@ export default function ProfileClient() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [pointsHistory, setPointsHistory] = useState<PointsTransactionType[]>(
-    [],
-  );
+  const [pointsHistory, setPointsHistory] = useState<PointsTransactionType[]>([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -280,70 +267,52 @@ export default function ProfileClient() {
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t.name}
-                  </label>
+                  <label className="block text-sm font-medium mb-1">{t.name}</label>
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t.email}
-                  </label>
+                  <label className="block text-sm font-medium mb-1">{t.email}</label>
                   <div className="flex items-center gap-2 px-4 py-2 bg-bg-tertiary border border-border rounded-lg text-muted">
                     <Mail className="w-4 h-4" />
                     {profile?.email}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t.phone}
-                  </label>
+                  <label className="block text-sm font-medium mb-1">{t.phone}</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
                     <input
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full pl-10 pr-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t.country}
-                  </label>
+                  <label className="block text-sm font-medium mb-1">{t.country}</label>
                   <input
                     type="text"
                     value={formData.country}
-                    onChange={(e) =>
-                      setFormData({ ...formData, country: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  {t.address}
-                </label>
+                <label className="block text-sm font-medium mb-1">{t.address}</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted" />
                   <input
                     type="text"
                     value={formData.address}
-                    onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     className="w-full pl-10 pr-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   />
                 </div>
@@ -351,41 +320,29 @@ export default function ProfileClient() {
 
               <div className="grid sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t.city}
-                  </label>
+                  <label className="block text-sm font-medium mb-1">{t.city}</label>
                   <input
                     type="text"
                     value={formData.city}
-                    onChange={(e) =>
-                      setFormData({ ...formData, city: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t.state}
-                  </label>
+                  <label className="block text-sm font-medium mb-1">{t.state}</label>
                   <input
                     type="text"
                     value={formData.state}
-                    onChange={(e) =>
-                      setFormData({ ...formData, state: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t.zipCode}
-                  </label>
+                  <label className="block text-sm font-medium mb-1">{t.zipCode}</label>
                   <input
                     type="text"
                     value={formData.zipCode}
-                    onChange={(e) =>
-                      setFormData({ ...formData, zipCode: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
                     className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                   />
                 </div>
@@ -422,9 +379,7 @@ export default function ProfileClient() {
                   <Star className="w-8 h-8 text-amber" />
                   <div>
                     <div className="text-sm text-muted">{t.loyaltyPoints}</div>
-                    <div className="text-3xl font-bold">
-                      {profile?.loyaltyPoints || 0}
-                    </div>
+                    <div className="text-3xl font-bold">{profile?.loyaltyPoints || 0}</div>
                   </div>
                 </div>
                 <div className="text-sm text-muted">
@@ -450,14 +405,9 @@ export default function ProfileClient() {
               </button>
 
               {showPasswordForm && (
-                <form
-                  onSubmit={handleChangePassword}
-                  className="mt-4 space-y-4"
-                >
+                <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
                   <div>
-                    <label className="block text-sm mb-1">
-                      {t.currentField}
-                    </label>
+                    <label className="block text-sm mb-1">{t.currentField}</label>
                     <div className="relative">
                       <input
                         type={showCurrentPassword ? "text" : "password"}
@@ -472,9 +422,7 @@ export default function ProfileClient() {
                       />
                       <button
                         type="button"
-                        onClick={() =>
-                          setShowCurrentPassword(!showCurrentPassword)
-                        }
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted"
                       >
                         {showCurrentPassword ? (
@@ -513,9 +461,7 @@ export default function ProfileClient() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm mb-1">
-                      {t.confirmField}
-                    </label>
+                    <label className="block text-sm mb-1">{t.confirmField}</label>
                     <input
                       type="password"
                       value={passwordData.confirmPassword}
@@ -563,9 +509,7 @@ export default function ProfileClient() {
                     </div>
                   </div>
                   <div className={`font-bold ${typeColors[tx.type] || ""}`}>
-                    {tx.type === "redeemed" || tx.type === "expired"
-                      ? "-"
-                      : "+"}
+                    {tx.type === "redeemed" || tx.type === "expired" ? "-" : "+"}
                     {tx.points}
                   </div>
                 </div>

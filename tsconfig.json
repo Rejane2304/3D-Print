@@ -33,5 +33,5 @@
     ".build/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "private", "engram"]
+  "exclude": ["node_modules", "private", "engram", "engram/internal/cloud/dashboard/static/htmx.min.js"]
 }

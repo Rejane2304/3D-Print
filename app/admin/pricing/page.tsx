@@ -1,5 +1,1 @@
-import AdminPricingClient from "./_components/pricing-client";
-
-export default function AdminPricingPage() {
-  return <AdminPricingClient />;
-}
+// Página eliminada. Usar /admin/materials-pricing

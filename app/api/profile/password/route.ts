@@ -23,7 +23,7 @@ export async function PUT(request: NextRequest) {
     if (newPassword.length < 6) {
       return NextResponse.json(
         { error: "Password must be at least 6 characters" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -35,16 +35,13 @@ export async function PUT(request: NextRequest) {
     if (!user?.password) {
       return NextResponse.json(
         { error: "Cannot change password for OAuth users" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     const isValid = await bcrypt.compare(currentPassword, user.password);
     if (!isValid) {
-      return NextResponse.json(
-        { error: "Current password is incorrect" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -56,9 +53,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Error changing password:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

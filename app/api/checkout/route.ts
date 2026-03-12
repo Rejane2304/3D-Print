@@ -55,7 +55,7 @@ function buildStripeLineItems(
   tax: number,
   shippingCost: number,
   discount: number,
-  couponCode: string,
+  couponCode: string
 ): StripeLineItem[] {
   const lineItems: StripeLineItem[] = items.map((i) => ({
     price_data: {
@@ -106,19 +106,14 @@ function buildStripeLineItems(
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const userId = (session.user as Record<string, unknown>)?.id as string;
     const body = await req.json();
     const parsed = CheckoutBodySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.errors[0].message },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
     }
-    const { items, shipping, subtotal, tax, shippingCost, total, couponCode } =
-      parsed.data;
+    const { items, shipping, subtotal, tax, shippingCost, total, couponCode } = parsed.data;
 
     // ---- Validar cupón si se proporcionó ----
     let couponId: string | null = null;
@@ -184,13 +179,7 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get("origin") ?? "http://localhost:3000";
 
-    const lineItems = buildStripeLineItems(
-      items,
-      tax,
-      shippingCost,
-      discount,
-      couponCode ?? "",
-    );
+    const lineItems = buildStripeLineItems(items, tax, shippingCost, discount, couponCode ?? "");
 
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",

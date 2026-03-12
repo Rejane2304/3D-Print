@@ -121,16 +121,10 @@ export function Footer() {
         <div className="mt-10 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-zinc-500">{t.rights}</p>
           <div className="flex gap-4">
-            <Link
-              href="/"
-              className="text-xs text-zinc-500 hover:text-cyan transition"
-            >
+            <Link href="/" className="text-xs text-zinc-500 hover:text-cyan transition">
               {t.home}
             </Link>
-            <Link
-              href="/catalog"
-              className="text-xs text-zinc-500 hover:text-cyan transition"
-            >
+            <Link href="/catalog" className="text-xs text-zinc-500 hover:text-cyan transition">
               {t.catalog}
             </Link>
           </div>

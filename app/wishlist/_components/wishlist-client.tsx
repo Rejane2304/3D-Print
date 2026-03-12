@@ -25,8 +25,7 @@ export default function WishlistClient() {
   const t = {
     es: {
       title: "Mi Lista de Deseos",
-      saved: (n: number) =>
-        `${n} producto${n === 1 ? "" : "s"} guardado${n === 1 ? "" : "s"}`,
+      saved: (n: number) => `${n} producto${n === 1 ? "" : "s"} guardado${n === 1 ? "" : "s"}`,
       emptyTitle: "Tu lista de deseos está vacía",
       emptyDesc: "Guarda tus productos favoritos para comprarlos más tarde",
       exploreCatalog: "Explorar Catálogo",
@@ -90,8 +89,7 @@ export default function WishlistClient() {
   const moveToCart = (item: WishlistItemType) => {
     const product = item.product;
     const weight =
-      ((product.defaultDimX * product.defaultDimY * product.defaultDimZ) /
-        1000) *
+      ((product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000) *
       product.density *
       0.2;
     const price = weight * product.basePricePerGram + product.finishCost;
@@ -187,9 +185,7 @@ export default function WishlistClient() {
                         {item.product.name}
                       </h3>
                     </Link>
-                    <p className="text-sm text-muted mb-3">
-                      {item.product.category}
-                    </p>
+                    <p className="text-sm text-muted mb-3">{item.product.category}</p>
                     <p className="font-mono text-sm text-cyan mb-4">
                       {`${((item.product.defaultDimX ?? 0) / 10).toFixed(2)} x ${((item.product.defaultDimY ?? 0) / 10).toFixed(2)} x ${((item.product.defaultDimZ ?? 0) / 10).toFixed(2)} cm`}
                     </p>

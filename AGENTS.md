@@ -8,23 +8,23 @@ Plataforma de e-commerce especializada en productos impresos en 3D (Bambu Lab P2
 
 ## 2. PILA TECNOLÓGICA OFICIAL
 
-| Capa | Tecnología | Versión |
-|------|-----------|---------|
-| Marco de trabajo | Next.js App Router | 13.x |
-| Lenguaje | TypeScript | 5.2 (strict) |
-| ORM | Prisma | 6.7 |
-| Base de datos | PostgreSQL | 15+ |
-| Autenticación | NextAuth.js JWT + PrismaAdapter | 4.x |
-| Pagos | Stripe | más reciente |
-| Estado | Zustand + persist | más reciente |
-| Estilos | Tailwind CSS | 3.3 |
-| Animaciones | Framer Motion | más reciente |
-| Pruebas unitarias | Vitest | 4.x |
-| Pruebas E2E | Playwright | 1.58+ |
-| Validación | Zod | más reciente |
-| Primitivas de interfaz | Radix UI | más reciente |
-| Iconos | Lucide React | más reciente |
-| Trabajadores | Web Workers API | nativo |
+| Capa                   | Tecnología                      | Versión      |
+| ---------------------- | ------------------------------- | ------------ |
+| Marco de trabajo       | Next.js App Router              | 13.x         |
+| Lenguaje               | TypeScript                      | 5.2 (strict) |
+| ORM                    | Prisma                          | 6.7          |
+| Base de datos          | PostgreSQL                      | 15+          |
+| Autenticación          | NextAuth.js JWT + PrismaAdapter | 4.x          |
+| Pagos                  | Stripe                          | más reciente |
+| Estado                 | Zustand + persist               | más reciente |
+| Estilos                | Tailwind CSS                    | 3.3          |
+| Animaciones            | Framer Motion                   | más reciente |
+| Pruebas unitarias      | Vitest                          | 4.x          |
+| Pruebas E2E            | Playwright                      | 1.58+        |
+| Validación             | Zod                             | más reciente |
+| Primitivas de interfaz | Radix UI                        | más reciente |
+| Iconos                 | Lucide React                    | más reciente |
+| Trabajadores           | Web Workers API                 | nativo       |
 
 ---
 
@@ -101,24 +101,24 @@ ecommerce_3d_print/
 
 ### 4.2 Modelos Core
 
-| Modelo | Rol |
-|--------|-----|
-| User | Usuario con roles: `user` / `admin` |
-| Product | Producto imprimible con dimensiones, peso, color, material, acabado, multimágenes, tiempo de impresion y stock |
-| Material | PLA / PETG / ASA / TPU con precio/kg y densidad |
-| Color | Colores Bambu Lab con código hex |
-| MaterialColor | Relación N:M material-color con stock en gramos |
-| Cart / CartItem | Carrito persistido en BD |
-| Order / OrderItem | Pedido completado con ítems |
-| Wishlist | Lista de deseos por usuario |
-| Review | Valoraciones con rating 1-5 |
-| Coupon | Descuentos por código |
-| Inventory | Stock por material y producto |
-| Printer | Impresoras disponibles (Bambu Lab P2S) |
-| ProductPrice | Precios materiales para un producto |
-| PricingConfig | Configuración de precios global |
-| Alert | Alertas de stock y operación |
-| PointsTransaction | Historial de puntos de fidelidad |
+| Modelo            | Rol                                                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------------- |
+| User              | Usuario con roles: `user` / `admin`                                                                            |
+| Product           | Producto imprimible con dimensiones, peso, color, material, acabado, multimágenes, tiempo de impresion y stock |
+| Material          | PLA / PETG / ASA / TPU con precio/kg y densidad                                                                |
+| Color             | Colores Bambu Lab con código hex                                                                               |
+| MaterialColor     | Relación N:M material-color con stock en gramos                                                                |
+| Cart / CartItem   | Carrito persistido en BD                                                                                       |
+| Order / OrderItem | Pedido completado con ítems                                                                                    |
+| Wishlist          | Lista de deseos por usuario                                                                                    |
+| Review            | Valoraciones con rating 1-5                                                                                    |
+| Coupon            | Descuentos por código                                                                                          |
+| Inventory         | Stock por material y producto                                                                                  |
+| Printer           | Impresoras disponibles (Bambu Lab P2S)                                                                         |
+| ProductPrice      | Precios materiales para un producto                                                                            |
+| PricingConfig     | Configuración de precios global                                                                                |
+| Alert             | Alertas de stock y operación                                                                                   |
+| PointsTransaction | Historial de puntos de fidelidad                                                                               |
 
 ### 4.3 Reglas de Precios
 
@@ -454,13 +454,13 @@ Antes de cualquier merge/deploy:
 
 ## 17. ERRORES CONOCIDOS Y SOLUCIONES
 
-| Error | Causa | Solución |
-|-------|-------|----------|
-| Hydration mismatch en language | Zustand persist + SSR | `useLanguage()` retorna `"es"` hasta que `_hasHydrated === true` |
-| `usePathname()` en RootLayout | Los hooks de navegación no están disponibles en componentes de servidor raíz | Usar `BodyClassController` (componente cliente) |
-| Importación por defecto de prisma en wishlist | `import prisma from "@/lib/db"` en vez de named export | Cambiar a `import { prisma } from "@/lib/db"` |
-| `console.log` en auth-options | Debug logs en callbacks de JWT/session | Eliminar los 4 console.log de `lib/auth-options.ts` |
-| `(user as any)?.role` en auth-options | NextAuth no extiende el tipo User | Usar `(user as { role?: string })?.role` |
+| Error                                         | Causa                                                                        | Solución                                                         |
+| --------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Hydration mismatch en language                | Zustand persist + SSR                                                        | `useLanguage()` retorna `"es"` hasta que `_hasHydrated === true` |
+| `usePathname()` en RootLayout                 | Los hooks de navegación no están disponibles en componentes de servidor raíz | Usar `BodyClassController` (componente cliente)                  |
+| Importación por defecto de prisma en wishlist | `import prisma from "@/lib/db"` en vez de named export                       | Cambiar a `import { prisma } from "@/lib/db"`                    |
+| `console.log` en auth-options                 | Debug logs en callbacks de JWT/session                                       | Eliminar los 4 console.log de `lib/auth-options.ts`              |
+| `(user as any)?.role` en auth-options         | NextAuth no extiende el tipo User                                            | Usar `(user as { role?: string })?.role`                         |
 
 ---
 

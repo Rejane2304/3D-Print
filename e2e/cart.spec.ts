@@ -15,9 +15,7 @@ test.describe("Shopping Cart", () => {
 
   test("cart icon should be visible in header", async ({ page }) => {
     await page.goto("/");
-    const cartIcon = page
-      .locator('[data-testid="cart-icon"]')
-      .or(page.locator('a[href="/cart"]'));
+    const cartIcon = page.locator('[data-testid="cart-icon"]').or(page.locator('a[href="/cart"]'));
     await expect(cartIcon.first()).toBeVisible();
   });
 });

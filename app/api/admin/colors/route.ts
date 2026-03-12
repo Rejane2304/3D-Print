@@ -24,10 +24,7 @@ export async function POST(req: Request) {
     return NextResponse.json(color);
   } catch (error: unknown) {
     if ((error as { code?: string }).code === "P2002") {
-      return NextResponse.json(
-        { error: "Ya existe un color con este código" },
-        { status: 409 },
-      );
+      return NextResponse.json({ error: "Ya existe un color con este código" }, { status: 409 });
     }
     throw error;
   }

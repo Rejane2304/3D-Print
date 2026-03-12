@@ -8,10 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== "admin"
-    ) {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -69,7 +66,7 @@ export async function GET() {
           acc[month] = (acc[month] || 0) + order.total;
           return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
       );
 
     // Orders by status
@@ -85,9 +82,7 @@ export async function GET() {
       _sum: { quantity: true },
     });
 
-    const totalPieces =
-      itemsForCost.reduce((sum, item) => sum + (item._sum.quantity || 0), 0) ||
-      1;
+    const totalPieces = itemsForCost.reduce((sum, item) => sum + (item._sum.quantity || 0), 0) || 1;
 
     const costByMaterial = itemsForCost.map((item) => ({
       material: item.material,
@@ -128,12 +123,10 @@ export async function GET() {
       totalUsers,
       recentOrders,
       topProducts,
-      revenueByMonth: Object.entries(revenueByMonth).map(
-        ([month, revenue]) => ({
-          month,
-          revenue,
-        }),
-      ),
+      revenueByMonth: Object.entries(revenueByMonth).map(([month, revenue]) => ({
+        month,
+        revenue,
+      })),
       ordersByStatus: ordersByStatus.map((item) => ({
         status: item.status,
         count: item._count,
@@ -146,9 +139,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching admin stats:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -99,9 +99,7 @@ export default function AdminDashboardClient() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Panel de control</h1>
-        <p className="text-muted">
-          Bienvenido al panel de administración de 3D Print
-        </p>
+        <p className="text-muted">Bienvenido al panel de administración de 3D Print</p>
         <div className="mt-6">
           <Link
             href="/admin/catalog"
@@ -157,10 +155,7 @@ export default function AdminDashboardClient() {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Pedidos Recientes</h2>
-            <Link
-              href="/admin/orders"
-              className="text-cyan text-sm hover:underline"
-            >
+            <Link href="/admin/orders" className="text-cyan text-sm hover:underline">
               Ver todos
             </Link>
           </div>
@@ -172,9 +167,7 @@ export default function AdminDashboardClient() {
                   className="flex items-center justify-between py-3 border-b border-border last:border-0"
                 >
                   <div>
-                    <div className="font-medium">
-                      #{order.id.slice(-8).toUpperCase()}
-                    </div>
+                    <div className="font-medium">#{order.id.slice(-8).toUpperCase()}</div>
                     <div className="text-sm text-muted">
                       {order.user?.name || order.user?.email || "Usuario"}
                     </div>
@@ -190,9 +183,7 @@ export default function AdminDashboardClient() {
                 </div>
               ))
             ) : (
-              <p className="text-muted text-center py-4">
-                No hay pedidos recientes
-              </p>
+              <p className="text-muted text-center py-4">No hay pedidos recientes</p>
             )}
           </div>
         </motion.div>
@@ -206,10 +197,7 @@ export default function AdminDashboardClient() {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Productos Más Vendidos</h2>
-            <Link
-              href="/admin/products"
-              className="text-cyan text-sm hover:underline"
-            >
+            <Link href="/admin/products" className="text-cyan text-sm hover:underline">
               Ver todos
             </Link>
           </div>
@@ -224,12 +212,8 @@ export default function AdminDashboardClient() {
                     {index + 1}
                   </div>
                   <div className="flex-1">
-                    <div className="font-medium">
-                      {item.product?.name || "Producto"}
-                    </div>
-                    <div className="text-sm text-muted">
-                      {item.product?.category}
-                    </div>
+                    <div className="font-medium">{item.product?.name || "Producto"}</div>
+                    <div className="text-sm text-muted">{item.product?.category}</div>
                   </div>
                   <div className="text-right">
                     <div className="font-medium flex items-center gap-1">
@@ -240,9 +224,7 @@ export default function AdminDashboardClient() {
                 </div>
               ))
             ) : (
-              <p className="text-muted text-center py-4">
-                No hay datos de ventas
-              </p>
+              <p className="text-muted text-center py-4">No hay datos de ventas</p>
             )}
           </div>
         </motion.div>
@@ -262,10 +244,7 @@ export default function AdminDashboardClient() {
             <>
               <div className="space-y-3 mb-6">
                 {stats.costByMaterial.map((item) => (
-                  <div
-                    key={item.material}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={item.material} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-bg-tertiary flex items-center justify-center text-xs font-semibold">
                         {item.material}
@@ -291,18 +270,14 @@ export default function AdminDashboardClient() {
                       cx="50%"
                       cy="50%"
                       outerRadius={70}
-                      label={(entry) =>
-                        `${entry.material} ${entry.percentage.toFixed(0)}%`
-                      }
+                      label={(entry) => `${entry.material} ${entry.percentage.toFixed(0)}%`}
                     >
                       {stats.costByMaterial.map((entry, index) => (
                         <Cell
                           key={entry.material}
                           fill={
                             pieColors[entry.material] ||
-                            ["#00FFFF", "#FFBF00", "#22C55E", "#6366F1"][
-                              index % 4
-                            ]
+                            ["#00FFFF", "#FFBF00", "#22C55E", "#6366F1"][index % 4]
                           }
                         />
                       ))}
@@ -316,9 +291,7 @@ export default function AdminDashboardClient() {
               </div>
             </>
           ) : (
-            <p className="text-sm text-muted">
-              Sin datos suficientes de pedidos.
-            </p>
+            <p className="text-sm text-muted">Sin datos suficientes de pedidos.</p>
           )}
         </motion.div>
 
@@ -329,9 +302,7 @@ export default function AdminDashboardClient() {
           transition={{ delay: 0.6 }}
           className="bg-bg-secondary border border-border rounded-xl p-6"
         >
-          <h2 className="text-xl font-bold mb-6">
-            Distribución de tamaños (lado mayor)
-          </h2>
+          <h2 className="text-xl font-bold mb-6">Distribución de tamaños (lado mayor)</h2>
           {stats?.sizeDistribution && stats.sizeDistribution.length > 0 ? (
             <div className="space-y-3">
               {stats.sizeDistribution.map((bucket) => (
@@ -354,9 +325,7 @@ export default function AdminDashboardClient() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted">
-              Aún no hay datos de tamaños impresos.
-            </p>
+            <p className="text-sm text-muted">Aún no hay datos de tamaños impresos.</p>
           )}
         </motion.div>
       </div>
@@ -371,10 +340,7 @@ export default function AdminDashboardClient() {
         <h2 className="text-xl font-bold mb-6">Pedidos por Estado</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {stats?.ordersByStatus?.map((item) => (
-            <div
-              key={item.status}
-              className="text-center p-4 bg-bg-tertiary rounded-lg"
-            >
+            <div key={item.status} className="text-center p-4 bg-bg-tertiary rounded-lg">
               <div
                 className={`inline-block px-3 py-1 rounded-full text-sm mb-2 ${statusColors[item.status] || "bg-gray-500/20"}`}
               >
@@ -382,9 +348,7 @@ export default function AdminDashboardClient() {
               </div>
               <div className="text-2xl font-bold">{item.count}</div>
             </div>
-          )) || (
-            <p className="col-span-full text-center text-muted">Sin datos</p>
-          )}
+          )) || <p className="col-span-full text-center text-muted">Sin datos</p>}
         </div>
       </motion.div>
     </div>

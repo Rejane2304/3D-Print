@@ -44,7 +44,7 @@ export function calculateWeight(
   dimY: number,
   dimZ: number,
   density: number,
-  fillFactor: number = PRICING_CONFIG.infillFactor,
+  fillFactor: number = PRICING_CONFIG.infillFactor
 ): number {
   const volumeCm3 = (dimX * dimY * dimZ) / 1000;
   return volumeCm3 * density * fillFactor;
@@ -64,7 +64,7 @@ export function scalePrintTime(
   dimZ: number,
   refDimX: number,
   refDimY: number,
-  refDimZ: number,
+  refDimZ: number
 ): number {
   const refVol = refDimX * refDimY * refDimZ;
   if (refVol <= 0) return basePrintTimeMinutes;
@@ -89,16 +89,14 @@ export function calculateAdvancedPrice(
     operationCostPerHour?: number;
     consumablesCostPerHour?: number;
     margins?: Readonly<{ unit: number; medium: number; bulk: number }>;
-  }>,
+  }>
 ): PriceCalculation {
   const printTimeHours = printTimeMinutes / 60;
   const weightKg = weightGrams / 1000;
 
   const machineAmortizationPerHour =
-    config?.machineAmortizationPerHour ??
-    PRICING_CONFIG.machineAmortizationPerHour;
-  const operationCostPerHour =
-    config?.operationCostPerHour ?? PRICING_CONFIG.operationCostPerHour;
+    config?.machineAmortizationPerHour ?? PRICING_CONFIG.machineAmortizationPerHour;
+  const operationCostPerHour = config?.operationCostPerHour ?? PRICING_CONFIG.operationCostPerHour;
   const consumablesCostPerHour =
     config?.consumablesCostPerHour ?? PRICING_CONFIG.consumablesCostPerHour;
   const margins = config?.margins ?? PRICING_CONFIG.margins;
@@ -129,12 +127,7 @@ export function calculateAdvancedPrice(
   const priceMedium = baseCost * margins.medium;
   const priceBulk = baseCost * margins.bulk;
 
-  const finalPrice = getPriceByQuantity(
-    priceUnit,
-    priceMedium,
-    priceBulk,
-    quantity,
-  );
+  const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
 
   return {
     weight: round(weightGrams),
@@ -178,7 +171,7 @@ export function calculatePriceFromDimensions(
     refDimX?: number;
     refDimY?: number;
     refDimZ?: number;
-  }>,
+  }>
 ): PriceCalculation {
   const quantity = options?.quantity ?? 1;
   const finishCost = options?.finishCost ?? 0;
@@ -186,9 +179,7 @@ export function calculatePriceFromDimensions(
 
   // Escalar tiempo de impresión con el volumen relativo a las dims de referencia
   const printTimeMinutes =
-    options?.refDimX !== undefined &&
-    options.refDimY !== undefined &&
-    options.refDimZ !== undefined
+    options?.refDimX !== undefined && options.refDimY !== undefined && options.refDimZ !== undefined
       ? scalePrintTime(
           basePrintTimeMinutes,
           dimX,
@@ -196,24 +187,13 @@ export function calculatePriceFromDimensions(
           dimZ,
           options.refDimX,
           options.refDimY,
-          options.refDimZ,
+          options.refDimZ
         )
       : basePrintTimeMinutes;
 
-  const weightGrams = calculateWeight(
-    dimX,
-    dimY,
-    dimZ,
-    material.density,
-    fillFactor,
-  );
+  const weightGrams = calculateWeight(dimX, dimY, dimZ, material.density, fillFactor);
   // Adaptar: el acabado se suma antes del margen
-  const result = calculateAdvancedPrice(
-    weightGrams,
-    printTimeMinutes,
-    material,
-    quantity,
-  );
+  const result = calculateAdvancedPrice(weightGrams, printTimeMinutes, material, quantity);
   // Recalcular baseCost incluyendo acabado
   const baseCost =
     result.materialCost +
@@ -227,12 +207,7 @@ export function calculatePriceFromDimensions(
   const priceUnit = baseCost * margins.unit;
   const priceMedium = baseCost * margins.medium;
   const priceBulk = baseCost * margins.bulk;
-  const finalPrice = getPriceByQuantity(
-    priceUnit,
-    priceMedium,
-    priceBulk,
-    quantity,
-  );
+  const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
 
   return {
     ...result,
@@ -255,7 +230,7 @@ export function getPriceByQuantity(
   priceUnit: number,
   priceMedium: number,
   priceBulk: number,
-  quantity: number,
+  quantity: number
 ): number {
   if (quantity >= 10) return priceBulk;
   if (quantity >= 5) return priceMedium;

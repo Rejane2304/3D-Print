@@ -7,26 +7,17 @@ export async function GET(req: NextRequest) {
   try {
     const sessionId = new URL(req.url).searchParams.get("session_id");
     if (!sessionId) {
-      return NextResponse.json(
-        { error: "Missing session_id" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Missing session_id" }, { status: 400 });
     }
 
     const stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
     if (stripeSession.payment_status !== "paid") {
-      return NextResponse.json(
-        { error: "Payment not completed" },
-        { status: 402 },
-      );
+      return NextResponse.json({ error: "Payment not completed" }, { status: 402 });
     }
 
     const orderId = stripeSession.metadata?.orderId;
     if (!orderId) {
-      return NextResponse.json(
-        { error: "Order reference not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Order reference not found" }, { status: 404 });
     }
 
     const order = await prisma.order.findUnique({ where: { id: orderId } });

@@ -7,17 +7,14 @@ import prisma from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 function isAdmin(session: Session | null): boolean {
-  return !!(
-    session?.user && (session.user as { role?: string }).role === "admin"
-  );
+  return !!(session?.user && (session.user as { role?: string }).role === "admin");
 }
 
 /** GET /api/admin/materials — Todos los materiales */
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const materials = await prisma.material.findMany({
       include: { inventory: true },
@@ -26,10 +23,7 @@ export async function GET() {
     return NextResponse.json(materials);
   } catch (error) {
     console.error("Error fetching materials:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -37,8 +31,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await request.json();
 
@@ -57,15 +50,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(material, { status: 201 });
   } catch (error: unknown) {
     if ((error as { code?: string }).code === "P2002") {
-      return NextResponse.json(
-        { error: "Material code already exists" },
-        { status: 409 },
-      );
+      return NextResponse.json({ error: "Material code already exists" }, { status: 409 });
     }
     console.error("Error creating material:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

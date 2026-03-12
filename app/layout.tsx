@@ -16,13 +16,7 @@ export const metadata: Metadata = {
   description:
     "Ecommerce de productos personalizados impresos en 3D con materiales PLA y PETG de alta calidad.",
   metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
-  keywords: [
-    "impresión 3D",
-    "productos personalizados",
-    "PLA",
-    "PETG",
-    "ecommerce",
-  ],
+  keywords: ["impresión 3D", "productos personalizados", "PLA", "PETG", "ecommerce"],
   authors: [{ name: "3D Print" }],
   robots: { index: true, follow: true },
   icons: {
@@ -37,9 +31,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
       <head />

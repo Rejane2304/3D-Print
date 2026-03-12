@@ -14,12 +14,7 @@ type Alert = {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-const ALERT_TYPES = [
-  "stock",
-  "print-queue",
-  "customer-message",
-  "business-event",
-];
+const ALERT_TYPES = ["stock", "print-queue", "customer-message", "business-event"];
 
 const SEEN_FILTERS = [
   { label: "Nuevas", value: "false" },
@@ -72,9 +67,7 @@ export default function AdminAlertsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, seen: true }),
     });
-    setAlerts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, seen: true } : a)),
-    );
+    setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, seen: true } : a)));
   };
 
   return (
@@ -131,10 +124,7 @@ export default function AdminAlertsPage() {
             </thead>
             <tbody>
               {alerts.map((alert) => (
-                <tr
-                  key={alert.id}
-                  className={alert.seen ? "bg-gray-100" : "bg-white"}
-                >
+                <tr key={alert.id} className={alert.seen ? "bg-gray-100" : "bg-white"}>
                   <td className="p-2 border">
                     <Badge>{getTypeLabel(alert.type)}</Badge>
                   </td>
@@ -163,10 +153,7 @@ export default function AdminAlertsPage() {
         );
       })()}
       <div className="flex justify-between mt-4">
-        <Button
-          disabled={page <= 1}
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-        >
+        <Button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
           Anterior
         </Button>
         <span>

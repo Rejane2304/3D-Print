@@ -5,10 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Edit, Trash2, X, Package } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/components/toast-provider";
-import {
-  calculatePriceFromDimensions,
-  calculateWeight,
-} from "@/lib/price-calculator";
+import { calculatePriceFromDimensions, calculateWeight } from "@/lib/price-calculator";
 import type { ProductType } from "@/lib/types";
 import { useAdminCatalog } from "@/app/admin/_hooks/use-admin-catalog";
 
@@ -94,21 +91,13 @@ export default function AdminProductsClient() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<ProductType | null>(
-    null,
-  );
+  const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const catalog = useAdminCatalog();
 
-  const categories = [
-    "Accesorios",
-    "Decoracion",
-    "Figuras",
-    "Funcional",
-    "Articulados",
-  ];
+  const categories = ["Accesorios", "Decoracion", "Figuras", "Funcional", "Articulados"];
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -131,7 +120,7 @@ export default function AdminProductsClient() {
 
   const selectedMaterial = useMemo(
     () => catalog.materials.find((m) => m.code === formData.material) ?? null,
-    [catalog.materials, formData.material],
+    [catalog.materials, formData.material]
   );
 
   const selectedColor = useMemo(
@@ -139,14 +128,12 @@ export default function AdminProductsClient() {
       catalog.colors.find((color) => color.id === formData.colorId) ??
       catalog.colors.find((color) => formData.colors.includes(color.hex)) ??
       null,
-    [catalog.colors, formData.colorId, formData.colors],
+    [catalog.colors, formData.colorId, formData.colors]
   );
 
   const selectedPrinter = useMemo(
-    () =>
-      catalog.printers.find((printer) => printer.id === formData.printerId) ??
-      null,
-    [catalog.printers, formData.printerId],
+    () => catalog.printers.find((printer) => printer.id === formData.printerId) ?? null,
+    [catalog.printers, formData.printerId]
   );
 
   const weightEstimate = useMemo(() => {
@@ -159,7 +146,7 @@ export default function AdminProductsClient() {
       dimY,
       dimZ,
       Number.parseFloat(formData.density) || selectedMaterial.density,
-      Number.parseFloat(formData.modelFillFactor) || 0.15,
+      Number.parseFloat(formData.modelFillFactor) || 0.15
     );
   }, [formData, selectedMaterial]);
 
@@ -174,28 +161,20 @@ export default function AdminProductsClient() {
     const qty = Number.parseInt(formData.stock) || 1;
     const fillFactor = Number.parseFloat(formData.modelFillFactor) || 0.15;
     const maintenanceFactor =
-      Number.parseFloat(formData.maintenanceCostPerHour) ||
-      selectedMaterial.maintenanceFactor;
+      Number.parseFloat(formData.maintenanceCostPerHour) || selectedMaterial.maintenanceFactor;
     const materialConfig = {
       pricePerKg: Number.parseFloat(formData.basePricePerGram) * 1000 || 0,
       density: Number.parseFloat(formData.density) || selectedMaterial.density,
       maintenanceFactor,
     };
-    return calculatePriceFromDimensions(
-      dimX,
-      dimY,
-      dimZ,
-      basePrintTime,
-      materialConfig,
-      {
-        quantity: qty,
-        finishCost: finish + custom,
-        fillFactor,
-        refDimX: dimX,
-        refDimY: dimY,
-        refDimZ: dimZ,
-      },
-    );
+    return calculatePriceFromDimensions(dimX, dimY, dimZ, basePrintTime, materialConfig, {
+      quantity: qty,
+      finishCost: finish + custom,
+      fillFactor,
+      refDimX: dimX,
+      refDimY: dimY,
+      refDimZ: dimZ,
+    });
   }, [formData, selectedMaterial]);
 
   const handleEdit = (product: ProductType) => {
@@ -262,10 +241,7 @@ export default function AdminProductsClient() {
       });
 
       if (res.ok) {
-        showToast(
-          "success",
-          editingProduct ? "Producto actualizado" : "Producto creado",
-        );
+        showToast("success", editingProduct ? "Producto actualizado" : "Producto creado");
         setShowModal(false);
         fetchProducts();
       } else {
@@ -340,32 +316,17 @@ export default function AdminProductsClient() {
             <table className="w-full">
               <thead className="bg-bg-tertiary">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Producto
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Categoría
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Material
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Precio/g
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Stock
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted">
-                    Acciones
-                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Producto</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Categoría</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Material</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Precio/g</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Stock</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
-                  <tr
-                    key={product.id}
-                    className="border-t border-border hover:bg-bg-tertiary/50"
-                  >
+                  <tr key={product.id} className="border-t border-border hover:bg-bg-tertiary/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-bg-tertiary">
@@ -396,13 +357,9 @@ export default function AdminProductsClient() {
                         {product.material}
                       </span>
                     </td>
+                    <td className="px-4 py-3">€{product.basePricePerGram.toFixed(2)}</td>
                     <td className="px-4 py-3">
-                      €{product.basePricePerGram.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={product.stock < 10 ? "text-red-400" : ""}
-                      >
+                      <span className={product.stock < 10 ? "text-red-400" : ""}>
                         {product.stock}
                       </span>
                     </td>
@@ -478,29 +435,21 @@ export default function AdminProductsClient() {
                 <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">Datos principales</h3>
-                    <span className="text-xs uppercase tracking-[0.3em] text-muted">
-                      Paso 1
-                    </span>
+                    <span className="text-xs uppercase tracking-[0.3em] text-muted">Paso 1</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
-                      <label className="text-sm font-medium mb-1 block">
-                        Nombre
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Nombre</label>
                       <input
                         type="text"
                         required
                         value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="text-sm font-medium mb-1 block">
-                        Descripción
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Descripción</label>
                       <textarea
                         required
                         rows={3}
@@ -515,14 +464,10 @@ export default function AdminProductsClient() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Categoría
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Categoría</label>
                       <select
                         value={formData.category}
-                        onChange={(e) =>
-                          setFormData({ ...formData, category: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                       >
                         {categories.map((cat) => (
@@ -567,9 +512,7 @@ export default function AdminProductsClient() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Material base
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Material base</label>
                       <select
                         value={formData.material}
                         onChange={(e) => {
@@ -588,9 +531,7 @@ export default function AdminProductsClient() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Color principal
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Color principal</label>
                       <select
                         value={formData.colorId}
                         onChange={(e) =>
@@ -612,23 +553,17 @@ export default function AdminProductsClient() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs uppercase text-muted">
-                        Preview
-                      </label>
+                      <label className="text-xs uppercase text-muted">Preview</label>
                       <div
                         className="mt-2 h-12 rounded-2xl border border-border shadow-inner"
                         style={{
                           background: selectedColor?.hex ?? "#0f172a",
-                          border: selectedColor
-                            ? "2px solid #0ea5e9"
-                            : undefined,
+                          border: selectedColor ? "2px solid #0ea5e9" : undefined,
                         }}
                       />
                     </div>
                     <div>
-                      <label className="text-xs uppercase text-muted">
-                        HEX
-                      </label>
+                      <label className="text-xs uppercase text-muted">HEX</label>
                       <p className="mt-2 text-sm font-mono text-white">
                         {selectedColor?.hex ?? formData.colors[0] ?? "#FFFFFF"}
                       </p>
@@ -636,9 +571,7 @@ export default function AdminProductsClient() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Precio por gramo (€)
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Precio por gramo (€)</label>
                       <input
                         type="number"
                         step="0.001"
@@ -653,16 +586,12 @@ export default function AdminProductsClient() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Densidad (g/cm³)
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Densidad (g/cm³)</label>
                       <input
                         type="number"
                         step="0.01"
                         value={formData.density}
-                        onChange={(e) =>
-                          setFormData({ ...formData, density: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, density: e.target.value })}
                         className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                       />
                     </div>
@@ -671,12 +600,8 @@ export default function AdminProductsClient() {
 
                 <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">
-                      Dimensiones y tiempo
-                    </h3>
-                    <span className="text-xs uppercase tracking-[0.3em] text-muted">
-                      Paso 2
-                    </span>
+                    <h3 className="text-lg font-semibold">Dimensiones y tiempo</h3>
+                    <span className="text-xs uppercase tracking-[0.3em] text-muted">Paso 2</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {[
@@ -685,16 +610,12 @@ export default function AdminProductsClient() {
                       { label: "Min dimension Z (mm)", field: "minDimZ" },
                     ].map(({ label, field }) => (
                       <div key={field}>
-                        <label className="text-sm font-medium mb-1 block">
-                          {label}
-                        </label>
+                        <label className="text-sm font-medium mb-1 block">{label}</label>
                         <input
                           type="number"
                           step="1"
                           min="1"
-                          value={
-                            formData[field as keyof ProductFormData] as string
-                          }
+                          value={formData[field as keyof ProductFormData] as string}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
@@ -713,16 +634,12 @@ export default function AdminProductsClient() {
                       { label: "Max dimension Z (mm)", field: "maxDimZ" },
                     ].map(({ label, field }) => (
                       <div key={field}>
-                        <label className="text-sm font-medium mb-1 block">
-                          {label}
-                        </label>
+                        <label className="text-sm font-medium mb-1 block">{label}</label>
                         <input
                           type="number"
                           step="1"
                           min="1"
-                          value={
-                            formData[field as keyof ProductFormData] as string
-                          }
+                          value={formData[field as keyof ProductFormData] as string}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
@@ -782,9 +699,7 @@ export default function AdminProductsClient() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Factor de relleno
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Factor de relleno</label>
                       <input
                         type="number"
                         step="0.01"
@@ -821,23 +736,17 @@ export default function AdminProductsClient() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Stock inicial
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Stock inicial</label>
                       <input
                         type="number"
                         step="1"
                         value={formData.stock}
-                        onChange={(e) =>
-                          setFormData({ ...formData, stock: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                         className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Precio base (€)
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Precio base (€)</label>
                       <input
                         type="number"
                         step="0.001"
@@ -856,9 +765,7 @@ export default function AdminProductsClient() {
 
                 <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">
-                      Impresora y operación
-                    </h3>
+                    <h3 className="text-lg font-semibold">Impresora y operación</h3>
                     <button
                       type="button"
                       onClick={catalog.reloadPrinters}
@@ -869,9 +776,7 @@ export default function AdminProductsClient() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Selecciona impresora
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Selecciona impresora</label>
                       <select
                         value={formData.printerId}
                         onChange={(e) =>
@@ -891,9 +796,7 @@ export default function AdminProductsClient() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Amortización €/h
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Amortización €/h</label>
                       <input
                         type="number"
                         step="0.01"
@@ -910,9 +813,7 @@ export default function AdminProductsClient() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Mantenimiento €/h
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Mantenimiento €/h</label>
                       <input
                         type="number"
                         step="0.01"
@@ -927,9 +828,7 @@ export default function AdminProductsClient() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Electricidad €/kWh
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Electricidad €/kWh</label>
                       <input
                         type="number"
                         step="0.01"
@@ -947,26 +846,16 @@ export default function AdminProductsClient() {
                   {selectedPrinter && (
                     <div className="grid grid-cols-3 gap-3 text-sm">
                       <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-muted">
-                          Estado
-                        </p>
+                        <p className="text-xs uppercase tracking-[0.3em] text-muted">Estado</p>
                         <p className="text-white">{selectedPrinter.status}</p>
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-muted">
-                          Ubicación
-                        </p>
-                        <p className="text-white">
-                          {selectedPrinter.location ?? "N/D"}
-                        </p>
+                        <p className="text-xs uppercase tracking-[0.3em] text-muted">Ubicación</p>
+                        <p className="text-white">{selectedPrinter.location ?? "N/D"}</p>
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-muted">
-                          ID máquina
-                        </p>
-                        <p className="text-xs text-white">
-                          {selectedPrinter.id}
-                        </p>
+                        <p className="text-xs uppercase tracking-[0.3em] text-muted">ID máquina</p>
+                        <p className="text-xs text-white">{selectedPrinter.id}</p>
                       </div>
                     </div>
                   )}
@@ -990,9 +879,7 @@ export default function AdminProductsClient() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Finalización
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Finalización</label>
                       <select
                         value={formData.finishOption}
                         onChange={(e) =>
@@ -1011,9 +898,7 @@ export default function AdminProductsClient() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Costo acabado (€)
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Costo acabado (€)</label>
                       <input
                         type="number"
                         step="0.1"
@@ -1066,23 +951,17 @@ export default function AdminProductsClient() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Desperdicio (%)
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Desperdicio (%)</label>
                       <input
                         type="number"
                         step="0.1"
                         value={formData.wastePct}
-                        onChange={(e) =>
-                          setFormData({ ...formData, wastePct: e.target.value })
-                        }
+                        onChange={(e) => setFormData({ ...formData, wastePct: e.target.value })}
                         className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        Margen (%)
-                      </label>
+                      <label className="text-sm font-medium mb-1 block">Margen (%)</label>
                       <input
                         type="number"
                         step="0.1"
@@ -1098,16 +977,12 @@ export default function AdminProductsClient() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-1 block">
-                      Costes extras (€)
-                    </label>
+                    <label className="text-sm font-medium mb-1 block">Costes extras (€)</label>
                     <input
                       type="number"
                       step="0.1"
                       value={formData.customCost}
-                      onChange={(e) =>
-                        setFormData({ ...formData, customCost: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, customCost: e.target.value })}
                       className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
                     />
                   </div>
@@ -1116,41 +991,27 @@ export default function AdminProductsClient() {
                 {pricePreview && (
                   <section className="rounded-2xl border border-cyan/40 bg-bg-tertiary/60 p-5">
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-cyan">
-                        Previsualización de coste
-                      </h3>
+                      <h3 className="text-lg font-semibold text-cyan">Previsualización de coste</h3>
                       <span className="text-xs uppercase tracking-[0.3em] text-muted">
-                        {catalog.pricingConfig
-                          ? "Configuración actual"
-                          : "Calculado"}
+                        {catalog.pricingConfig ? "Configuración actual" : "Calculado"}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm text-white">
                       <div>
                         <p className="text-xs text-muted">Peso estimado (g)</p>
-                        <p className="text-lg font-semibold">
-                          {weightEstimate.toFixed(1)}
-                        </p>
+                        <p className="text-lg font-semibold">{weightEstimate.toFixed(1)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted">
-                          Tiempo impresión (min)
-                        </p>
-                        <p className="text-lg font-semibold">
-                          {pricePreview.printTimeMinutes}
-                        </p>
+                        <p className="text-xs text-muted">Tiempo impresión (min)</p>
+                        <p className="text-lg font-semibold">{pricePreview.printTimeMinutes}</p>
                       </div>
                       <div>
                         <p className="text-xs text-muted">Coste base</p>
-                        <p className="text-lg font-semibold">
-                          €{pricePreview.baseCost}
-                        </p>
+                        <p className="text-lg font-semibold">€{pricePreview.baseCost}</p>
                       </div>
                       <div>
                         <p className="text-xs text-muted">Precio sugerido</p>
-                        <p className="text-lg font-semibold">
-                          €{pricePreview.finalPrice}
-                        </p>
+                        <p className="text-lg font-semibold">€{pricePreview.finalPrice}</p>
                       </div>
                     </div>
                   </section>
@@ -1197,8 +1058,8 @@ export default function AdminProductsClient() {
             >
               <h3 className="text-xl font-bold mb-2">Confirmar Eliminación</h3>
               <p className="text-muted mb-6">
-                ¿Estás seguro de que quieres eliminar este producto? Esta acción
-                no se puede deshacer.
+                ¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede
+                deshacer.
               </p>
               <div className="flex justify-end gap-3">
                 <button

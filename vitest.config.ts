@@ -7,11 +7,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.tsx"],
     coverage: {
       provider: "istanbul",
-      include: [
-        "lib/**/*.{ts,tsx}",
-        "components/**/*.{ts,tsx}",
-        "app/**/*.{ts,tsx}",
-      ],
+      include: ["lib/**/*.{ts,tsx}", "components/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
       exclude: ["**/*.d.ts", "**/node_modules/**"],
     },
     include: ["**/*.{test,spec}.{ts,tsx}"],

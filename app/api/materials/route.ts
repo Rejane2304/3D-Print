@@ -13,9 +13,6 @@ export async function GET() {
     return NextResponse.json(materials); // Variable 'materials' is used here
   } catch (error) {
     console.error("Error fetching materials:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

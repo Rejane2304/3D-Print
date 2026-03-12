@@ -19,10 +19,7 @@ import {
 } from "lucide-react";
 import { useCartStore } from "@/lib/cart-store";
 import { useToast } from "@/components/toast-provider";
-import {
-  calculatePriceFromDimensions,
-  MATERIAL_INFO,
-} from "@/lib/price-calculator";
+import { calculatePriceFromDimensions, MATERIAL_INFO } from "@/lib/price-calculator";
 import type { ReviewType, MaterialType } from "@/lib/types";
 import { useLanguage } from "@/lib/language-store";
 
@@ -73,9 +70,7 @@ const MAX_DIM_CM = 25;
 const mmToCm = (mm: number) => mm / 10;
 const cmToMm = (cm: number) => cm * 10;
 
-export function ProductDetailClient({
-  productId,
-}: Readonly<{ productId: string }>) {
+export function ProductDetailClient({ productId }: Readonly<{ productId: string }>) {
   const { data: session } = useSession() || {};
   const addItem = useCartStore((s) => s?.addItem);
   const { showToast } = useToast();
@@ -221,17 +216,17 @@ export function ProductDetailClient({
           const clampedX = clampDim(
             productData.defaultDimX ?? 50,
             productData.minDimX ?? 10,
-            productData.maxDimX ?? 300,
+            productData.maxDimX ?? 300
           );
           const clampedY = clampDim(
             productData.defaultDimY ?? 50,
             productData.minDimY ?? 10,
-            productData.maxDimY ?? 300,
+            productData.maxDimY ?? 300
           );
           const clampedZ = clampDim(
             productData.defaultDimZ ?? 50,
             productData.minDimZ ?? 10,
-            productData.maxDimZ ?? 300,
+            productData.maxDimZ ?? 300
           );
           setDimX(clampedX);
           setDimY(clampedY);
@@ -258,8 +253,7 @@ export function ProductDetailClient({
         maintenanceFactor: fromDB.maintenanceFactor,
       };
     const fromStatic =
-      MATERIAL_INFO[selectedMaterial as keyof typeof MATERIAL_INFO] ??
-      MATERIAL_INFO.PLA;
+      MATERIAL_INFO[selectedMaterial as keyof typeof MATERIAL_INFO] ?? MATERIAL_INFO.PLA;
     return {
       pricePerKg: fromStatic.pricePerKg,
       density: fromStatic.density,
@@ -282,7 +276,7 @@ export function ProductDetailClient({
         refDimX: product.defaultDimX,
         refDimY: product.defaultDimY,
         refDimZ: product.defaultDimZ,
-      },
+      }
     );
   }, [product, dimX, dimY, dimZ, quantity, matConfig]);
 
@@ -322,9 +316,7 @@ export function ProductDetailClient({
         showToast("success", t.reviewPublished);
         setReviewText("");
         setReviewRating(5);
-        const updated = await fetch(`/api/products/${productId}`).then((r) =>
-          r.json(),
-        );
+        const updated = await fetch(`/api/products/${productId}`).then((r) => r.json());
         if (updated?.id) setProduct(updated);
       } else {
         showToast("error", t.reviewError);
@@ -341,8 +333,7 @@ export function ProductDetailClient({
     return Object.keys(MATERIAL_INFO);
   }, [materials]);
 
-  const clampDim = (val: number, min: number, max: number) =>
-    Math.max(min, Math.min(max, val));
+  const clampDim = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
 
   const getBadgeClass = (code: string) => {
     const colorMap: Record<string, string> = {
@@ -416,14 +407,8 @@ export function ProductDetailClient({
     <div className="min-h-screen py-8">
       <div className="max-w-site mx-auto px-4">
         {/* Breadcrumbs */}
-        <nav
-          className="flex items-center gap-2 text-sm text-zinc-500 mb-6"
-          aria-label="Breadcrumb"
-        >
-          <Link
-            href="/"
-            className="hover:text-cyan transition flex items-center gap-1"
-          >
+        <nav className="flex items-center gap-2 text-sm text-zinc-500 mb-6" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-cyan transition flex items-center gap-1">
             <Home className="w-3.5 h-3.5" /> {t.breadcrumbHome}
           </Link>
           <ChevronRight className="w-3.5 h-3.5" />
@@ -444,11 +429,7 @@ export function ProductDetailClient({
               className="relative aspect-video rounded-xl overflow-hidden bg-zinc-800 mb-4"
             >
               <Image
-                src={
-                  product.images?.[selectedImage] ??
-                  product.images?.[0] ??
-                  "/og-image.png"
-                }
+                src={product.images?.[selectedImage] ?? product.images?.[0] ?? "/og-image.png"}
                 alt={product.name}
                 fill
                 className="object-cover"
@@ -487,12 +468,8 @@ export function ProductDetailClient({
               </span>
               <span className="text-xs text-zinc-500">{product.category}</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-3">
-              {product.name}
-            </h1>
-            <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-              {product.description}
-            </p>
+            <h1 className="text-2xl md:text-3xl font-bold mb-3">{product.name}</h1>
+            <p className="text-zinc-400 text-sm leading-relaxed mb-6">{product.description}</p>
 
             {product.reviewCount > 0 && (
               <div className="flex items-center gap-2 mb-6">
@@ -505,8 +482,7 @@ export function ProductDetailClient({
                   ))}
                 </div>
                 <span className="text-sm text-zinc-400">
-                  {product.rating.toFixed(1)} (
-                  {t.ratingLabel(product.reviewCount)})
+                  {product.rating.toFixed(1)} ({t.ratingLabel(product.reviewCount)})
                 </span>
               </div>
             )}
@@ -520,8 +496,7 @@ export function ProductDetailClient({
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   {materialList.map((code) => {
-                    const info =
-                      MATERIAL_INFO[code as keyof typeof MATERIAL_INFO];
+                    const info = MATERIAL_INFO[code as keyof typeof MATERIAL_INFO];
                     const matColor = info?.color ?? "#9ca3af";
                     const isSelected = selectedMaterial === code;
                     const btnBorderClass = isSelected
@@ -542,16 +517,11 @@ export function ProductDetailClient({
                         }
                       >
                         <div className="flex items-center gap-2">
-                          <Layers
-                            className="w-4 h-4"
-                            style={{ color: matColor }}
-                          />
+                          <Layers className="w-4 h-4" style={{ color: matColor }} />
                           <span className="font-semibold text-sm">{code}</span>
                         </div>
                         {info?.uses && (
-                          <p className="text-xs text-zinc-400 mt-1 line-clamp-2">
-                            {info.uses}
-                          </p>
+                          <p className="text-xs text-zinc-400 mt-1 line-clamp-2">{info.uses}</p>
                         )}
                       </button>
                     );
@@ -562,10 +532,7 @@ export function ProductDetailClient({
               {/* Color Selector */}
               <div>
                 <label className="text-sm font-medium text-zinc-300 mb-3 block">
-                  {t.colorLabel}:{" "}
-                  <span className="text-zinc-400 font-normal">
-                    {selectedColor}
-                  </span>
+                  {t.colorLabel}: <span className="text-zinc-400 font-normal">{selectedColor}</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {(product.colors ?? []).slice(0, 8).map((color) => (
@@ -626,7 +593,7 @@ export function ProductDetailClient({
                           const clampedMm = clampDim(
                             cmToMm(Number.isNaN(raw) ? mmToCm(d.minMm) : raw),
                             d.minMm,
-                            cmToMm(MAX_DIM_CM),
+                            cmToMm(MAX_DIM_CM)
                           );
                           d.setMm(clampedMm);
                           d.setVal(String(mmToCm(clampedMm)));
@@ -654,11 +621,7 @@ export function ProductDetailClient({
                   <input
                     type="number"
                     value={quantity}
-                    onChange={(e) =>
-                      setQuantity(
-                        Math.max(1, Number.parseInt(e.target.value) || 1),
-                      )
-                    }
+                    onChange={(e) => setQuantity(Math.max(1, Number.parseInt(e.target.value) || 1))}
                     className="w-16 text-center bg-white/5 rounded-lg py-2 font-mono text-sm outline-none focus:ring-1 focus:ring-cyan"
                   />
                   <button
@@ -707,9 +670,7 @@ export function ProductDetailClient({
                       key={label}
                       className={`rounded-lg p-2 border transition-all ${active ? "border-cyan bg-cyan/5" : "border-white/5 opacity-50"}`}
                     >
-                      <p className="text-[10px] text-zinc-400 mb-0.5">
-                        {label}
-                      </p>
+                      <p className="text-[10px] text-zinc-400 mb-0.5">{label}</p>
                       <p
                         className={`font-mono text-sm font-semibold ${active ? "text-cyan" : "text-zinc-300"}`}
                       >
@@ -760,24 +721,18 @@ export function ProductDetailClient({
                           >
                             <div className="space-y-1 pt-2 border-t border-white/5">
                               <div className="flex justify-between text-xs">
-                                <span className="text-zinc-500">
-                                  {t.estimatedWeight}
-                                </span>
+                                <span className="text-zinc-500">{t.estimatedWeight}</span>
                                 <span className="font-mono text-zinc-300">
                                   {(() => {
-                                    if (priceCalc.weight < 1)
-                                      return priceCalc.weight.toFixed(2);
-                                    if (priceCalc.weight < 10)
-                                      return priceCalc.weight.toFixed(3);
+                                    if (priceCalc.weight < 1) return priceCalc.weight.toFixed(2);
+                                    if (priceCalc.weight < 10) return priceCalc.weight.toFixed(3);
                                     return Math.round(priceCalc.weight);
                                   })()}{" "}
                                   g
                                 </span>
                               </div>
                               <div className="flex justify-between text-xs">
-                                <span className="text-zinc-500">
-                                  {t.printTimeLabel}
-                                </span>
+                                <span className="text-zinc-500">{t.printTimeLabel}</span>
                                 <span className="font-mono text-zinc-300">
                                   {Math.round(priceCalc.printTimeMinutes)} min
                                 </span>
@@ -808,10 +763,7 @@ export function ProductDetailClient({
                                   value: priceCalc.finishCost,
                                 },
                               ].map(({ label, value }) => (
-                                <div
-                                  key={label}
-                                  className="flex justify-between text-xs"
-                                >
+                                <div key={label} className="flex justify-between text-xs">
                                   <span className="text-zinc-500">{label}</span>
                                   <span className="font-mono text-zinc-300">
                                     €{value.toFixed(2)}
@@ -819,9 +771,7 @@ export function ProductDetailClient({
                                 </div>
                               ))}
                               <div className="flex justify-between text-xs font-semibold border-t border-white/5 pt-1">
-                                <span className="text-zinc-300">
-                                  {t.baseCost}
-                                </span>
+                                <span className="text-zinc-300">{t.baseCost}</span>
                                 <span className="font-mono text-zinc-100">
                                   €{priceCalc.baseCost.toFixed(2)}
                                 </span>
@@ -894,9 +844,7 @@ export function ProductDetailClient({
           </h2>
           {session?.user && (
             <div className="bg-bg-card rounded-xl p-6 border border-white/5 mb-6">
-              <h3 className="font-semibold mb-3 text-sm">
-                {t.writeReviewTitle}
-              </h3>
+              <h3 className="font-semibold mb-3 text-sm">{t.writeReviewTitle}</h3>
               <div className="flex gap-1 mb-3">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <button
@@ -939,9 +887,7 @@ export function ProductDetailClient({
                     {(r?.user?.name ?? r?.user?.email ?? "U")[0].toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm font-medium">
-                      {r?.user?.name ?? t.anonymous}
-                    </p>
+                    <p className="text-sm font-medium">{r?.user?.name ?? t.anonymous}</p>
                     <div className="flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, j) => (
                         <Star
@@ -955,9 +901,7 @@ export function ProductDetailClient({
                 <p className="text-sm text-zinc-400">{r?.comment ?? ""}</p>
               </motion.div>
             ))}
-            {product.reviews.length === 0 && (
-              <p className="text-sm text-zinc-500">{t.noReviews}</p>
-            )}
+            {product.reviews.length === 0 && <p className="text-sm text-zinc-500">{t.noReviews}</p>}
           </div>
         </section>
       </div>

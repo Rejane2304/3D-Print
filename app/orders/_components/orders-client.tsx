@@ -16,13 +16,7 @@ import {
 import type { OrderType } from "@/lib/types";
 import { useLanguage } from "@/lib/language-store";
 
-const WORKFLOW_STEPS = [
-  "paid",
-  "processing",
-  "ready",
-  "shipped",
-  "delivered",
-] as const;
+const WORKFLOW_STEPS = ["paid", "processing", "ready", "shipped", "delivered"] as const;
 
 export function OrdersClient() {
   const { data: session, status } = useSession() || {};
@@ -66,10 +60,7 @@ export function OrdersClient() {
     },
   }[language];
 
-  const statusConfig: Record<
-    string,
-    { icon: React.ElementType; color: string; label: string }
-  > = {
+  const statusConfig: Record<string, { icon: React.ElementType; color: string; label: string }> = {
     pending: { icon: Clock, color: "text-amber", label: t.status.pending },
     paid: { icon: CheckCircle, color: "text-green-400", label: t.status.paid },
     processing: {
@@ -124,9 +115,7 @@ export function OrdersClient() {
         <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
           <Package className="w-7 h-7 text-cyan" /> {t.title}
         </h1>
-        <p className="text-zinc-400 text-sm mb-8">
-          {t.orders(orders?.length ?? 0)}
-        </p>
+        <p className="text-zinc-400 text-sm mb-8">{t.orders(orders?.length ?? 0)}</p>
 
         {(orders?.length ?? 0) === 0 ? (
           <div className="text-center py-20">
@@ -136,13 +125,11 @@ export function OrdersClient() {
         ) : (
           <div className="space-y-6">
             {(orders ?? []).map((order, i) => {
-              const sc =
-                statusConfig[order?.status ?? "pending"] ??
-                statusConfig.pending;
+              const sc = statusConfig[order?.status ?? "pending"] ?? statusConfig.pending;
               const StatusIcon = sc.icon;
               const isCancelled = order?.status === "cancelled";
               const currentStepIdx = WORKFLOW_STEPS.indexOf(
-                order?.status as (typeof WORKFLOW_STEPS)[number],
+                order?.status as (typeof WORKFLOW_STEPS)[number]
               );
 
               return (
@@ -160,15 +147,11 @@ export function OrdersClient() {
                       </p>
                       <p className="text-xs text-zinc-500">
                         {order?.createdAt
-                          ? new Date(order.createdAt).toLocaleDateString(
-                              t.locale,
-                            )
+                          ? new Date(order.createdAt).toLocaleDateString(t.locale)
                           : ""}
                       </p>
                     </div>
-                    <div
-                      className={`flex items-center gap-1 text-sm font-medium ${sc.color}`}
-                    >
+                    <div className={`flex items-center gap-1 text-sm font-medium ${sc.color}`}>
                       <StatusIcon className="w-4 h-4" /> {sc.label}
                     </div>
                   </div>
@@ -183,8 +166,7 @@ export function OrdersClient() {
                         const isDone = currentStepIdx > idx;
                         let circleClass = "bg-white/5 text-zinc-600";
                         if (isActive) circleClass = "bg-cyan text-black";
-                        else if (isDone)
-                          circleClass = "bg-white/10 text-zinc-300";
+                        else if (isDone) circleClass = "bg-white/10 text-zinc-300";
                         let textClass = "text-zinc-600";
                         if (isActive) textClass = "text-cyan font-medium";
                         else if (isDone) textClass = "text-zinc-400";
@@ -196,9 +178,7 @@ export function OrdersClient() {
                               >
                                 <StepIcon className="w-3.5 h-3.5" />
                               </div>
-                              <span
-                                className={`text-[10px] whitespace-nowrap ${textClass}`}
-                              >
+                              <span className={`text-[10px] whitespace-nowrap ${textClass}`}>
                                 {stepCfg.label}
                               </span>
                             </div>
@@ -215,31 +195,22 @@ export function OrdersClient() {
 
                   <div className="space-y-2">
                     {(order?.items ?? []).map((item, j) => (
-                      <div
-                        key={item?.id ?? j}
-                        className="flex justify-between text-sm"
-                      >
+                      <div key={item?.id ?? j} className="flex justify-between text-sm">
                         <span className="text-zinc-400">
                           {item?.name ?? ""}{" "}
                           <span className="text-xs">
-                            ({item?.material ?? ""}, {item?.color ?? ""}) x
-                            {item?.quantity ?? 1}
+                            ({item?.material ?? ""}, {item?.color ?? ""}) x{item?.quantity ?? 1}
                           </span>
                         </span>
                         <span className="font-mono">
-                          €
-                          {(
-                            (item?.unitPrice ?? 0) * (item?.quantity ?? 1)
-                          ).toFixed(2)}
+                          €{((item?.unitPrice ?? 0) * (item?.quantity ?? 1)).toFixed(2)}
                         </span>
                       </div>
                     ))}
                   </div>
                   <div className="mt-4 pt-3 border-t border-white/5 flex justify-between font-semibold">
                     <span>{t.total}</span>
-                    <span className="font-mono text-cyan">
-                      €{(order?.total ?? 0).toFixed(2)}
-                    </span>
+                    <span className="font-mono text-cyan">€{(order?.total ?? 0).toFixed(2)}</span>
                   </div>
                 </motion.div>
               );

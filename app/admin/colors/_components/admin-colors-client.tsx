@@ -1,14 +1,7 @@
 "use client";
 
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Palette,
-  CheckCircle,
-  AlertTriangle,
-} from "lucide-react";
+import { Plus, Edit, Trash2, Palette, CheckCircle, AlertTriangle } from "lucide-react";
 
 interface ColorType {
   id: string;
@@ -58,7 +51,7 @@ export default function AdminColorsClient() {
 
   const activeColor = useMemo(
     () => colors.find((color) => color.id === activeColorId) ?? null,
-    [colors, activeColorId],
+    [colors, activeColorId]
   );
 
   const previewHex = activeColor?.hex || form.hex || "#00FFFF";
@@ -83,9 +76,7 @@ export default function AdminColorsClient() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const url = editing
-        ? `/api/admin/colors/${editing}`
-        : "/api/admin/colors";
+      const url = editing ? `/api/admin/colors/${editing}` : "/api/admin/colors";
       const method = editing ? "PATCH" : "POST";
       const payload = {
         ...form,
@@ -130,7 +121,7 @@ export default function AdminColorsClient() {
         syncFormWithColor(selected);
       }
     },
-    [colors, syncFormWithColor],
+    [colors, syncFormWithColor]
   );
 
   const handleDelete = async (id: string) => {
@@ -172,9 +163,7 @@ export default function AdminColorsClient() {
             style={{ backgroundColor: previewHex }}
           />
           <div>
-            <p className="text-xs text-zinc-400 uppercase tracking-[0.3em]">
-              Color actual
-            </p>
+            <p className="text-xs text-zinc-400 uppercase tracking-[0.3em]">Color actual</p>
             <p className="text-sm font-semibold">
               {activeColor
                 ? `${activeColor.code} · ${activeColor.name}`
@@ -214,32 +203,22 @@ export default function AdminColorsClient() {
       )}
       {showForm && (
         <div className="bg-bg-card border border-white/10 rounded-xl p-6 mb-6">
-          <h2 className="font-semibold mb-4">
-            {editing ? "Editar color" : "Nuevo color"}
-          </h2>
+          <h2 className="font-semibold mb-4">{editing ? "Editar color" : "Nuevo color"}</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label
-                htmlFor="color-name"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="color-name" className="text-xs text-zinc-400 block mb-1">
                 Nombre
               </label>
               <input
                 type="text"
                 placeholder="Bambu Green"
                 value={form.name}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="color-code"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="color-code" className="text-xs text-zinc-400 block mb-1">
                 Código
               </label>
               <input
@@ -255,17 +234,12 @@ export default function AdminColorsClient() {
                 }
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
-              <p className="text-[0.65rem] text-zinc-500 mt-1">
-                Formato sugerido: 001B
-              </p>
+              <p className="text-[0.65rem] text-zinc-500 mt-1">Formato sugerido: 001B</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <label
-                htmlFor="color-field"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="color-field" className="text-xs text-zinc-400 block mb-1">
                 Color
               </label>
               <input
@@ -278,10 +252,8 @@ export default function AdminColorsClient() {
                   if (activeColorId) {
                     setColors((prev) =>
                       prev.map((color) =>
-                        color.id === activeColorId
-                          ? { ...color, hex: hexValue }
-                          : color,
-                      ),
+                        color.id === activeColorId ? { ...color, hex: hexValue } : color
+                      )
                     );
                   }
                 }}
@@ -289,19 +261,14 @@ export default function AdminColorsClient() {
               />
             </div>
             <div>
-              <label
-                htmlFor="color-image"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="color-image" className="text-xs text-zinc-400 block mb-1">
                 Imagen (opcional)
               </label>
               <input
                 type="text"
                 placeholder="URL de imagen"
                 value={form.image}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, image: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
@@ -388,10 +355,7 @@ export default function AdminColorsClient() {
               ))}
               {colors.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={3}
-                    className="px-4 py-8 text-center text-zinc-500 text-sm"
-                  >
+                  <td colSpan={3} className="px-4 py-8 text-center text-zinc-500 text-sm">
                     No hay colores. Crea el primero.
                   </td>
                 </tr>
