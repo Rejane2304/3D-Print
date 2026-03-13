@@ -104,7 +104,6 @@
     "formik": "2.4.5",
     "framer-motion": "^12.35.1",
     "gray-matter": "4.0.3",
-    "engram": "^0.0.1",
     "i18next": "^25.8.14",
     "input-otp": "1.2.4",
     "jotai": "2.6.0",
