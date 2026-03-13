@@ -1,11 +1,38 @@
-import { describe, it, beforeEach, vi, expect } from 'vitest';
+import { describe, it, beforeEach, vi, expect } from "vitest";
+import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import AdminMaterialsPricingClient from "@/app/admin/materials-pricing/_components/admin-materials-pricing-client";
+
+const MaterialColorsManagerMock = () => (
+  <div data-testid="material-colors-manager-mock">Material colors manager mock</div>
+);
+
+vi.mock("framer-motion", () => {
+  const ReactMock = require("react");
+  const createMotionTag = (tag: string) =>
+    ReactMock.forwardRef(({ children, ...rest }: React.ComponentPropsWithoutRef<"div">, ref) =>
+      ReactMock.createElement(tag, { ref, ...rest }, children)
+    );
+  return {
+    motion: new Proxy(
+      {},
+      {
+        get: (_, prop: string) => createMotionTag(prop),
+      }
+    ),
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  };
+});
 
 vi.mock("next/dynamic", () => ({
-  default: (cb: any) => cb,
+  __esModule: true,
+  default: () => MaterialColorsManagerMock,
 }));
 vi.mock("@/components/toast-provider", () => ({ useToast: () => ({ showToast: vi.fn() }) }));
+
+const loadAdminMaterialsPricingClient = async () => {
+  const module = await import("@/app/admin/materials-pricing/_components/admin-materials-pricing-client");
+  return module.default;
+};
 
 // Mock fetch global
 beforeEach(() => {
@@ -26,6 +53,7 @@ beforeEach(() => {
 
 describe("AdminMaterialsPricingClient", () => {
   it("renderiza encabezado y secciones principales", async () => {
+    const AdminMaterialsPricingClient = await loadAdminMaterialsPricingClient();
     render(<AdminMaterialsPricingClient />);
     // Hay múltiples elementos con el texto 'Materiales', seleccionamos el primero
     const materialesElements = screen.getAllByText(/Materiales/i);
@@ -39,6 +67,7 @@ describe("AdminMaterialsPricingClient", () => {
   });
 
   it("muestra formulario de material y permite editar campos", async () => {
+    const AdminMaterialsPricingClient = await loadAdminMaterialsPricingClient();
     render(<AdminMaterialsPricingClient />);
     const nombreInputs = await screen.findAllByPlaceholderText("Nombre");
     const nombre = nombreInputs[0];
