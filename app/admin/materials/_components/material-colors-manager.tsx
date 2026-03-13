@@ -1,13 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Plus,
-  Trash2,
-  Palette,
-  CheckCircle,
-  AlertTriangle,
-} from "lucide-react";
+import { Plus, Trash2, Palette, CheckCircle, AlertTriangle } from "lucide-react";
 import { getBrightness } from "@/lib/color-utils";
 import type { ColorSummary } from "@/lib/types";
 
@@ -18,11 +12,7 @@ interface MaterialColorType {
   image?: string;
 }
 
-export default function MaterialColorsManager({
-  materialId,
-}: {
-  readonly materialId: string;
-}) {
+export default function MaterialColorsManager({ materialId }: { readonly materialId: string }) {
   const [materialColors, setMaterialColors] = useState<MaterialColorType[]>([]);
   const [allColors, setAllColors] = useState<ColorSummary[]>([]);
   const [adding, setAdding] = useState(false);
@@ -36,9 +26,7 @@ export default function MaterialColorsManager({
 
   const loadMaterialColors = useCallback(async () => {
     try {
-      const res = await fetch(
-        `/api/admin/material-colors?materialId=${materialId}`,
-      );
+      const res = await fetch(`/api/admin/material-colors?materialId=${materialId}`);
       const data = await res.json();
       if (Array.isArray(data)) setMaterialColors(data);
     } catch (error) {
@@ -46,7 +34,7 @@ export default function MaterialColorsManager({
     }
   }, [materialId]);
 
-  const loadAllColors = async () => {
+  const loadAllColors = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/colors");
       const data = await res.json();
@@ -54,12 +42,12 @@ export default function MaterialColorsManager({
     } catch (error) {
       console.error("Error al cargar el catálogo de colores", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadMaterialColors();
     loadAllColors();
-  }, [materialId, loadMaterialColors]);
+  }, [materialId, loadMaterialColors, loadAllColors]);
 
   const notify = (type: "success" | "error", msg: string) => {
     setFeedback({ type, msg });
@@ -124,16 +112,13 @@ export default function MaterialColorsManager({
   }, [allColors]);
 
   const availableCatalog = useMemo(
-    () =>
-      sortedCatalog.filter(
-        (color) => !materialColors.some((mc) => mc.color.id === color.id),
-      ),
-    [materialColors, sortedCatalog],
+    () => sortedCatalog.filter((color) => !materialColors.some((mc) => mc.color.id === color.id)),
+    [materialColors, sortedCatalog]
   );
 
   const selectedColorDetails = useMemo(
     () => allColors.find((color) => color.id === selectedColorId) ?? null,
-    [allColors, selectedColorId],
+    [allColors, selectedColorId]
   );
 
   useEffect(() => {
@@ -150,9 +135,7 @@ export default function MaterialColorsManager({
     ? `${selectedColorDetails.code} · ${selectedColorDetails.name}`
     : "Selecciona un color";
   const previewBorder =
-    getBrightness(previewHex) > 200
-      ? "1px solid #475569"
-      : "1px solid transparent";
+    getBrightness(previewHex) > 200 ? "1px solid #475569" : "1px solid transparent";
 
   return (
     <div className="mt-8 space-y-6">
@@ -279,15 +262,11 @@ export default function MaterialColorsManager({
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-muted">
               Catálogo completo
             </p>
-            <span className="text-xs text-zinc-500">
-              Total: {sortedCatalog.length}
-            </span>
+            <span className="text-xs text-zinc-500">Total: {sortedCatalog.length}</span>
           </div>
           <div className="grid gap-3">
             {sortedCatalog.map((color) => {
-              const isAssociated = materialColors.some(
-                (mc) => mc.color.id === color.id,
-              );
+              const isAssociated = materialColors.some((mc) => mc.color.id === color.id);
               const isActive = color.id === selectedColorId;
               const brightness = getBrightness(color.hex);
               return (
@@ -305,9 +284,7 @@ export default function MaterialColorsManager({
                     }}
                   />
                   <div>
-                    <p className="text-sm font-semibold text-white">
-                      {color.name}
-                    </p>
+                    <p className="text-sm font-semibold text-white">{color.name}</p>
                     <p className="text-[0.65rem] uppercase tracking-[0.3em] text-muted">
                       Código: {color.code} · HEX: {color.hex.toUpperCase()}
                     </p>
@@ -371,10 +348,7 @@ export default function MaterialColorsManager({
             ))}
             {materialColors.length === 0 && (
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-8 text-center text-zinc-500 text-sm"
-                >
+                <td colSpan={5} className="px-4 py-8 text-center text-zinc-500 text-sm">
                   No hay colores asociados.
                 </td>
               </tr>
