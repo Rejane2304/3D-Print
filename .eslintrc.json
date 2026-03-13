@@ -50,7 +50,9 @@
     "*.config.js",
     "*.config.ts",
     "private/",
-    "scripts/postinstall.js"
-      "engram/",
-      "engram/internal/cloud/dashboard/static/htmx.min.js"
+    "scripts/postinstall.js",
+    "scripts/postinstall.js",
+    "engram/",
+    "engram/internal/cloud/dashboard/static/htmx.min.js"
+  ]
 }

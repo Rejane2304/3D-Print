@@ -74,7 +74,16 @@ describe("SignupSchema", () => {
 });
 
 describe("CartItemSchema", () => {
-  const validItem = {
+  const validItem: {
+    productId: string;
+    material: string;
+    color: string;
+    quantity?: number;
+    dimX: number;
+    dimY: number;
+    dimZ: number;
+    unitPrice: number;
+  } = {
     productId: "prod-123",
     material: "PLA",
     color: "Cyan",
@@ -121,7 +130,8 @@ describe("CartItemSchema", () => {
   });
 
   it("defaults quantity to 1 when not provided", () => {
-    const { quantity, ...withoutQty } = validItem;
+    const withoutQty = { ...validItem };
+    delete withoutQty.quantity;
     const result = CartItemSchema.safeParse(withoutQty);
     expect(result.success).toBe(true);
     if (result.success) {
