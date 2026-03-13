@@ -1,7 +1,7 @@
 // =============================================================
-// Pricing Service — isomórfico (server-side con Prisma)
+// Servicio de precios — isomórfico (server-side con Prisma)
 // Persiste y recalcula la tabla ProductPrice en BD.
-// Usar sólo en API routes / Server Components (accede a Prisma).
+// Usar sólo en rutas API o en Componentes de servidor (accede a Prisma).
 // =============================================================
 
 import prisma from "./db";
@@ -62,7 +62,7 @@ export async function updateProductPrices(productId: string): Promise<void> {
         maintenanceFactor: mat.maintenanceFactor,
       },
       1,
-      config,
+      config
     );
 
     await prisma.productPrice.upsert({
@@ -116,7 +116,7 @@ export async function getProductPrices(productId: string) {
   });
 }
 
-// ---- Helpers privados ----------------------------------------
+// ---- Ayudantes privados ----------------------------------------
 
 /**
  * Calcula el peso en gramos a partir de las dimensiones por defecto del producto.
@@ -129,10 +129,9 @@ function getDefaultWeight(
     defaultDimZ: number;
     density: number;
     modelFillFactor?: number;
-  }>,
+  }>
 ): number {
-  const volumeCm3 =
-    (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
+  const volumeCm3 = (product.defaultDimX * product.defaultDimY * product.defaultDimZ) / 1000;
   const fillFactor = product.modelFillFactor ?? 0.15;
   return volumeCm3 * product.density * fillFactor;
 }

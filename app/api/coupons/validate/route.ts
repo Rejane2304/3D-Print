@@ -24,22 +24,19 @@ export async function POST(request: NextRequest) {
     if (!coupon || !coupon.isActive) {
       return NextResponse.json(
         { valid: false, error: "Coupon not found or inactive" },
-        { status: 200 },
+        { status: 200 }
       );
     }
 
     const now = new Date();
     if (coupon.validUntil && coupon.validUntil < now) {
-      return NextResponse.json(
-        { valid: false, error: "Coupon has expired" },
-        { status: 200 },
-      );
+      return NextResponse.json({ valid: false, error: "Coupon has expired" }, { status: 200 });
     }
 
     if (coupon.maxUses !== null && coupon.usedCount >= coupon.maxUses) {
       return NextResponse.json(
         { valid: false, error: "Coupon usage limit reached" },
-        { status: 200 },
+        { status: 200 }
       );
     }
 
@@ -49,7 +46,7 @@ export async function POST(request: NextRequest) {
           valid: false,
           error: `Minimum purchase of €${coupon.minPurchase.toFixed(2)} required`,
         },
-        { status: 200 },
+        { status: 200 }
       );
     }
 
@@ -70,9 +67,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error validating coupon:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -34,10 +34,7 @@ describe("Cart Store Logic", () => {
         { unitPrice: 15, quantity: 1 },
         { unitPrice: 5, quantity: 3 },
       ];
-      const subtotal = items.reduce(
-        (sum, item) => sum + item.unitPrice * item.quantity,
-        0,
-      );
+      const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
       expect(subtotal).toBe(50); // 10*2 + 15*1 + 5*3
     });
   });

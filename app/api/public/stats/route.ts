@@ -16,9 +16,6 @@ export async function GET() {
     return NextResponse.json({ totalProducts, totalCustomers, totalMaterials });
   } catch (err: unknown) {
     console.error("Public stats error:", err);
-    return NextResponse.json(
-      { error: "Error fetching stats" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Error fetching stats" }, { status: 500 });
   }
 }

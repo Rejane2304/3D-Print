@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Edit, Trash2, X, Package } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "@/components/toast-provider";
+import { calculatePriceFromDimensions, calculateWeight } from "@/lib/price-calculator";
 import type { ProductType } from "@/lib/types";
+import { useAdminCatalog } from "@/app/admin/_hooks/use-admin-catalog";
 
 interface ProductFormData {
   name: string;
@@ -30,6 +32,18 @@ interface ProductFormData {
   colors: string[];
   featured: boolean;
   stock: string;
+  colorId: string;
+  printerId: string;
+  machineAmortizationPerHour: string;
+  maintenanceCostPerHour: string;
+  electricityRate: string;
+  printerPowerKw: string;
+  finishOption: string;
+  postProcessMinutes: string;
+  laborRate: string;
+  wastePct: string;
+  marginPct: string;
+  customCost: string;
 }
 
 const initialFormData: ProductFormData = {
@@ -55,6 +69,18 @@ const initialFormData: ProductFormData = {
   colors: ["#FFFFFF", "#000000"],
   featured: false,
   stock: "100",
+  colorId: "",
+  printerId: "",
+  machineAmortizationPerHour: "0.12",
+  maintenanceCostPerHour: "0.03",
+  electricityRate: "0.27",
+  printerPowerKw: "0.15",
+  finishOption: "Lijado",
+  postProcessMinutes: "10",
+  laborRate: "25",
+  wastePct: "5",
+  marginPct: "30",
+  customCost: "0",
 };
 
 export default function AdminProductsClient() {
@@ -65,20 +91,13 @@ export default function AdminProductsClient() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<ProductType | null>(
-    null,
-  );
+  const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
   const [formData, setFormData] = useState<ProductFormData>(initialFormData);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const catalog = useAdminCatalog();
 
-  const categories = [
-    "Accesorios",
-    "Decoracion",
-    "Figuras",
-    "Funcional",
-    "Articulados",
-  ];
+  const categories = ["Accesorios", "Decoracion", "Figuras", "Funcional", "Articulados"];
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -98,6 +117,65 @@ export default function AdminProductsClient() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  const selectedMaterial = useMemo(
+    () => catalog.materials.find((m) => m.code === formData.material) ?? null,
+    [catalog.materials, formData.material]
+  );
+
+  const selectedColor = useMemo(
+    () =>
+      catalog.colors.find((color) => color.id === formData.colorId) ??
+      catalog.colors.find((color) => formData.colors.includes(color.hex)) ??
+      null,
+    [catalog.colors, formData.colorId, formData.colors]
+  );
+
+  const selectedPrinter = useMemo(
+    () => catalog.printers.find((printer) => printer.id === formData.printerId) ?? null,
+    [catalog.printers, formData.printerId]
+  );
+
+  const weightEstimate = useMemo(() => {
+    if (!selectedMaterial) return 0;
+    const dimX = Number.parseFloat(formData.defaultDimX) || 0;
+    const dimY = Number.parseFloat(formData.defaultDimY) || 0;
+    const dimZ = Number.parseFloat(formData.defaultDimZ) || 0;
+    return calculateWeight(
+      dimX,
+      dimY,
+      dimZ,
+      Number.parseFloat(formData.density) || selectedMaterial.density,
+      Number.parseFloat(formData.modelFillFactor) || 0.15
+    );
+  }, [formData, selectedMaterial]);
+
+  const pricePreview = useMemo(() => {
+    if (!selectedMaterial) return null;
+    const dimX = Number.parseFloat(formData.defaultDimX) || 1;
+    const dimY = Number.parseFloat(formData.defaultDimY) || 1;
+    const dimZ = Number.parseFloat(formData.defaultDimZ) || 1;
+    const basePrintTime = Number.parseFloat(formData.printTimeMinutes) || 60;
+    const finish = Number.parseFloat(formData.finishCost) || 0;
+    const custom = Number.parseFloat(formData.customCost) || 0;
+    const qty = Number.parseInt(formData.stock) || 1;
+    const fillFactor = Number.parseFloat(formData.modelFillFactor) || 0.15;
+    const maintenanceFactor =
+      Number.parseFloat(formData.maintenanceCostPerHour) || selectedMaterial.maintenanceFactor;
+    const materialConfig = {
+      pricePerKg: Number.parseFloat(formData.basePricePerGram) * 1000 || 0,
+      density: Number.parseFloat(formData.density) || selectedMaterial.density,
+      maintenanceFactor,
+    };
+    return calculatePriceFromDimensions(dimX, dimY, dimZ, basePrintTime, materialConfig, {
+      quantity: qty,
+      finishCost: finish + custom,
+      fillFactor,
+      refDimX: dimX,
+      refDimY: dimY,
+      refDimZ: dimZ,
+    });
+  }, [formData, selectedMaterial]);
 
   const handleEdit = (product: ProductType) => {
     setEditingProduct(product);
@@ -124,6 +202,18 @@ export default function AdminProductsClient() {
       colors: product.colors,
       featured: product.featured,
       stock: String(product.stock),
+      colorId: formData.colorId,
+      printerId: formData.printerId,
+      machineAmortizationPerHour: formData.machineAmortizationPerHour,
+      maintenanceCostPerHour: formData.maintenanceCostPerHour,
+      electricityRate: formData.electricityRate,
+      printerPowerKw: formData.printerPowerKw,
+      finishOption: formData.finishOption,
+      postProcessMinutes: formData.postProcessMinutes,
+      laborRate: formData.laborRate,
+      wastePct: formData.wastePct,
+      marginPct: formData.marginPct,
+      customCost: formData.customCost,
     });
     setShowModal(true);
   };
@@ -151,10 +241,7 @@ export default function AdminProductsClient() {
       });
 
       if (res.ok) {
-        showToast(
-          "success",
-          editingProduct ? "Producto actualizado" : "Producto creado",
-        );
+        showToast("success", editingProduct ? "Producto actualizado" : "Producto creado");
         setShowModal(false);
         fetchProducts();
       } else {
@@ -229,32 +316,17 @@ export default function AdminProductsClient() {
             <table className="w-full">
               <thead className="bg-bg-tertiary">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Producto
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Categoría
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Material
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Precio/g
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">
-                    Stock
-                  </th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted">
-                    Acciones
-                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Producto</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Categoría</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Material</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Precio/g</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted">Stock</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((product) => (
-                  <tr
-                    key={product.id}
-                    className="border-t border-border hover:bg-bg-tertiary/50"
-                  >
+                  <tr key={product.id} className="border-t border-border hover:bg-bg-tertiary/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-bg-tertiary">
@@ -285,13 +357,9 @@ export default function AdminProductsClient() {
                         {product.material}
                       </span>
                     </td>
+                    <td className="px-4 py-3">€{product.basePricePerGram.toFixed(2)}</td>
                     <td className="px-4 py-3">
-                      €{product.basePricePerGram.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={product.stock < 10 ? "text-red-400" : ""}
-                      >
+                      <span className={product.stock < 10 ? "text-red-400" : ""}>
                         {product.stock}
                       </span>
                     </td>
@@ -363,318 +431,53 @@ export default function AdminProductsClient() {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="admin-name"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Nombre
-                    </label>
-                    <input
-                      id="admin-name"
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
-                    />
+              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Datos principales</h3>
+                    <span className="text-xs uppercase tracking-[0.3em] text-muted">Paso 1</span>
                   </div>
-
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="admin-desc"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Descripción
-                    </label>
-                    <textarea
-                      id="admin-desc"
-                      required
-                      rows={3}
-                      value={formData.description}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          description: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="admin-category"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Categoría
-                    </label>
-                    <select
-                      id="admin-category"
-                      value={formData.category}
-                      onChange={(e) =>
-                        setFormData({ ...formData, category: e.target.value })
-                      }
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
-                    >
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="admin-material"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Material
-                    </label>
-                    <select
-                      id="admin-material"
-                      value={formData.material}
-                      onChange={(e) => {
-                        const material = e.target.value;
-                        setFormData({
-                          ...formData,
-                          material,
-                          density: material === "PLA" ? "1.24" : "1.27",
-                          basePricePerGram:
-                            material === "PLA" ? "0.02" : "0.025",
-                        });
-                      }}
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
-                    >
-                      <option value="PLA">PLA</option>
-                      <option value="PETG">PETG</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="admin-price"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Precio por Gramo (€)
-                    </label>
-                    <input
-                      id="admin-price"
-                      type="number"
-                      step="0.001"
-                      required
-                      value={formData.basePricePerGram}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          basePricePerGram: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="admin-density"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Densidad (g/cm³)
-                    </label>
-                    <input
-                      id="admin-density"
-                      type="number"
-                      step="0.01"
-                      required
-                      value={formData.density}
-                      onChange={(e) =>
-                        setFormData({ ...formData, density: e.target.value })
-                      }
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="admin-stock"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Stock
-                    </label>
-                    <input
-                      id="admin-stock"
-                      type="number"
-                      required
-                      value={formData.stock}
-                      onChange={(e) =>
-                        setFormData({ ...formData, stock: e.target.value })
-                      }
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="admin-finish"
-                      className="block text-sm font-medium mb-1"
-                    >
-                      Costo de Acabado (€)
-                    </label>
-                    <input
-                      id="admin-finish"
-                      type="number"
-                      step="0.01"
-                      required
-                      value={formData.finishCost}
-                      onChange={(e) =>
-                        setFormData({ ...formData, finishCost: e.target.value })
-                      }
-                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
-                    />
-                  </div>
-
-                  {/* Calibración desde Bambu Slicer */}
-                  <div className="sm:col-span-2">
-                    <p className="text-xs font-semibold text-amber uppercase tracking-wide mb-3">
-                      Calibración desde Bambu Slicer
-                    </p>
-                    <p className="text-xs text-muted mb-3">
-                      Introduce el tamaño y resultados del laminador para el
-                      modelo tal como está diseñado (dimensiones de referencia).
-                      La fórmula de precios escalará a partir de estos valores.
-                    </p>
-                    <div className="grid grid-cols-3 gap-3 mb-3">
-                      <div>
-                        <label
-                          htmlFor="admin-defX"
-                          className="block text-xs text-muted mb-1"
-                        >
-                          Ref. X (mm)
-                        </label>
-                        <input
-                          id="admin-defX"
-                          type="number"
-                          step="1"
-                          min="1"
-                          required
-                          value={formData.defaultDimX}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              defaultDimX: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="admin-defY"
-                          className="block text-xs text-muted mb-1"
-                        >
-                          Ref. Y (mm)
-                        </label>
-                        <input
-                          id="admin-defY"
-                          type="number"
-                          step="1"
-                          min="1"
-                          required
-                          value={formData.defaultDimY}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              defaultDimY: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="admin-defZ"
-                          className="block text-xs text-muted mb-1"
-                        >
-                          Ref. Z (mm)
-                        </label>
-                        <input
-                          id="admin-defZ"
-                          type="number"
-                          step="1"
-                          min="1"
-                          required
-                          value={formData.defaultDimZ}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              defaultDimZ: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
-                        />
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium mb-1 block">Nombre</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label
-                          htmlFor="admin-printtime"
-                          className="block text-xs text-muted mb-1"
-                        >
-                          Tiempo impresión (min)
-                        </label>
-                        <input
-                          id="admin-printtime"
-                          type="number"
-                          step="1"
-                          min="1"
-                          required
-                          value={formData.printTimeMinutes}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              printTimeMinutes: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="admin-fillfactor"
-                          className="block text-xs text-muted mb-1"
-                        >
-                          Factor de relleno
-                        </label>
-                        <input
-                          id="admin-fillfactor"
-                          type="number"
-                          step="0.001"
-                          min="0.01"
-                          max="1"
-                          required
-                          value={formData.modelFillFactor}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              modelFillFactor: e.target.value,
-                            })
-                          }
-                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
-                        />
-                        <p className="text-xs text-muted mt-1">
-                          peso_g ÷ (X×Y×Z/1000 × dens.)
-                        </p>
-                      </div>
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium mb-1 block">Descripción</label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={formData.description}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            description: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan resize-none"
+                      />
                     </div>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Categoría</label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      >
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         checked={formData.featured}
@@ -684,14 +487,537 @@ export default function AdminProductsClient() {
                             featured: e.target.checked,
                           })
                         }
-                        className="w-4 h-4 rounded border-border bg-bg-tertiary text-cyan focus:ring-cyan"
+                        className="accent-cyan"
                       />
                       <span className="text-sm">Producto destacado</span>
-                    </label>
+                    </div>
                   </div>
-                </div>
+                </section>
 
-                <div className="flex justify-end gap-3 pt-4">
+                <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Material y color</h3>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          colorId: catalog.colors[0]?.id ?? prev.colorId ?? "",
+                        }));
+                      }}
+                      className="text-xs text-cyan hover:underline"
+                    >
+                      Recargar catálogo
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Material base</label>
+                      <select
+                        value={formData.material}
+                        onChange={(e) => {
+                          setFormData({
+                            ...formData,
+                            material: e.target.value,
+                          });
+                        }}
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      >
+                        {catalog.materials.map((material) => (
+                          <option key={material.id} value={material.code}>
+                            {material.name} ({material.code})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Color principal</label>
+                      <select
+                        value={formData.colorId}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            colorId: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      >
+                        <option value="">Seleccionar color</option>
+                        {catalog.colors.map((color) => (
+                          <option key={color.id} value={color.id}>
+                            {color.code} · {color.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs uppercase text-muted">Preview</label>
+                      <div
+                        className="mt-2 h-12 rounded-2xl border border-border shadow-inner"
+                        style={{
+                          background: selectedColor?.hex ?? "#0f172a",
+                          border: selectedColor ? "2px solid #0ea5e9" : undefined,
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs uppercase text-muted">HEX</label>
+                      <p className="mt-2 text-sm font-mono text-white">
+                        {selectedColor?.hex ?? formData.colors[0] ?? "#FFFFFF"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Precio por gramo (€)</label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        value={formData.basePricePerGram}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            basePricePerGram: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Densidad (g/cm³)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.density}
+                        onChange={(e) => setFormData({ ...formData, density: e.target.value })}
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Dimensiones y tiempo</h3>
+                    <span className="text-xs uppercase tracking-[0.3em] text-muted">Paso 2</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {[
+                      { label: "Min dimension X (mm)", field: "minDimX" },
+                      { label: "Min dimension Y (mm)", field: "minDimY" },
+                      { label: "Min dimension Z (mm)", field: "minDimZ" },
+                    ].map(({ label, field }) => (
+                      <div key={field}>
+                        <label className="text-sm font-medium mb-1 block">{label}</label>
+                        <input
+                          type="number"
+                          step="1"
+                          min="1"
+                          value={formData[field as keyof ProductFormData] as string}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              [field]: e.target.value,
+                            })
+                          }
+                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {[
+                      { label: "Max dimension X (mm)", field: "maxDimX" },
+                      { label: "Max dimension Y (mm)", field: "maxDimY" },
+                      { label: "Max dimension Z (mm)", field: "maxDimZ" },
+                    ].map(({ label, field }) => (
+                      <div key={field}>
+                        <label className="text-sm font-medium mb-1 block">{label}</label>
+                        <input
+                          type="number"
+                          step="1"
+                          min="1"
+                          value={formData[field as keyof ProductFormData] as string}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              [field]: e.target.value,
+                            })
+                          }
+                          className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium mb-1 block">
+                        Dimensiones de referencia (X×Y×Z mm)
+                      </label>
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <input
+                          type="number"
+                          step="1"
+                          min="1"
+                          value={formData.defaultDimX}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              defaultDimX: e.target.value,
+                            })
+                          }
+                          className="px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                        />
+                        <input
+                          type="number"
+                          step="1"
+                          min="1"
+                          value={formData.defaultDimY}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              defaultDimY: e.target.value,
+                            })
+                          }
+                          className="px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                        />
+                        <input
+                          type="number"
+                          step="1"
+                          min="1"
+                          value={formData.defaultDimZ}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              defaultDimZ: e.target.value,
+                            })
+                          }
+                          className="px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Factor de relleno</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        max="1"
+                        value={formData.modelFillFactor}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            modelFillFactor: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">
+                        Tiempo impresión (min)
+                      </label>
+                      <input
+                        type="number"
+                        step="1"
+                        min="1"
+                        value={formData.printTimeMinutes}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            printTimeMinutes: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Stock inicial</label>
+                      <input
+                        type="number"
+                        step="1"
+                        value={formData.stock}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                        className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Precio base (€)</label>
+                      <input
+                        type="number"
+                        step="0.001"
+                        value={formData.basePricePerGram}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            basePricePerGram: e.target.value,
+                          })
+                        }
+                        className="w-full px-3 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Impresora y operación</h3>
+                    <button
+                      type="button"
+                      onClick={catalog.reloadPrinters}
+                      className="text-xs text-cyan hover:underline"
+                    >
+                      Actualizar impresoras
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Selecciona impresora</label>
+                      <select
+                        value={formData.printerId}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            printerId: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      >
+                        <option value="">Sin selección</option>
+                        {catalog.printers.map((printer) => (
+                          <option key={printer.id} value={printer.id}>
+                            {printer.name} · {printer.status}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Amortización €/h</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.machineAmortizationPerHour}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            machineAmortizationPerHour: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Mantenimiento €/h</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.maintenanceCostPerHour}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            maintenanceCostPerHour: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Electricidad €/kWh</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.electricityRate}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            electricityRate: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                  </div>
+                  {selectedPrinter && (
+                    <div className="grid grid-cols-3 gap-3 text-sm">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.3em] text-muted">Estado</p>
+                        <p className="text-white">{selectedPrinter.status}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.3em] text-muted">Ubicación</p>
+                        <p className="text-white">{selectedPrinter.location ?? "N/D"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.3em] text-muted">ID máquina</p>
+                        <p className="text-xs text-white">{selectedPrinter.id}</p>
+                      </div>
+                    </div>
+                  )}
+                </section>
+
+                <section className="rounded-2xl border border-border bg-bg-card/60 p-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Acabado & fuerza</h3>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          finishOption: "Lijado",
+                        }))
+                      }
+                      className="text-xs text-cyan hover:underline"
+                    >
+                      Resetear acabados
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Finalización</label>
+                      <select
+                        value={formData.finishOption}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            finishOption: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      >
+                        {["Lijado", "Pintura", "Pulido", "UV"].map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Costo acabado (€)</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={formData.finishCost}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            finishCost: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">
+                        Mano de obra (minutos)
+                      </label>
+                      <input
+                        type="number"
+                        step="1"
+                        value={formData.postProcessMinutes}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            postProcessMinutes: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">
+                        Tarifa mano de obra (€)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={formData.laborRate}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            laborRate: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Desperdicio (%)</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={formData.wastePct}
+                        onChange={(e) => setFormData({ ...formData, wastePct: e.target.value })}
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Margen (%)</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={formData.marginPct}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            marginPct: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Costes extras (€)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={formData.customCost}
+                      onChange={(e) => setFormData({ ...formData, customCost: e.target.value })}
+                      className="w-full px-4 py-2 bg-bg-tertiary border border-border rounded-lg focus:outline-none focus:border-cyan"
+                    />
+                  </div>
+                </section>
+
+                {pricePreview && (
+                  <section className="rounded-2xl border border-cyan/40 bg-bg-tertiary/60 p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-lg font-semibold text-cyan">Previsualización de coste</h3>
+                      <span className="text-xs uppercase tracking-[0.3em] text-muted">
+                        {catalog.pricingConfig ? "Configuración actual" : "Calculado"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm text-white">
+                      <div>
+                        <p className="text-xs text-muted">Peso estimado (g)</p>
+                        <p className="text-lg font-semibold">{weightEstimate.toFixed(1)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted">Tiempo impresión (min)</p>
+                        <p className="text-lg font-semibold">{pricePreview.printTimeMinutes}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted">Coste base</p>
+                        <p className="text-lg font-semibold">€{pricePreview.baseCost}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted">Precio sugerido</p>
+                        <p className="text-lg font-semibold">€{pricePreview.finalPrice}</p>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                <div className="flex justify-end gap-3">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
@@ -732,8 +1058,8 @@ export default function AdminProductsClient() {
             >
               <h3 className="text-xl font-bold mb-2">Confirmar Eliminación</h3>
               <p className="text-muted mb-6">
-                ¿Estás seguro de que quieres eliminar este producto? Esta acción
-                no se puede deshacer.
+                ¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede
+                deshacer.
               </p>
               <div className="flex justify-end gap-3">
                 <button

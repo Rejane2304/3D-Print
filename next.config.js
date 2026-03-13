@@ -8,6 +8,9 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
   images: { unoptimized: true },
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 module.exports = nextConfig;

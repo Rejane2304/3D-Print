@@ -13,10 +13,7 @@ import {
   X as XIcon,
 } from "lucide-react";
 import { ProductType } from "@/lib/types";
-import {
-  calculatePriceFromDimensions,
-  MATERIAL_INFO,
-} from "@/lib/price-calculator";
+import { calculatePriceFromDimensions, MATERIAL_INFO } from "@/lib/price-calculator";
 import { useLanguage } from "@/lib/language-store";
 
 const CATEGORIES = [
@@ -107,10 +104,7 @@ const SORTS: Record<"es" | "en", { value: string; label: string }[]> = {
   ],
 };
 
-const CATEGORY_LABELS: Record<
-  "es" | "en",
-  Record<(typeof CATEGORIES)[number], string>
-> = {
+const CATEGORY_LABELS: Record<"es" | "en", Record<(typeof CATEGORIES)[number], string>> = {
   es: {
     Todos: "Todos",
     Accesorios: "Accesorios",
@@ -164,8 +158,7 @@ export function CatalogClient() {
           Product <span className="text-gradient-cyan">Catalog</span>
         </>
       ),
-      subtitle:
-        "Browse our collection of 3D printed parts and customize each one to your needs.",
+      subtitle: "Browse our collection of 3D printed parts and customize each one to your needs.",
       searchPlaceholder: "Search products...",
       searchButton: "Search",
       filters: "Filters",
@@ -175,8 +168,7 @@ export function CatalogClient() {
       activeFiltersMaterial: (m: string) => m,
       activeFiltersCategory: (c: string) =>
         CATEGORY_LABELS.en[c as (typeof CATEGORIES)[number]] ?? c,
-      results: (total: number) =>
-        `${total} product${total === 1 ? "" : "s"} found`,
+      results: (total: number) => `${total} product${total === 1 ? "" : "s"} found`,
       noProducts: "No products found",
       clearFiltersButton: "Clear filters",
       from: "From",
@@ -197,9 +189,7 @@ export function CatalogClient() {
   const [material, setMaterial] = useState(searchParams?.get("material") ?? "");
   const [category, setCategory] = useState(searchParams?.get("category") ?? "");
   const [sort, setSort] = useState(searchParams?.get("sort") ?? "newest");
-  const [page, setPage] = useState(
-    Number.parseInt(searchParams?.get("page") ?? "1", 10),
-  );
+  const [page, setPage] = useState(Number.parseInt(searchParams?.get("page") ?? "1", 10));
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -306,9 +296,7 @@ export function CatalogClient() {
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="text-sm text-zinc-400 mb-2 block">
-                  {t.materialLabel}
-                </label>
+                <label className="text-sm text-zinc-400 mb-2 block">{t.materialLabel}</label>
                 <div className="flex gap-2">
                   {["", "PLA", "PETG"].map((m) => (
                     <button
@@ -329,9 +317,7 @@ export function CatalogClient() {
                 </div>
               </div>
               <div>
-                <label className="text-sm text-zinc-400 mb-2 block">
-                  {t.categoryLabel}
-                </label>
+                <label className="text-sm text-zinc-400 mb-2 block">{t.categoryLabel}</label>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map((c) => (
                     <button
@@ -384,10 +370,7 @@ export function CatalogClient() {
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {["sk-0", "sk-1", "sk-2", "sk-3", "sk-4", "sk-5"].map((sk) => (
-              <div
-                key={sk}
-                className="bg-bg-card rounded-lg overflow-hidden animate-pulse"
-              >
+              <div key={sk} className="bg-bg-card rounded-lg overflow-hidden animate-pulse">
                 <div className="aspect-video bg-zinc-800" />
                 <div className="p-4 space-y-2">
                   <div className="h-4 bg-zinc-800 rounded w-3/4" />
@@ -440,9 +423,7 @@ export function CatalogClient() {
                         >
                           {p?.material ?? ""}
                         </span>
-                        <span className="text-xs text-zinc-500">
-                          {p?.category ?? ""}
-                        </span>
+                        <span className="text-xs text-zinc-500">{p?.category ?? ""}</span>
                         {(p?.rating ?? 0) > 0 && (
                           <span className="flex items-center gap-1 text-xs text-zinc-400 ml-auto">
                             <Star className="w-3 h-3 fill-amber text-amber" />
@@ -456,16 +437,14 @@ export function CatalogClient() {
                       {/* Color swatches */}
                       {(p?.colors?.length ?? 0) > 0 && (
                         <div className="flex items-center gap-1 mb-2">
-                          {(p?.colors ?? [])
-                            .slice(0, 3)
-                            .map((color: string) => (
-                              <span
-                                key={color}
-                                className="w-4 h-4 rounded-full border border-white/20"
-                                style={{ backgroundColor: getColorHex(color) }}
-                                title={color}
-                              />
-                            ))}
+                          {(p?.colors ?? []).slice(0, 3).map((color: string) => (
+                            <span
+                              key={color}
+                              className="w-4 h-4 rounded-full border border-white/20"
+                              style={{ backgroundColor: getColorHex(color) }}
+                              title={color}
+                            />
+                          ))}
                           {(p?.colors?.length ?? 0) > 3 && (
                             <span className="text-xs text-zinc-500">
                               +{(p?.colors?.length ?? 0) - 3}
@@ -481,9 +460,7 @@ export function CatalogClient() {
                         </span>
                         {(() => {
                           // Obtener info de material
-                          const mat =
-                            MATERIAL_INFO[p?.material ?? "PLA"] ??
-                            MATERIAL_INFO["PLA"];
+                          const mat = MATERIAL_INFO[p?.material ?? "PLA"] ?? MATERIAL_INFO["PLA"];
                           // Calcular precio unitario (1 ud, dimensiones por defecto, coste de acabado si existe)
                           const price = calculatePriceFromDimensions(
                             p?.defaultDimX ?? 0,
@@ -497,7 +474,7 @@ export function CatalogClient() {
                               refDimX: p?.defaultDimX ?? 0,
                               refDimY: p?.defaultDimY ?? 0,
                               refDimZ: p?.defaultDimZ ?? 0,
-                            },
+                            }
                           );
                           return (
                             <span className="font-mono text-cyan text-2xl font-bold">

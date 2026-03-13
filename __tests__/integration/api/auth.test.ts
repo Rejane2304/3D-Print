@@ -72,8 +72,7 @@ describe("Auth API Integration", () => {
       const { POST } = await import("@/app/api/auth/login/route");
       const request = {
         json: async () => ({
-          email:
-            process.env.TEST_EMAIL_NONEXISTENT || "nonexistent@example.com",
+          email: process.env.TEST_EMAIL_NONEXISTENT || "nonexistent@example.com",
           password: process.env.TEST_PASSWORD || "fakepass",
         }),
       } as any;

@@ -3,16 +3,7 @@ import React, { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  Mail,
-  Lock,
-  User,
-  Eye,
-  EyeOff,
-  Package,
-  AlertCircle,
-  CheckCircle,
-} from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Package, AlertCircle, CheckCircle } from "lucide-react";
 import { useToast } from "@/components/toast-provider";
 import { useLanguage } from "@/lib/language-store";
 
@@ -107,8 +98,7 @@ export function LoginClient() {
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
     if (!email?.trim()) errs.email = t.emailRequired;
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      errs.email = t.emailInvalid;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = t.emailInvalid;
     if (!password) errs.password = t.fieldRequired;
     else if (password.length < 6) errs.password = t.fieldMinLen;
     if (!isLogin) {
@@ -120,10 +110,15 @@ export function LoginClient() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-      // eslint-disable-next-line no-console
-      console.log("[LoginClient] handleSubmit", { email, isLogin, status, session });
-      // eslint-disable-next-line no-console
-      console.log("[LoginClient] useEffect status:", status, "session:", session);
+    // eslint-disable-next-line no-console
+    console.log("[LoginClient] handleSubmit", {
+      email,
+      isLogin,
+      status,
+      session,
+    });
+    // eslint-disable-next-line no-console
+    console.log("[LoginClient] useEffect status:", status, "session:", session);
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
@@ -206,9 +201,7 @@ export function LoginClient() {
       >
         <div className="text-center mb-8">
           <Package className="w-10 h-10 text-cyan mx-auto mb-3" />
-          <h1 className="text-2xl font-bold">
-            {isLogin ? t.loginTitle : t.registerTitle}
-          </h1>
+          <h1 className="text-2xl font-bold">{isLogin ? t.loginTitle : t.registerTitle}</h1>
           <p className="text-sm text-zinc-400 mt-1">
             {isLogin ? t.loginSubtitle : t.registerSubtitle}
           </p>
@@ -218,9 +211,7 @@ export function LoginClient() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.name}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.name}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                   <input
@@ -248,9 +239,7 @@ export function LoginClient() {
             )}
 
             <div>
-              <label className="text-sm text-zinc-400 mb-1 block">
-                {t.email}
-              </label>
+              <label className="text-sm text-zinc-400 mb-1 block">{t.email}</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
@@ -277,9 +266,7 @@ export function LoginClient() {
             </div>
 
             <div>
-              <label className="text-sm text-zinc-400 mb-1 block">
-                {t.fieldInput}
-              </label>
+              <label className="text-sm text-zinc-400 mb-1 block">{t.fieldInput}</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
@@ -302,11 +289,7 @@ export function LoginClient() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
                   aria-label={t.toggleBtn}
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors?.password && (
@@ -319,15 +302,8 @@ export function LoginClient() {
                 <div className="mt-2 flex gap-1">
                   {(["b-0", "b-1", "b-2", "b-3"] as const).map((bk, i) => {
                     const barClass =
-                      password.length >= (i + 1) * 3
-                        ? getBarColor(password.length)
-                        : "bg-white/10";
-                    return (
-                      <div
-                        key={bk}
-                        className={`h-1 flex-1 rounded-full ${barClass}`}
-                      />
-                    );
+                      password.length >= (i + 1) * 3 ? getBarColor(password.length) : "bg-white/10";
+                    return <div key={bk} className={`h-1 flex-1 rounded-full ${barClass}`} />;
                   })}
                 </div>
               )}
@@ -335,9 +311,7 @@ export function LoginClient() {
 
             {!isLogin && (
               <div>
-                <label className="text-sm text-zinc-400 mb-1 block">
-                  {t.fieldConfirm}
-                </label>
+                <label className="text-sm text-zinc-400 mb-1 block">{t.fieldConfirm}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                   <input

@@ -50,18 +50,12 @@ export default function AdminPaymentsClient() {
     }
     return orders.map((o) => (
       <tr key={o.id} className="border-t border-border/60">
-        <td className="px-4 py-2 font-mono text-xs">
-          #{o.id.slice(-8).toUpperCase()}
-        </td>
-        <td className="px-4 py-2 text-muted">
-          {o.user?.name || o.user?.email || "Cliente"}
-        </td>
+        <td className="px-4 py-2 font-mono text-xs">#{o.id.slice(-8).toUpperCase()}</td>
+        <td className="px-4 py-2 text-muted">{o.user?.name || o.user?.email || "Cliente"}</td>
         <td className="px-4 py-2 text-muted">
           {new Date(o.createdAt).toLocaleDateString("es-ES")}
         </td>
-        <td className="px-4 py-2 text-right font-mono">
-          €{o.total.toFixed(2)}
-        </td>
+        <td className="px-4 py-2 text-right font-mono">€{o.total.toFixed(2)}</td>
       </tr>
     ));
   }
@@ -71,9 +65,7 @@ export default function AdminPaymentsClient() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Panel de control</h1>
-          <p className="text-muted text-sm">
-            Visión general de pedidos pagados y liquidaciones.
-          </p>
+          <p className="text-muted text-sm">Visión general de pedidos pagados y liquidaciones.</p>
         </div>
         <button
           onClick={fetchPayments}
@@ -94,8 +86,7 @@ export default function AdminPaymentsClient() {
             <span className="text-sm font-medium">Pagos completados</span>
           </div>
           <div className="text-sm text-muted">
-            Total:{" "}
-            <span className="font-mono text-cyan">€{totalPaid.toFixed(2)}</span>
+            Total: <span className="font-mono text-cyan">€{totalPaid.toFixed(2)}</span>
           </div>
         </div>
         <div className="max-h-[480px] overflow-auto">

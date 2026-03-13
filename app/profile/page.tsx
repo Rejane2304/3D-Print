@@ -6,5 +6,5 @@ export default function ProfilePage() {
       <ProfileClient />
     </SecondaryLayout>
   );
-// ...fin del archivo
+  // ...fin del archivo
 }

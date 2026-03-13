@@ -35,10 +35,7 @@ export function Toaster({ children }: { children?: React.ReactNode }) {
   const showToast = useCallback((type: ToastType, message: string) => {
     const id = Math.random().toString(36).slice(2);
     setToasts((prev) => [...prev, { id, type, message }]);
-    setTimeout(
-      () => setToasts((prev) => prev?.filter((t) => t?.id !== id) ?? []),
-      4000,
-    );
+    setTimeout(() => setToasts((prev) => prev?.filter((t) => t?.id !== id) ?? []), 4000);
   }, []);
 
   const dismiss = useCallback((id: string) => {

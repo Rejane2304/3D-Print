@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
   test: {
@@ -6,11 +7,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.tsx"],
     coverage: {
       provider: "istanbul",
-      include: [
-        "lib/**/*.{ts,tsx}",
-        "components/**/*.{ts,tsx}",
-        "app/**/*.{ts,tsx}",
-      ],
+      include: ["lib/**/*.{ts,tsx}", "components/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
       exclude: ["**/*.d.ts", "**/node_modules/**"],
     },
     include: ["**/*.{test,spec}.{ts,tsx}"],
@@ -18,7 +15,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": "/Users/rejanerodrigues/MASTER/ecommerce_3d_print",
+      "@": path.resolve(__dirname),
     },
   },
 });

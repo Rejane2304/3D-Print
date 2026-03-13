@@ -1,14 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Palette,
-  CheckCircle,
-  AlertTriangle,
-} from "lucide-react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { Plus, Edit, Trash2, Palette, CheckCircle, AlertTriangle } from "lucide-react";
 
 interface ColorType {
   id: string;
@@ -36,13 +29,17 @@ export default function AdminColorsClient() {
     type: "success" | "error";
     msg: string;
   } | null>(null);
+  const [activeColorId, setActiveColorId] = useState<string | null>(null);
 
   const loadColors = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/colors");
       const data = await res.json();
-      if (Array.isArray(data)) setColors(data);
+      if (Array.isArray(data)) {
+        setColors(data);
+        setActiveColorId((prev) => prev ?? data[0]?.id ?? null);
+      }
     } finally {
       setLoading(false);
     }
@@ -50,6 +47,25 @@ export default function AdminColorsClient() {
 
   useEffect(() => {
     loadColors();
+  }, []);
+
+  const activeColor = useMemo(
+    () => colors.find((color) => color.id === activeColorId) ?? null,
+    [colors, activeColorId]
+  );
+
+  const previewHex = activeColor?.hex || form.hex || "#00FFFF";
+
+  const syncFormWithColor = useCallback((color: ColorType) => {
+    setActiveColorId(color.id);
+    setForm({
+      name: color.name,
+      code: color.code,
+      hex: color.hex,
+      image: color.image ?? "",
+    });
+    setEditing(color.id);
+    setShowForm(true);
   }, []);
 
   const notify = (type: "success" | "error", msg: string) => {
@@ -60,14 +76,16 @@ export default function AdminColorsClient() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const url = editing
-        ? `/api/admin/colors/${editing}`
-        : "/api/admin/colors";
+      const url = editing ? `/api/admin/colors/${editing}` : "/api/admin/colors";
       const method = editing ? "PATCH" : "POST";
+      const payload = {
+        ...form,
+        code: form.code.trim().toUpperCase(),
+      };
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         notify("success", editing ? "Color actualizado" : "Color creado");
@@ -85,15 +103,26 @@ export default function AdminColorsClient() {
   };
 
   const handleEdit = (c: ColorType) => {
-    setForm({
-      name: c.name,
-      code: c.code,
-      hex: c.hex,
-      image: c.image ?? "",
-    });
-    setEditing(c.id);
-    setShowForm(true);
+    syncFormWithColor(c);
   };
+
+  const handleSelectColorChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      const value = event.target.value;
+      if (!value) {
+        setActiveColorId(null);
+        setForm(emptyForm);
+        setEditing(null);
+        setShowForm(true);
+        return;
+      }
+      const selected = colors.find((color) => color.id === value);
+      if (selected) {
+        syncFormWithColor(selected);
+      }
+    },
+    [colors, syncFormWithColor]
+  );
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar este color?")) return;
@@ -117,6 +146,7 @@ export default function AdminColorsClient() {
         </div>
         <button
           onClick={() => {
+            setActiveColorId(null);
             setForm(emptyForm);
             setEditing(null);
             setShowForm(true);
@@ -125,6 +155,39 @@ export default function AdminColorsClient() {
         >
           <Plus className="w-4 h-4" /> Nuevo color
         </button>
+      </div>
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span
+            className="w-8 h-6 rounded-sm border border-white/20 shadow-inner"
+            style={{ backgroundColor: previewHex }}
+          />
+          <div>
+            <p className="text-xs text-zinc-400 uppercase tracking-[0.3em]">Color actual</p>
+            <p className="text-sm font-semibold">
+              {activeColor
+                ? `${activeColor.code} · ${activeColor.name}`
+                : form.name
+                  ? `${form.code} · ${form.name}`
+                  : "Nuevo color"}
+            </p>
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+              HEX: {previewHex.toUpperCase()}
+            </p>
+          </div>
+        </div>
+        <select
+          value={activeColorId ?? ""}
+          onChange={handleSelectColorChange}
+          className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none text-white focus:border-cyan"
+        >
+          <option value="">Nuevo color</option>
+          {colors.map((color) => (
+            <option key={color.id} value={color.id}>
+              {`${color.code} · ${color.name}`}
+            </option>
+          ))}
+        </select>
       </div>
       {feedback && (
         <div
@@ -140,84 +203,72 @@ export default function AdminColorsClient() {
       )}
       {showForm && (
         <div className="bg-bg-card border border-white/10 rounded-xl p-6 mb-6">
-          <h2 className="font-semibold mb-4">
-            {editing ? "Editar color" : "Nuevo color"}
-          </h2>
+          <h2 className="font-semibold mb-4">{editing ? "Editar color" : "Nuevo color"}</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label
-                htmlFor="color-name"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="color-name" className="text-xs text-zinc-400 block mb-1">
                 Nombre
               </label>
               <input
                 type="text"
                 placeholder="Bambu Green"
                 value={form.name}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
             <div>
-              <label
-                htmlFor="color-code"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="color-code" className="text-xs text-zinc-400 block mb-1">
                 Código
               </label>
               <input
                 type="text"
-                placeholder="Pantone 123C"
+                placeholder="001B"
+                maxLength={4}
                 value={form.code}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, code: e.target.value }))
+                  setForm((f) => ({
+                    ...f,
+                    code: e.target.value.toUpperCase(),
+                  }))
                 }
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
+              <p className="text-[0.65rem] text-zinc-500 mt-1">Formato sugerido: 001B</p>
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <label
-                htmlFor="color-hex"
-                className="text-xs text-zinc-400 block mb-1"
-              >
-                Color (hex)
+              <label htmlFor="color-field" className="text-xs text-zinc-400 block mb-1">
+                Color
               </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={form.hex}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, hex: e.target.value }))
+              <input
+                id="color-field"
+                type="color"
+                value={form.hex}
+                onChange={(e) => {
+                  const hexValue = e.target.value;
+                  setForm((prev) => ({ ...prev, hex: hexValue }));
+                  if (activeColorId) {
+                    setColors((prev) =>
+                      prev.map((color) =>
+                        color.id === activeColorId ? { ...color, hex: hexValue } : color
+                      )
+                    );
                   }
-                  className="w-10 h-9 rounded cursor-pointer bg-transparent border border-white/10"
-                />
-                <input
-                  type="text"
-                  value={form.hex}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, hex: e.target.value }))
-                  }
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono outline-none focus:ring-1 focus:ring-cyan"
-                />
-              </div>
+                }}
+                className="w-16 h-10 rounded-lg border border-white/10 bg-transparent p-0"
+              />
             </div>
             <div>
-              <label
-                htmlFor="color-image"
-                className="text-xs text-zinc-400 block mb-1"
-              >
+              <label htmlFor="color-image" className="text-xs text-zinc-400 block mb-1">
                 Imagen (opcional)
               </label>
               <input
                 type="text"
                 placeholder="URL de imagen"
                 value={form.image}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, image: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-cyan"
               />
             </div>
@@ -253,34 +304,47 @@ export default function AdminColorsClient() {
               <tr className="text-zinc-400 text-xs uppercase tracking-wide">
                 <th className="text-left px-4 py-3">Color</th>
                 <th className="text-left px-4 py-3">Código</th>
-                <th className="text-left px-4 py-3">Hex</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {colors.map((c) => (
-                <tr key={c.id} className="hover:bg-white/[0.02] transition">
+                <tr
+                  key={c.id}
+                  className="hover:bg-white/[0.02] transition cursor-pointer"
+                  onClick={() => {
+                    setActiveColorId(c.id);
+                    setForm((prev) => ({ ...prev, hex: c.hex }));
+                    setShowForm(true);
+                    setEditing(c.id);
+                  }}
+                >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span
                         className="w-5 h-5 rounded-full inline-block border border-white/20"
-                        style={{ backgroundColor: c.hex }}
+                        style={{ backgroundColor: c.hex || "#00FFFF" }}
                       />
                       <span className="font-semibold">{c.name}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">{c.code}</td>
-                  <td className="px-4 py-3 font-mono">{c.hex}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-1">
                       <button
-                        onClick={() => handleEdit(c)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleEdit(c);
+                        }}
                         className="p-1.5 rounded-lg hover:bg-white/10 transition text-zinc-400 hover:text-white"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(c.id)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleDelete(c.id);
+                        }}
                         className="p-1.5 rounded-lg hover:bg-red-500/10 transition text-zinc-400 hover:text-red-400"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -291,10 +355,7 @@ export default function AdminColorsClient() {
               ))}
               {colors.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-4 py-8 text-center text-zinc-500 text-sm"
-                  >
+                  <td colSpan={3} className="px-4 py-8 text-center text-zinc-500 text-sm">
                     No hay colores. Crea el primero.
                   </td>
                 </tr>

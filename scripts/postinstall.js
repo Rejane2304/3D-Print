@@ -17,10 +17,7 @@ if (!fs.existsSync(link)) {
     fs.symlinkSync(target, link, "dir");
     console.log("✔ Created @prisma/client/.prisma symlink");
   } catch (e) {
-    console.warn(
-      "⚠ Could not create @prisma/client/.prisma symlink:",
-      e.message,
-    );
+    console.warn("⚠ Could not create @prisma/client/.prisma symlink:", e.message);
   }
 }
 

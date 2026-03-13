@@ -19,10 +19,7 @@
   },
   "rules": {
     "prettier/prettier": ["warn", { "endOfLine": "auto" }],
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
-      { "argsIgnorePattern": "^_" }
-    ],
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-var-requires": "off",
@@ -53,6 +50,9 @@
     "*.config.js",
     "*.config.ts",
     "private/",
-    "scripts/postinstall.js"
+    "scripts/postinstall.js",
+    "scripts/postinstall.js",
+    "engram/",
+    "engram/internal/cloud/dashboard/static/htmx.min.js"
   ]
 }

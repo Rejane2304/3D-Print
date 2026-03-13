@@ -8,10 +8,7 @@ import { MATERIAL_INFO } from "@/lib/price-calculator";
 import Image from "next/image";
 import { useLanguage } from "@/lib/language-store";
 
-function CountUp({
-  target,
-  suffix = "",
-}: Readonly<{ target: number; suffix?: string }>) {
+function CountUp({ target, suffix = "" }: Readonly<{ target: number; suffix?: string }>) {
   const [val, setVal] = useState(0);
   useEffect(() => {
     let frame: number;
@@ -41,8 +38,7 @@ export function HomeClient() {
       badge: "Fabricación bajo demanda",
       title: (
         <>
-          Productos <span className="text-gradient-cyan">impresos en 3D</span> a
-          tu medida
+          Productos <span className="text-gradient-cyan">impresos en 3D</span> a tu medida
         </>
       ),
       subtitle:
@@ -53,8 +49,7 @@ export function HomeClient() {
       badge: "Made-to-order manufacturing",
       title: (
         <>
-          3D printed <span className="text-gradient-cyan">products</span>{" "}
-          tailor‑made for you
+          3D printed <span className="text-gradient-cyan">products</span> tailor‑made for you
         </>
       ),
       subtitle:
@@ -187,23 +182,19 @@ export function HomeClient() {
     es: {
       title: (
         <>
-          ¿Listo para crear algo{" "}
-          <span className="text-gradient-amber">único</span>?
+          ¿Listo para crear algo <span className="text-gradient-amber">único</span>?
         </>
       ),
-      subtitle:
-        "Explora nuestro catálogo, personaliza tu pieza y recíbela en tu puerta.",
+      subtitle: "Explora nuestro catálogo, personaliza tu pieza y recíbela en tu puerta.",
       button: "Comenzar Ahora",
     },
     en: {
       title: (
         <>
-          Ready to create something{" "}
-          <span className="text-gradient-amber">unique</span>?
+          Ready to create something <span className="text-gradient-amber">unique</span>?
         </>
       ),
-      subtitle:
-        "Browse the catalog, customize your part and receive it at home.",
+      subtitle: "Browse the catalog, customize your part and receive it at home.",
       button: "Start now",
     },
   }[language];
@@ -246,12 +237,8 @@ export function HomeClient() {
             <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-cyan/10 text-cyan border border-cyan/20 mb-6">
               {tHero.badge}
             </span>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-              {tHero.title}
-            </h1>
-            <p className="text-lg text-zinc-400 mb-8 leading-relaxed">
-              {tHero.subtitle}
-            </p>
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">{tHero.title}</h1>
+            <p className="text-lg text-zinc-400 mb-8 leading-relaxed">{tHero.subtitle}</p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/catalog"
@@ -334,9 +321,7 @@ export function HomeClient() {
                         >
                           {p?.material ?? ""}
                         </span>
-                        <span className="text-xs text-zinc-500">
-                          {p?.category ?? ""}
-                        </span>
+                        <span className="text-xs text-zinc-500">{p?.category ?? ""}</span>
                         {(p?.rating ?? 0) > 0 && (
                           <span className="flex items-center gap-1 text-xs text-zinc-400 ml-auto">
                             <Star className="w-3 h-3 fill-amber text-amber" />
@@ -349,20 +334,17 @@ export function HomeClient() {
                       </h3>
                       {(p?.colors?.length ?? 0) > 0 && (
                         <div className="flex items-center gap-1 mb-2">
-                          {(p?.colors ?? [])
-                            .slice(0, 3)
-                            .map((color: string) => (
-                              <span
-                                key={color}
-                                className="w-4 h-4 rounded-full border border-white/20"
-                                style={{
-                                  backgroundColor:
-                                    MATERIAL_INFO[p?.material ?? "PLA"]
-                                      ?.color ?? "#6B7280",
-                                }}
-                                title={color}
-                              />
-                            ))}
+                          {(p?.colors ?? []).slice(0, 3).map((color: string) => (
+                            <span
+                              key={color}
+                              className="w-4 h-4 rounded-full border border-white/20"
+                              style={{
+                                backgroundColor:
+                                  MATERIAL_INFO[p?.material ?? "PLA"]?.color ?? "#6B7280",
+                              }}
+                              title={color}
+                            />
+                          ))}
                           {(p?.colors?.length ?? 0) > 3 && (
                             <span className="text-xs text-zinc-500">
                               +{(p?.colors?.length ?? 0) - 3}
@@ -377,9 +359,7 @@ export function HomeClient() {
                           {((p?.defaultDimZ ?? 0) / 10).toFixed(2)} cm)
                         </span>
                         {(() => {
-                          const mat =
-                            MATERIAL_INFO[p?.material ?? "PLA"] ??
-                            MATERIAL_INFO["PLA"];
+                          const mat = MATERIAL_INFO[p?.material ?? "PLA"] ?? MATERIAL_INFO["PLA"];
                           const price =
                             require("@/lib/price-calculator").calculatePriceFromDimensions(
                               p?.defaultDimX ?? 0,
@@ -393,7 +373,7 @@ export function HomeClient() {
                                 refDimX: p?.defaultDimX ?? 0,
                                 refDimY: p?.defaultDimY ?? 0,
                                 refDimZ: p?.defaultDimZ ?? 0,
-                              },
+                              }
                             );
                           return (
                             <span className="font-mono text-cyan text-2xl font-bold">
@@ -447,16 +427,10 @@ export function HomeClient() {
                       className="w-12 h-12 rounded-lg flex items-center justify-center"
                       style={{ backgroundColor: `${info.color}15` }}
                     >
-                      <Layers
-                        className="w-6 h-6"
-                        style={{ color: info.color }}
-                      />
+                      <Layers className="w-6 h-6" style={{ color: info.color }} />
                     </div>
                     <div>
-                      <h3
-                        className="text-xl font-bold"
-                        style={{ color: info.color }}
-                      >
+                      <h3 className="text-xl font-bold" style={{ color: info.color }}>
                         {info.label}
                       </h3>
                       <p className="text-xs text-zinc-400">
@@ -473,8 +447,7 @@ export function HomeClient() {
                     className="inline-flex items-center gap-1 text-sm font-medium transition"
                     style={{ color: info.color }}
                   >
-                    {tMaterials.seeProducts(mat)}{" "}
-                    <ArrowRight className="w-4 h-4" />
+                    {tMaterials.seeProducts(mat)} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </motion.div>
               );
@@ -534,9 +507,7 @@ export function HomeClient() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl font-bold mb-4">{tCTA.title}</h2>
-            <p className="text-zinc-400 mb-8 max-w-lg mx-auto">
-              {tCTA.subtitle}
-            </p>
+            <p className="text-zinc-400 mb-8 max-w-lg mx-auto">{tCTA.subtitle}</p>
             <Link
               href="/catalog"
               className="inline-flex items-center gap-2 px-8 py-3 bg-amber text-black font-semibold rounded-lg hover:bg-amber-dim transition text-sm"

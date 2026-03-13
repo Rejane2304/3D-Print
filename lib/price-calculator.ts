@@ -1,12 +1,3 @@
-// =============================================================
-// Motor de precios unificado — Bambu Lab P2S
-// Combina la lógica original (dimensiones→peso→precio) con el
-// motor avanzado del p2s-pricing-system (amortización de máquina,
-// mantenimiento, electricidad, precios escalonados por volumen).
-// =============================================================
-
-// ---- Configuración del motor --------------------------------
-
 export const PRICING_CONFIG = {
   /** Amortización: P2S ~€750 / 6000 h vida útil (mercado ES, 2025) */
   machineAmortizationPerHour: 0.12,
@@ -14,11 +5,7 @@ export const PRICING_CONFIG = {
   operationCostPerHour: 0.04,
   /** Consumibles: boquilla E6 / ~300h + lubricación ≈ €0.02/h */
   consumablesCostPerHour: 0.02,
-  /**
-   * Factor de relleno por defecto (15 %).
-   * Cada producto puede calibrar su propio valor desde el laminador:
-   * modelFillFactor = pesoLaminador_g / (X × Y × Z / 1000 × densidad)
-   */
+
   infillFactor: 0.15,
   margins: {
     unit: 2.5, // ×250% para 1–4 uds.
@@ -51,25 +38,13 @@ export interface PriceCalculation {
   priceBulk: number;
   finalPrice: number;
 }
-// ...existing code...
 
-// ---- Funciones core -----------------------------------------
-
-/**
- * Calcula el peso en gramos a partir de dimensiones en mm.
- *
- * @param fillFactor  Factor de relleno calibrado desde el laminador.
- *   - Valor por defecto: PRICING_CONFIG.infillFactor (0.15)
- *   - Fórmula de calibración: peso_laminador_g / (X*Y*Z/1000 * densidad)
- *   - Ejemplo British Soldier (PLA, 56×56×140mm, 35.23 g):
- *       35.23 / (440 * 1.24) ≈ 0.0646
- */
 export function calculateWeight(
   dimX: number,
   dimY: number,
   dimZ: number,
   density: number,
-  fillFactor: number = PRICING_CONFIG.infillFactor,
+  fillFactor: number = PRICING_CONFIG.infillFactor
 ): number {
   const volumeCm3 = (dimX * dimY * dimZ) / 1000;
   return volumeCm3 * density * fillFactor;
@@ -89,7 +64,7 @@ export function scalePrintTime(
   dimZ: number,
   refDimX: number,
   refDimY: number,
-  refDimZ: number,
+  refDimZ: number
 ): number {
   const refVol = refDimX * refDimY * refDimZ;
   if (refVol <= 0) return basePrintTimeMinutes;
@@ -114,16 +89,14 @@ export function calculateAdvancedPrice(
     operationCostPerHour?: number;
     consumablesCostPerHour?: number;
     margins?: Readonly<{ unit: number; medium: number; bulk: number }>;
-  }>,
+  }>
 ): PriceCalculation {
   const printTimeHours = printTimeMinutes / 60;
   const weightKg = weightGrams / 1000;
 
   const machineAmortizationPerHour =
-    config?.machineAmortizationPerHour ??
-    PRICING_CONFIG.machineAmortizationPerHour;
-  const operationCostPerHour =
-    config?.operationCostPerHour ?? PRICING_CONFIG.operationCostPerHour;
+    config?.machineAmortizationPerHour ?? PRICING_CONFIG.machineAmortizationPerHour;
+  const operationCostPerHour = config?.operationCostPerHour ?? PRICING_CONFIG.operationCostPerHour;
   const consumablesCostPerHour =
     config?.consumablesCostPerHour ?? PRICING_CONFIG.consumablesCostPerHour;
   const margins = config?.margins ?? PRICING_CONFIG.margins;
@@ -154,12 +127,7 @@ export function calculateAdvancedPrice(
   const priceMedium = baseCost * margins.medium;
   const priceBulk = baseCost * margins.bulk;
 
-  const finalPrice = getPriceByQuantity(
-    priceUnit,
-    priceMedium,
-    priceBulk,
-    quantity,
-  );
+  const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
 
   return {
     weight: round(weightGrams),
@@ -203,7 +171,7 @@ export function calculatePriceFromDimensions(
     refDimX?: number;
     refDimY?: number;
     refDimZ?: number;
-  }>,
+  }>
 ): PriceCalculation {
   const quantity = options?.quantity ?? 1;
   const finishCost = options?.finishCost ?? 0;
@@ -211,9 +179,7 @@ export function calculatePriceFromDimensions(
 
   // Escalar tiempo de impresión con el volumen relativo a las dims de referencia
   const printTimeMinutes =
-    options?.refDimX !== undefined &&
-    options.refDimY !== undefined &&
-    options.refDimZ !== undefined
+    options?.refDimX !== undefined && options.refDimY !== undefined && options.refDimZ !== undefined
       ? scalePrintTime(
           basePrintTimeMinutes,
           dimX,
@@ -221,24 +187,13 @@ export function calculatePriceFromDimensions(
           dimZ,
           options.refDimX,
           options.refDimY,
-          options.refDimZ,
+          options.refDimZ
         )
       : basePrintTimeMinutes;
 
-  const weightGrams = calculateWeight(
-    dimX,
-    dimY,
-    dimZ,
-    material.density,
-    fillFactor,
-  );
+  const weightGrams = calculateWeight(dimX, dimY, dimZ, material.density, fillFactor);
   // Adaptar: el acabado se suma antes del margen
-  const result = calculateAdvancedPrice(
-    weightGrams,
-    printTimeMinutes,
-    material,
-    quantity,
-  );
+  const result = calculateAdvancedPrice(weightGrams, printTimeMinutes, material, quantity);
   // Recalcular baseCost incluyendo acabado
   const baseCost =
     result.materialCost +
@@ -252,12 +207,7 @@ export function calculatePriceFromDimensions(
   const priceUnit = baseCost * margins.unit;
   const priceMedium = baseCost * margins.medium;
   const priceBulk = baseCost * margins.bulk;
-  const finalPrice = getPriceByQuantity(
-    priceUnit,
-    priceMedium,
-    priceBulk,
-    quantity,
-  );
+  const finalPrice = getPriceByQuantity(priceUnit, priceMedium, priceBulk, quantity);
 
   return {
     ...result,
@@ -280,7 +230,7 @@ export function getPriceByQuantity(
   priceUnit: number,
   priceMedium: number,
   priceBulk: number,
-  quantity: number,
+  quantity: number
 ): number {
   if (quantity >= 10) return priceBulk;
   if (quantity >= 5) return priceMedium;
@@ -373,7 +323,7 @@ export const MATERIAL_INFO: Record<
   },
 } as const;
 
-// ---- Helpers privados ----------------------------------------
+// ---- Ayudantes privados ----------------------------------------
 
 function round(n: number): number {
   return Math.round(n * 100) / 100;

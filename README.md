@@ -22,66 +22,37 @@
   - [Comandos útiles](#comandos-útiles-1)
   - [Stack](#stack)
   - [Estructura](#estructura)
-  - [Variables de entorno](#variables-de-entorno-1)
-  - [Estado](#estado)
-  - [Contacto](#contacto-1)
+# Ecommerce 3D Print
+
+Plataforma de e-commerce especializada en productos impresos en 3D (Bambu Lab P2S), con motor de precios dinámico, materiales configurables, gestión de pedidos, puntos de fidelidad, panel de administración y pagos vía Stripe.
 
 ---
 
-## Arquitectura
+## Stack Tecnológico
 
-```mermaid
-graph TD
-	A[Cliente] -->|HTTP| B[Next.js Frontend]
-	B -->|API| C[Next.js Backend]
-	C -->|ORM| D[Prisma]
-	D -->|SQL| E[(Base de datos)]
-	C -->|Pagos| F[Stripe]
-	C -->|Workers| G[pricing.worker.ts]
-	B -->|Auth| C
-	C -->|Admin| B
-	B -->|E2E| H[Playwright]
-	C -->|Tests| I[Vitest]
-	B -->|Tests| I
-	C -->|Lib| J[lib/]
-	B -->|Componentes| K[components/]
-	C -->|Prisma| D
-	B -->|UI| K
-	B -->|Assets| L[public/]
+| Capa                   | Tecnología                      | Versión      |
+| ---------------------- | ------------------------------- | ------------ |
+| Marco de trabajo       | Next.js App Router              | 13.x         |
+| Lenguaje               | TypeScript                      | 5.2 (strict) |
+| ORM                    | Prisma                          | 6.7          |
+| Base de datos          | PostgreSQL                      | 15+          |
+| Autenticación          | NextAuth.js JWT + PrismaAdapter | 4.x          |
+| Pagos                  | Stripe                          | más reciente |
+| Estado                 | Zustand + persist               | más reciente |
+| Estilos                | Tailwind CSS                    | 3.3          |
+| Animaciones            | Framer Motion                   | más reciente |
+| Pruebas unitarias      | Vitest                          | 4.x          |
+| Pruebas E2E            | Playwright                      | 1.58+        |
+| Validación             | Zod                             | más reciente |
+| Primitivas de interfaz | Radix UI                        | más reciente |
+| Iconos                 | Lucide React                    | más reciente |
+| Trabajadores           | Web Workers API                 | nativo       |
+
+---
+
+## Estructura de Carpetas
+
 ```
-
----
-
-## Backend
-
-- **Framework:** Next.js (API routes)
-- **Motor de precios:** Algoritmo en `lib/price-calculator.ts` y worker en `workers/pricing.worker.ts`
-- **Autenticación:** NextAuth.js
-- **Pagos:** Stripe
-- **Panel admin:** Rutas protegidas bajo `/app/admin/`
-- **Tests:** Vitest (unitarios), Playwright (E2E)
-
-### Ejemplo de endpoint
-
-```http
-POST /api/checkout
-Content-Type: application/json
-{
-	"cart": [ ... ],
-	"user": { ... }
-}
-```
-
----
-
-## Frontend
-
-- **Framework:** Next.js (App Router)
-- **UI:** TailwindCSS, componentes en `components/ui/`
-- **Estado:** Zustand
-- **Internacionalización:** `lib/i18n.ts`, soporte ES/EN
-- **Notificaciones:** Toasts (`components/toast-provider.tsx`)
-- **Catálogo:** `/app/catalog/`, filtros dinámicos
 - **Carrito:** `/app/cart/`, integración con motor de precios
 - **Checkout:** `/app/checkout/`, pagos con Stripe
 
@@ -136,6 +107,33 @@ Content-Type: application/json
 
 ---
 
+---
+
+## Modelo de Datos (Prisma)
+
+- User (roles: user/admin)
+- Product (dimensiones, peso, color, material, acabado, imágenes, stock)
+- Material (PLA/PETG/ASA/TPU, precio/kg, densidad)
+- Color (colores Bambu Lab)
+- MaterialColor (relación N:M material-color, stock en gramos)
+- Cart/CartItem (carrito persistido)
+- Order/OrderItem (pedido completado)
+- Wishlist (lista de deseos)
+- Review (valoraciones)
+- Coupon (descuentos)
+- Inventory (stock por material y producto)
+- Printer (impresoras disponibles)
+- ProductPrice (precios materiales por producto)
+- PricingConfig (configuración de precios global)
+- Alert (alertas de stock y operación)
+- PointsTransaction (historial de puntos de fidelidad)
+
+---
+
+## Comandos Útiles
+
+```bash
+
 ## Variables de entorno
 
 Ver `.env.example` para configuración. Variables principales:
@@ -145,6 +143,61 @@ Ver `.env.example` para configuración. Variables principales:
 - `NEXTAUTH_URL` — URL base para autenticación
 
 ---
+
+---
+
+## Variables de Entorno
+
+Requeridas:
+
+```env
+DATABASE_URL=postgresql://user:pass@host:5432/ecommerce_3d_print
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=<string_aleatorio_32_chars>
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
+```
+
+Opcionales:
+
+```env
+NEXT_DIST_DIR=.next
+```
+
+---
+
+## Estado del Proyecto
+
+- Todos los tests unitarios y de integración pasan (Vitest)
+- Tests E2E cubren flujos críticos (Playwright)
+- Cobertura mínima: 80% en lib/, 70% en components/
+- Sin advertencias ni errores de TypeScript
+- Sin any explícito
+- Sin secretos hardcodeados
+- Imágenes locales (<200KB)
+- Variables de entorno documentadas
+
+---
+
+## Reglas de Desarrollo
+
+- Migraciones Prisma siempre versionadas
+- Validación de inputs con Zod
+- Autenticación JWT NextAuth
+- Panel admin protegido por middleware y verificación de rol
+- Motor de precios solo en backend
+- Estado global con Zustand persist
+- Tests sin llamadas reales a red o BD
+- SSR en español, i18n con Zustand
+- Imágenes solo locales
+- Sin console.log en producción
+
+---
+
+## Contacto
+
+Para dudas o soporte, contacta a: rejanerodrigues@gmail.com
 
 ## Estado del proyecto
 

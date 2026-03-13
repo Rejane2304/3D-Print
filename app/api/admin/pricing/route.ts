@@ -30,10 +30,7 @@ type PricingConfigField = (typeof NUMERIC_FIELDS)[number];
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== "admin"
-    ) {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -47,10 +44,7 @@ export async function GET() {
     return NextResponse.json(defaultConfig);
   } catch (error) {
     console.error("Error fetching pricing config:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -58,16 +52,11 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== "admin"
-    ) {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = (await request.json()) as Partial<
-      Record<PricingConfigField, unknown>
-    >;
+    const body = (await request.json()) as Partial<Record<PricingConfigField, unknown>>;
     const updateData: PricingConfigUpdateData = {};
 
     for (const field of NUMERIC_FIELDS) {
@@ -76,14 +65,14 @@ export async function PUT(request: NextRequest) {
       if (typeof raw !== "number" && typeof raw !== "string") {
         return NextResponse.json(
           { error: `Invalid value for ${field}: must be a number` },
-          { status: 400 },
+          { status: 400 }
         );
       }
       const num = Number.parseFloat(String(raw));
       if (!Number.isFinite(num) || num <= 0) {
         return NextResponse.json(
           { error: `Invalid value for ${field}: must be a positive number` },
-          { status: 400 },
+          { status: 400 }
         );
       }
       updateData[field] = num;
@@ -102,15 +91,12 @@ export async function PUT(request: NextRequest) {
 
     // Recalcular precios en background (no bloquear la respuesta)
     updateAllProductPrices().catch((err: unknown) =>
-      console.error("Error recalculating prices after config update:", err),
+      console.error("Error recalculating prices after config update:", err)
     );
 
     return NextResponse.json(config);
   } catch (error) {
     console.error("Error updating pricing config:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

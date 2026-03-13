@@ -32,9 +32,7 @@ export default function AdminInventoryClient() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Panel de control</h1>
-          <p className="text-muted text-sm">
-            Controla el stock de tus productos impresos en 3D.
-          </p>
+          <p className="text-muted text-sm">Controla el stock de tus productos impresos en 3D.</p>
         </div>
         <button
           onClick={fetchInventory}
@@ -70,27 +68,24 @@ export default function AdminInventoryClient() {
                     Cargando inventario...
                   </td>
                 </tr>
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-muted">
+                    No hay productos en inventario.
+                  </td>
+                </tr>
               ) : (
-                products.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-muted">
-                      No hay productos en inventario.
-                    </td>
-                  </tr>
-                ) : (
-                  products.map((p) => (
+                products.map((p) => (
                   <tr key={p.id} className="border-t border-border/60">
                     <td className="px-4 py-2">{p.name}</td>
                     <td className="px-4 py-2 text-muted">{p.category}</td>
                     <td className="px-4 py-2 text-muted">{p.material}</td>
                     <td className="px-4 py-2 text-right">
-                      <span className={p.stock < 10 ? "text-red-400" : ""}>
-                        {p.stock}
-                      </span>
+                      <span className={p.stock < 10 ? "text-red-400" : ""}>{p.stock}</span>
                     </td>
                   </tr>
                 ))
-              ))}
+              )}
             </tbody>
           </table>
         </div>

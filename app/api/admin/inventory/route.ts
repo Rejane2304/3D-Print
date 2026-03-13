@@ -8,17 +8,14 @@ import type { Session } from "next-auth";
 export const dynamic = "force-dynamic";
 
 function isAdmin(session: Session | null): boolean {
-  return !!(
-    session?.user && (session.user as { role?: string }).role === "admin"
-  );
+  return !!(session?.user && (session.user as { role?: string }).role === "admin");
 }
 
 /** GET /api/admin/inventory — Stock por material */
 export async function GET(_req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const inventory = await prisma.inventory.findMany({
       include: { material: true },
@@ -33,10 +30,7 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json(withAlerts);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -44,24 +38,19 @@ export async function GET(_req: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await request.json();
 
     if (!data.materialId) {
-      return NextResponse.json(
-        { error: "materialId is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "materialId is required" }, { status: 400 });
     }
 
     const inventory = await prisma.inventory.upsert({
       where: { materialId: data.materialId },
       update: {
         quantity: parseFloat(data.quantity),
-        minStock:
-          data.minStock !== undefined ? parseFloat(data.minStock) : undefined,
+        minStock: data.minStock !== undefined ? parseFloat(data.minStock) : undefined,
         location: data.location,
         lastRefill: data.refill ? new Date() : undefined,
       },
@@ -77,9 +66,6 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(inventory);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

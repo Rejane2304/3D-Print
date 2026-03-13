@@ -6,5 +6,5 @@ export default function CartPage() {
       <CartClient />
     </SecondaryLayout>
   );
-// ...fin del archivo
+  // ...fin del archivo
 }

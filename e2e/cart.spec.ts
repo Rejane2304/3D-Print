@@ -2,6 +2,9 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Shopping Cart", () => {
   test("should display empty cart message", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.removeItem("3dprint-cart");
+    });
     await page.goto("/cart");
     const emptyMessage = page.locator("text=Tu carrito está vacío");
     await expect(emptyMessage).toBeVisible();
@@ -15,9 +18,7 @@ test.describe("Shopping Cart", () => {
 
   test("cart icon should be visible in header", async ({ page }) => {
     await page.goto("/");
-    const cartIcon = page
-      .locator('[data-testid="cart-icon"]')
-      .or(page.locator('a[href="/cart"]'));
+    const cartIcon = page.locator('[data-testid="cart-icon"]').or(page.locator('a[href="/cart"]'));
     await expect(cartIcon.first()).toBeVisible();
   });
 });

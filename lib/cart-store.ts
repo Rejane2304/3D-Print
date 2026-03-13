@@ -72,20 +72,15 @@ export const useCartStore = create<CartState>()(
       updateQuantity: (id, quantity) =>
         set((state) => ({
           items: (state?.items ?? []).map((i) =>
-            i?.id === id
-              ? { ...(i ?? {}), quantity: Math.max(1, quantity) }
-              : i,
+            i?.id === id ? { ...(i ?? {}), quantity: Math.max(1, quantity) } : i
           ),
         })),
       clearCart: () => set({ items: [] }),
       getSubtotal: () => {
         const items = get()?.items ?? [];
-        return items.reduce(
-          (sum, i) => sum + (i?.unitPrice ?? 0) * (i?.quantity ?? 1),
-          0,
-        );
+        return items.reduce((sum, i) => sum + (i?.unitPrice ?? 0) * (i?.quantity ?? 1), 0);
       },
     }),
-    { name: "3dprint-cart" },
-  ),
+    { name: "3dprint-cart" }
+  )
 );

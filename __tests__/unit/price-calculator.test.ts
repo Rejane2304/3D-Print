@@ -15,29 +15,11 @@ describe("Price Calculator", () => {
         maintenanceFactor: MATERIAL_INFO.PLA.maintenanceFactor,
       };
       // Producto pequeño
-      const resultSmall = calculatePriceFromDimensions(
-        50,
-        50,
-        50,
-        60,
-        material,
-      );
+      const resultSmall = calculatePriceFromDimensions(50, 50, 50, 60, material);
       // Producto mediano
-      const resultMedium = calculatePriceFromDimensions(
-        100,
-        100,
-        100,
-        60,
-        material,
-      );
+      const resultMedium = calculatePriceFromDimensions(100, 100, 100, 60, material);
       // Producto grande
-      const resultLarge = calculatePriceFromDimensions(
-        200,
-        200,
-        200,
-        60,
-        material,
-      );
+      const resultLarge = calculatePriceFromDimensions(200, 200, 200, 60, material);
 
       // El peso debe aumentar
       expect(resultSmall.weight).toBeLessThan(resultMedium.weight);
@@ -91,78 +73,34 @@ describe("Price Calculator", () => {
     };
 
     it("should return positive price and weight for single unit", () => {
-      const result = calculatePriceFromDimensions(
-        100,
-        100,
-        100,
-        60,
-        plaMaterial,
-      );
+      const result = calculatePriceFromDimensions(100, 100, 100, 60, plaMaterial);
       expect(result.finalPrice).toBeGreaterThan(0);
       expect(result.weight).toBeGreaterThan(0);
     });
 
     it("should apply lower per-unit price for bulk quantity (10+)", () => {
-      const resultUnit = calculatePriceFromDimensions(
-        50,
-        50,
-        50,
-        60,
-        plaMaterial,
-        { quantity: 1 },
-      );
-      const resultBulk = calculatePriceFromDimensions(
-        50,
-        50,
-        50,
-        60,
-        plaMaterial,
-        { quantity: 10 },
-      );
+      const resultUnit = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, { quantity: 1 });
+      const resultBulk = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, {
+        quantity: 10,
+      });
       expect(resultBulk.finalPrice).toBeLessThan(resultUnit.finalPrice);
     });
 
     it("should produce different prices for PLA and PETG", () => {
-      const pricePLA = calculatePriceFromDimensions(
-        100,
-        100,
-        100,
-        60,
-        plaMaterial,
-      );
-      const pricePETG = calculatePriceFromDimensions(
-        100,
-        100,
-        100,
-        60,
-        petgMaterial,
-      );
+      const pricePLA = calculatePriceFromDimensions(100, 100, 100, 60, plaMaterial);
+      const pricePETG = calculatePriceFromDimensions(100, 100, 100, 60, petgMaterial);
       expect(pricePLA.finalPrice).not.toBe(pricePETG.finalPrice);
     });
 
     it("should add finishCost as a flat fee (not affected by margin)", () => {
       const margins = PRICING_CONFIG.margins;
-      const noFinish = calculatePriceFromDimensions(
-        50,
-        50,
-        50,
-        60,
-        plaMaterial,
-      );
-      const withFinish = calculatePriceFromDimensions(
-        50,
-        50,
-        50,
-        60,
-        plaMaterial,
-        { finishCost: 5 },
-      );
+      const noFinish = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial);
+      const withFinish = calculatePriceFromDimensions(50, 50, 50, 60, plaMaterial, {
+        finishCost: 5,
+      });
       // El acabado se multiplica por el margen (unit)
       const expectedDiff = 5 * margins.unit;
-      expect(withFinish.finalPrice - noFinish.finalPrice).toBeCloseTo(
-        expectedDiff,
-        1,
-      );
+      expect(withFinish.finalPrice - noFinish.finalPrice).toBeCloseTo(expectedDiff, 1);
     });
 
     it("should return the full PriceCalculation structure", () => {
@@ -191,14 +129,7 @@ describe("Price Calculator", () => {
     });
 
     it("should have all required properties", () => {
-      const requiredProps = [
-        "label",
-        "density",
-        "basePricePerGram",
-        "color",
-        "properties",
-        "uses",
-      ];
+      const requiredProps = ["label", "density", "basePricePerGram", "color", "properties", "uses"];
       requiredProps.forEach((prop) => {
         expect(MATERIAL_INFO.PLA).toHaveProperty(prop);
         expect(MATERIAL_INFO.PETG).toHaveProperty(prop);

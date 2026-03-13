@@ -38,9 +38,7 @@ vi.mock("@/lib/db", () => ({
         if (args?.where?.OR) {
           const query = args.where.OR[0]?.name?.contains?.toLowerCase() || "";
           const filtered = mockProducts.filter(
-            (p) =>
-              p.name.toLowerCase().includes(query) ||
-              p.category.toLowerCase().includes(query),
+            (p) => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)
           );
           return Promise.resolve(filtered.slice(0, args.take || 5));
         }

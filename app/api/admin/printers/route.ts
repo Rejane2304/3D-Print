@@ -8,10 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== "admin"
-    ) {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const printers = await prisma.printer.findMany({
@@ -20,20 +17,14 @@ export async function GET() {
     return NextResponse.json({ printers });
   } catch (error) {
     console.error("Error fetching printers:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 export async function PATCH(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== "admin"
-    ) {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { orderId, orderItemId, printerId } = await req.json();
@@ -48,17 +39,11 @@ export async function PATCH(req: NextRequest) {
         data: { printerId },
       });
     } else {
-      return NextResponse.json(
-        { error: "Missing orderId or orderItemId" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Missing orderId or orderItemId" }, { status: 400 });
     }
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error assigning printer:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

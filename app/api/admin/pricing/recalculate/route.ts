@@ -9,19 +9,13 @@ export const dynamic = "force-dynamic";
 export async function POST() {
   try {
     const session = await getServerSession(authOptions);
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== "admin"
-    ) {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const result = await updateAllProductPrices();
     return NextResponse.json({ success: true, updated: result.updated });
   } catch (error) {
     console.error("Error recalculating prices:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

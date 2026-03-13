@@ -20,10 +20,7 @@ export const authOptions: NextAuthOptions = {
             where: { email: credentials.email },
           });
           if (!user?.password) return null;
-          const valid = await bcrypt.compare(
-            credentials.password,
-            user.password,
-          );
+          const valid = await bcrypt.compare(credentials.password, user.password);
           if (!valid) return null;
           return {
             id: user.id,
@@ -42,18 +39,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any)?.role ?? "user";
-        console.log("[NextAuth][jwt] user:", user);
-        console.log("[NextAuth][jwt] token:", token);
+        token.role = (user as { role?: string })?.role ?? "user";
       }
       return token;
     },
     async session({ session, token }) {
       if (session?.user) {
-        (session.user as any).id = token?.id;
-        (session.user as any).role = token?.role;
-        console.log("[NextAuth][session] session:", session);
-        console.log("[NextAuth][session] token:", token);
+        (session.user as { id?: unknown; role?: unknown }).id = token?.id;
+        (session.user as { id?: unknown; role?: unknown }).role = token?.role;
       }
       return session;
     },

@@ -8,17 +8,14 @@ import type { Session } from "next-auth";
 export const dynamic = "force-dynamic";
 
 function isAdmin(session: Session | null): boolean {
-  return !!(
-    session?.user && (session.user as { role?: string }).role === "admin"
-  );
+  return !!(session?.user && (session.user as { role?: string }).role === "admin");
 }
 
 /** GET /api/admin/coupons */
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
@@ -41,10 +38,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -52,8 +46,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!isAdmin(session))
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!isAdmin(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const data = await request.json();
 
@@ -73,15 +66,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(coupon, { status: 201 });
   } catch (error: unknown) {
     if ((error as { code?: string }).code === "P2002") {
-      return NextResponse.json(
-        { error: "Coupon code already exists" },
-        { status: 409 },
-      );
+      return NextResponse.json({ error: "Coupon code already exists" }, { status: 409 });
     }
     console.error(error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -42,8 +42,7 @@ async function main() {
         pricePerKg: 20,
         maintenanceFactor: 0.03,
         density: 1.24,
-        description:
-          "Ideal para prototipos, figuras y objetos decorativos. Biodegradable.",
+        description: "Ideal para prototipos, figuras y objetos decorativos. Biodegradable.",
         inStock: true,
       },
     }),
@@ -54,8 +53,7 @@ async function main() {
         pricePerKg: 25,
         maintenanceFactor: 0.04,
         density: 1.27,
-        description:
-          "Alta resistencia y durabilidad. Perfecto para piezas mecánicas y exteriores.",
+        description: "Alta resistencia y durabilidad. Perfecto para piezas mecánicas y exteriores.",
         inStock: true,
       },
     }),
@@ -66,8 +64,7 @@ async function main() {
         pricePerKg: 30,
         maintenanceFactor: 0.05,
         density: 1.07,
-        description:
-          "Resistente a UV. Ideal para aplicaciones industriales y automoción.",
+        description: "Resistente a UV. Ideal para aplicaciones industriales y automoción.",
         inStock: true,
       },
     }),
@@ -78,8 +75,7 @@ async function main() {
         pricePerKg: 35,
         maintenanceFactor: 0.06,
         density: 1.21,
-        description:
-          "Material flexible. Para juntas, fundas y piezas que requieren elasticidad.",
+        description: "Material flexible. Para juntas, fundas y piezas que requieren elasticidad.",
         inStock: true,
       },
     }),
@@ -235,15 +231,7 @@ async function main() {
     "Alberto Gil",
   ];
 
-  const cities = [
-    "Barcelona",
-    "Madrid",
-    "Valencia",
-    "Sevilla",
-    "Bilbao",
-    "Málaga",
-    "Zaragoza",
-  ];
+  const cities = ["Barcelona", "Madrid", "Valencia", "Sevilla", "Bilbao", "Málaga", "Zaragoza"];
 
   const clients = [];
   for (let i = 0; i < clientNames.length; i++) {
@@ -292,9 +280,7 @@ async function main() {
       maxDimY: 20,
       minDimZ: 8,
       maxDimZ: 15,
-      images: [
-        "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTg0K5kVsA11CeMd9GA8jiWcVaBMEmQwkMyn3ObfkjlwaYbX9GtJBK95AWXlpV_nHRXbVUJDa7ZPf-Z1hJ-YPZWHsqbwpu1Jv2NafKWsqVs0g&usqp=CAc",
-      ],
+      images: ["/images/product-01.jpg"],
       // colors: ["Blanco", "Negro", "Verde Salvia", "Terracota"],
       stock: 45,
       rating: 4.8,
@@ -302,9 +288,9 @@ async function main() {
       featured: true,
     },
     {
-      name: "Lámpara de Mesa Voronoi",
+      name: "Lámpara de Mesa",
       description:
-        "Lámpara decorativa con patrón Voronoi que crea efectos de luz únicos. Compatible con bombillas E27 LED.",
+        "Lámpara decorativa que crea efectos de luz únicos. Compatible con bombillas E27 LED.",
       category: "Decoracion",
       material: "PLA",
       basePricePerGram: 0.048,
@@ -321,9 +307,7 @@ async function main() {
       maxDimY: 25,
       minDimZ: 20,
       maxDimZ: 35,
-      images: [
-        "https://www.myminifactory.com/object/3d-print-voronoi-lamp-2-lq-10681",
-      ],
+      images: ["/images/product-02.jpg"],
       colors: ["Blanco", "Amarillo", "Naranja"],
       stock: 28,
       rating: 4.9,
@@ -350,9 +334,7 @@ async function main() {
       maxDimY: 12,
       minDimZ: 6,
       maxDimZ: 15,
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuNHho7MtkH_iQtkNcm7xGzSbpiqKyqHsRqg&s",
-      ],
+      images: ["/images/product-03.jpg"],
       colors: ["Rojo Metálico", "Dorado", "Negro", "Verde Esmeralda"],
       stock: 35,
       rating: 4.7,
@@ -379,9 +361,7 @@ async function main() {
       maxDimY: 15,
       minDimZ: 15,
       maxDimZ: 30,
-      images: [
-        "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=600",
-      ],
+      images: ["/images/product-04.jpg"],
       colors: ["Blanco Mate", "Gris", "Rosa Pálido", "Azul Cielo"],
       stock: 52,
       rating: 4.6,
@@ -407,9 +387,7 @@ async function main() {
       maxDimY: 12,
       minDimZ: 10,
       maxDimZ: 18,
-      images: [
-        "https://images.unsplash.com/photo-1603006905003-be475563bc59?w=600",
-      ],
+      images: ["/images/product-05.jpg"],
       colors: ["Transparente", "Azul Transparente", "Rosa Transparente"],
       stock: 67,
       rating: 4.5,
@@ -435,9 +413,7 @@ async function main() {
       maxDimY: 15,
       minDimZ: 12,
       maxDimZ: 25,
-      images: [
-        "https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600",
-      ],
+      images: ["/images/product-06.jpg"],
       colors: ["Blanco", "Negro", "Marmol"],
       stock: 23,
       rating: 4.8,
@@ -463,9 +439,7 @@ async function main() {
       maxDimY: 40,
       minDimZ: 4,
       maxDimZ: 8,
-      images: [
-        "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=600",
-      ],
+      images: ["/images/product-07.jpg"],
       colors: ["Negro", "Dorado Antiguo", "Cobre"],
       stock: 18,
       rating: 4.9,
@@ -491,9 +465,7 @@ async function main() {
       maxDimY: 18,
       minDimZ: 10,
       maxDimZ: 20,
-      images: [
-        "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=600",
-      ],
+      images: ["/images/product-08.jpg"],
       colors: ["Blanco", "Plata", "Dorado"],
       stock: 41,
       rating: 4.7,
@@ -519,9 +491,7 @@ async function main() {
       maxDimY: 22,
       minDimZ: 15,
       maxDimZ: 25,
-      images: [
-        "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=600",
-      ],
+      images: ["/images/product-09.jpg"],
       colors: ["Blanco Mármol", "Terracota", "Gris Piedra"],
       stock: 29,
       rating: 4.6,
@@ -547,9 +517,7 @@ async function main() {
       maxDimY: 10,
       minDimZ: 4,
       maxDimZ: 10,
-      images: [
-        "https://images.unsplash.com/photo-1509909756405-be0199881695?w=600",
-      ],
+      images: ["/images/product-10.jpg"],
       colors: ["Blanco", "Negro", "Pastel Mix"],
       stock: 38,
       rating: 4.5,
@@ -577,9 +545,7 @@ async function main() {
       maxDimY: 18,
       minDimZ: 8,
       maxDimZ: 15,
-      images: [
-        "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600",
-      ],
+      images: ["/images/product-11.jpg"],
       colors: ["Negro", "Blanco", "Gris", "Madera Clara"],
       stock: 73,
       rating: 4.8,
@@ -605,9 +571,7 @@ async function main() {
       maxDimY: 15,
       minDimZ: 20,
       maxDimZ: 30,
-      images: [
-        "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=600",
-      ],
+      images: ["/images/product-12.jpg"],
       colors: ["Negro", "Rojo", "RGB (con LEDs)"],
       stock: 56,
       rating: 4.9,
@@ -633,9 +597,7 @@ async function main() {
       maxDimY: 18,
       minDimZ: 4,
       maxDimZ: 8,
-      images: [
-        "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=600",
-      ],
+      images: ["/images/product-13.jpg"],
       colors: ["Naranja", "Azul", "Negro"],
       stock: 84,
       rating: 4.7,
@@ -661,9 +623,7 @@ async function main() {
       maxDimY: 15,
       minDimZ: 2,
       maxDimZ: 5,
-      images: [
-        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600",
-      ],
+      images: ["/images/product-14.jpg"],
       colors: ["Blanco", "Negro", "Gris Espacial"],
       stock: 62,
       rating: 4.6,
@@ -671,8 +631,7 @@ async function main() {
     },
     {
       name: "Gancho de Pared Minimalista (Pack 4)",
-      description:
-        "Set de 4 ganchos adhesivos de diseño discreto. Soportan hasta 3kg cada uno.",
+      description: "Set de 4 ganchos adhesivos de diseño discreto. Soportan hasta 3kg cada uno.",
       category: "Funcional",
       material: "PETG",
       basePricePerGram: 0.05,
@@ -689,9 +648,7 @@ async function main() {
       maxDimY: 5,
       minDimZ: 4,
       maxDimZ: 8,
-      images: [
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
-      ],
+      images: ["/images/product-15.jpg"],
       colors: ["Blanco", "Negro", "Roble", "Nogal"],
       stock: 120,
       rating: 4.4,
@@ -717,9 +674,7 @@ async function main() {
       maxDimY: 12,
       minDimZ: 8,
       maxDimZ: 15,
-      images: [
-        "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600",
-      ],
+      images: ["/images/product-16.jpg"],
       colors: ["Blanco", "Negro", "Azul Medianoche"],
       stock: 47,
       rating: 4.8,
@@ -745,9 +700,7 @@ async function main() {
       maxDimY: 8,
       minDimZ: 2,
       maxDimZ: 5,
-      images: [
-        "https://images.unsplash.com/photo-1625961332071-7dc0e249a295?w=600",
-      ],
+      images: ["/images/product-17.jpg"],
       colors: ["Blanco", "Negro", "Gris"],
       stock: 95,
       rating: 4.5,
@@ -773,9 +726,7 @@ async function main() {
       maxDimY: 12,
       minDimZ: 18,
       maxDimZ: 30,
-      images: [
-        "https://images.unsplash.com/photo-1532372320572-cda25653a26d?w=600",
-      ],
+      images: ["/images/product-18.jpg"],
       colors: ["Blanco", "Negro", "Roble Natural"],
       stock: 33,
       rating: 4.7,
@@ -803,9 +754,7 @@ async function main() {
       maxDimY: 15,
       minDimZ: 4,
       maxDimZ: 8,
-      images: [
-        "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600",
-      ],
+      images: ["/images/product-19.jpg"],
       colors: ["Multicolor", "Negro/Dorado", "Gris/Rojo"],
       stock: 22,
       rating: 4.9,
@@ -813,8 +762,7 @@ async function main() {
     },
     {
       name: "Caja de Cambios Demostrativa",
-      description:
-        "Modelo de transmisión de 3 velocidades transparente. Educativo y fascinante.",
+      description: "Modelo de transmisión de 3 velocidades transparente. Educativo y fascinante.",
       category: "Articulados",
       material: "PETG",
       basePricePerGram: 0.062,
@@ -831,9 +779,7 @@ async function main() {
       maxDimY: 15,
       minDimZ: 6,
       maxDimZ: 12,
-      images: [
-        "https://images.unsplash.com/photo-1621369116334-37e194d835f3?w=600",
-      ],
+      images: ["/images/product-20.jpg"],
       colors: ["Transparente/Naranja", "Negro/Rojo"],
       stock: 15,
       rating: 4.8,
@@ -859,9 +805,7 @@ async function main() {
       maxDimY: 8,
       minDimZ: 4,
       maxDimZ: 8,
-      images: [
-        "https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=600",
-      ],
+      images: ["/images/product-21.jpg"],
       colors: ["Negro", "Azul", "Verde", "Multicolor"],
       stock: 89,
       rating: 4.6,
@@ -887,9 +831,7 @@ async function main() {
       maxDimY: 10,
       minDimZ: 8,
       maxDimZ: 12,
-      images: [
-        "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=600",
-      ],
+      images: ["/images/product-22.jpg"],
       colors: ["Negro", "Rojo Industrial", "Azul"],
       stock: 27,
       rating: 4.5,
@@ -915,9 +857,7 @@ async function main() {
       maxDimY: 22,
       minDimZ: 8,
       maxDimZ: 15,
-      images: [
-        "https://media.printables.com/media/prints/399341/images/3605477_f7ac08ef-0c9a-415f-ab5a-768309d517df/thumbs/inside/1280x960/jpg/foto2.webp",
-      ],
+      images: ["/images/product-23.jpg"],
       colors: ["Gris Metálico", "Negro/Dorado"],
       stock: 12,
       rating: 4.9,
@@ -945,9 +885,7 @@ async function main() {
       maxDimY: 7,
       minDimZ: 0.3,
       maxDimZ: 1,
-      images: [
-        "https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600",
-      ],
+      images: ["/images/product-24.jpg"],
       colors: ["Negro", "Blanco", "Azul", "Rojo"],
       stock: 200,
       rating: 4.3,
@@ -973,9 +911,7 @@ async function main() {
       maxDimY: 6,
       minDimZ: 2.5,
       maxDimZ: 4,
-      images: [
-        "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600",
-      ],
+      images: ["/images/product-25.jpg"],
       colors: ["Negro Mate", "Gris Espacial", "Verde Militar"],
       stock: 67,
       rating: 4.7,
@@ -1001,9 +937,7 @@ async function main() {
       maxDimY: 3,
       minDimZ: 0.2,
       maxDimZ: 0.5,
-      images: [
-        "https://images.unsplash.com/photo-1584634731339-252c581abfc5?w=600",
-      ],
+      images: ["/images/product-26.jpg"],
       colors: ["Blanco", "Negro", "Azul", "Rosa"],
       stock: 300,
       rating: 4.2,
@@ -1029,9 +963,7 @@ async function main() {
       maxDimY: 4,
       minDimZ: 1.5,
       maxDimZ: 3,
-      images: [
-        "https://images.unsplash.com/photo-1508296695146-257a814070b4?w=600",
-      ],
+      images: ["/images/product-27.jpg"],
       colors: ["Negro", "Gris", "Beige"],
       stock: 78,
       rating: 4.4,
@@ -1059,9 +991,7 @@ async function main() {
       maxDimY: 18,
       minDimZ: 15,
       maxDimZ: 25,
-      images: [
-        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600",
-      ],
+      images: ["/images/product-28.jpg"],
       colors: ["Blanco", "Bronce", "Plata", "Negro"],
       stock: 25,
       rating: 4.8,
@@ -1088,17 +1018,14 @@ async function main() {
       maxDimY: 3,
       minDimZ: 15,
       maxDimZ: 30,
-      images: [
-        "https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=600",
-      ],
+      images: ["/images/product-29.jpg"],
       stock: 50,
       rating: 4.9,
       reviewCount: 189,
     },
     {
-      name: "Mapa Topográfico 3D Ciudad",
-      description:
-        "Relieve topográfico de tu ciudad favorita. Barcelona, Madrid, Valencia y más disponibles.",
+      name: "Escultura de león",
+      description: "Escultura de león de diseño impresa con efecto de piel afelpada.",
       category: "Decoracion",
       material: "PLA",
       basePricePerGram: 0.05,
@@ -1115,9 +1042,7 @@ async function main() {
       maxDimY: 40,
       minDimZ: 2,
       maxDimZ: 6,
-      images: [
-        "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=600",
-      ],
+      images: ["/images/product-30.jpg"],
       stock: 18,
       rating: 4.7,
       reviewCount: 78,
@@ -1125,9 +1050,21 @@ async function main() {
   ];
 
   const createdProducts = [];
-  for (const p of products) {
-    // Usar el campo colors si existe
-    const product = await prisma.product.create({ data: p });
+  const imageBuckets = [
+    "/images/product-01.png",
+    "/images/product-02.jpg",
+    "/images/product-03.webp",
+  ];
+  for (const [index, productTemplate] of products.entries()) {
+    const product = await prisma.product.create({
+      data: {
+        ...productTemplate,
+        images: [
+          imageBuckets[index % imageBuckets.length],
+          imageBuckets[(index + 1) % imageBuckets.length],
+        ],
+      },
+    });
     createdProducts.push(product);
   }
   console.log(`✅ ${createdProducts.length} productos creados`);
@@ -1136,9 +1073,7 @@ async function main() {
   // PRECIOS CALCULADOS (motor avanzado)
   // ========================================
   const priceResult = await updateAllProductPrices();
-  console.log(
-    `✅ ${priceResult.updated} precios calculados con el motor avanzado (p2s)`,
-  );
+  console.log(`✅ ${priceResult.updated} precios calculados con el motor avanzado (p2s)`);
 
   // ========================================
   // PEDIDOS FICTICIOS (15 pedidos)
@@ -1169,10 +1104,7 @@ async function main() {
       };
     });
 
-    const subtotal = orderItems.reduce(
-      (acc, item) => acc + item.unitPrice * item.quantity,
-      0,
-    );
+    const subtotal = orderItems.reduce((acc, item) => acc + item.unitPrice * item.quantity, 0);
     const tax = subtotal * 0.21;
     const shipping = subtotal > 50 ? 0 : 4.95;
     const total = subtotal + tax + shipping;
@@ -1260,9 +1192,7 @@ async function main() {
   console.log("   Admin: john@doe.com / johndoe123");
   console.log("   Cliente: cliente@test.com / cliente123");
   console.log("\n Materiales disponibles: PLA, PETG, ASA, TPU");
-  console.log(
-    " Cupones de prueba: BIENVENIDO10 (10%), PROMO5EUR (-5€), VERANO20 (20%)",
-  );
+  console.log(" Cupones de prueba: BIENVENIDO10 (10%), PROMO5EUR (-5€), VERANO20 (20%)");
 }
 
 main() // NOSONAR

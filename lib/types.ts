@@ -165,6 +165,15 @@ export interface MaterialType {
   updatedAt: string;
 }
 
+export interface PrinterType {
+  id: string;
+  name: string;
+  location: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProductPriceType {
   id: string;
   productId: string;
@@ -191,6 +200,16 @@ export interface InventoryType {
   lastRefill: string;
   updatedAt: string;
   material?: MaterialType;
+}
+
+export interface ColorSummary {
+  id: string;
+  code: string;
+  name: string;
+  hex: string;
+  image?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CouponType {
@@ -235,7 +254,4 @@ export interface WorkerErrorMessage {
   message: string;
 }
 
-export type WorkerMessage =
-  | WorkerProgressMessage
-  | WorkerResultMessage
-  | WorkerErrorMessage;
+export type WorkerMessage = WorkerProgressMessage | WorkerResultMessage | WorkerErrorMessage;

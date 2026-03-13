@@ -81,7 +81,7 @@ describe("Stripe Webhook API Integration", () => {
           type: "earned",
           orderId: "order_12345678",
         }),
-      }),
+      })
     );
   });
 

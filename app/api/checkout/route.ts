@@ -1,11 +1,45 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
 import { authOptions } from "@/lib/auth-options";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 
-// ---- Helper: construye line items para Stripe ---------------
+const CheckoutItemSchema = z.object({
+  productId: z.string().min(1),
+  name: z.string().min(1),
+  material: z.string().min(1),
+  color: z.string().min(1),
+  quantity: z.number().int().min(1).max(99),
+  dimX: z.number().nonnegative(),
+  dimY: z.number().nonnegative(),
+  dimZ: z.number().nonnegative(),
+  unitPrice: z.number().nonnegative(),
+});
+
+const ShippingSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Valid email required"),
+  phone: z.string().min(1, "Phone is required"),
+  address: z.string().min(1, "Address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().optional().default(""),
+  zip: z.string().min(1, "ZIP code is required"),
+  country: z.string().min(2, "Country is required"),
+});
+
+const CheckoutBodySchema = z.object({
+  items: z.array(CheckoutItemSchema).min(1, "At least one item is required"),
+  shipping: ShippingSchema,
+  subtotal: z.number().nonnegative(),
+  tax: z.number().nonnegative(),
+  shippingCost: z.number().nonnegative(),
+  total: z.number().nonnegative(),
+  couponCode: z.string().optional().nullable(),
+});
+
+// ---- Ayudante: construye line items para Stripe ---------------
 
 type StripeLineItem = {
   price_data: {
@@ -17,21 +51,21 @@ type StripeLineItem = {
 };
 
 function buildStripeLineItems(
-  items: Record<string, unknown>[],
+  items: z.infer<typeof CheckoutItemSchema>[],
   tax: number,
   shippingCost: number,
   discount: number,
-  couponCode: string,
+  couponCode: string
 ): StripeLineItem[] {
   const lineItems: StripeLineItem[] = items.map((i) => ({
     price_data: {
       currency: "eur",
       product_data: {
-        name: `${(i?.name as string) ?? "Producto"} (${(i?.material as string) ?? ""} - ${(i?.color as string) ?? ""})`,
+        name: `${i.name} (${i.material} - ${i.color})`,
       },
-      unit_amount: Math.round(((i?.unitPrice as number) ?? 0) * 100),
+      unit_amount: Math.round(i.unitPrice * 100),
     },
-    quantity: (i?.quantity as number) ?? 1,
+    quantity: i.quantity,
   }));
 
   if (tax > 0) {
@@ -72,15 +106,14 @@ function buildStripeLineItems(
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const userId = (session.user as Record<string, unknown>)?.id as string;
     const body = await req.json();
-    const { items, shipping, subtotal, tax, shippingCost, total, couponCode } =
-      body ?? {};
-
-    if (!items?.length)
-      return NextResponse.json({ error: "No items" }, { status: 400 });
+    const parsed = CheckoutBodySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 });
+    }
+    const { items, shipping, subtotal, tax, shippingCost, total, couponCode } = parsed.data;
 
     // ---- Validar cupón si se proporcionó ----
     let couponId: string | null = null;
@@ -115,30 +148,30 @@ export async function POST(req: NextRequest) {
         userId,
         subtotal: subtotal ?? 0,
         tax: tax ?? 0,
-        shipping: shippingCost ?? 0,
+        shipping: shippingCost,
         discount,
         total: finalTotal,
         status: "pending",
         couponId,
-        shippingName: shipping?.name ?? "",
-        shippingEmail: shipping?.email ?? "",
-        shippingPhone: shipping?.phone ?? "",
-        shippingAddress: shipping?.address ?? "",
-        shippingCity: shipping?.city ?? "",
-        shippingState: shipping?.state ?? "",
-        shippingZip: shipping?.zip ?? "",
-        shippingCountry: shipping?.country ?? "",
+        shippingName: shipping.name,
+        shippingEmail: shipping.email,
+        shippingPhone: shipping.phone,
+        shippingAddress: shipping.address,
+        shippingCity: shipping.city,
+        shippingState: shipping.state,
+        shippingZip: shipping.zip,
+        shippingCountry: shipping.country,
         items: {
-          create: (items ?? []).map((i: Record<string, unknown>) => ({
-            productId: (i?.productId as string) ?? "",
-            name: (i?.name as string) ?? "",
-            material: (i?.material as string) ?? "",
-            color: (i?.color as string) ?? "",
-            quantity: (i?.quantity as number) ?? 1,
-            dimX: (i?.dimX as number) ?? 0,
-            dimY: (i?.dimY as number) ?? 0,
-            dimZ: (i?.dimZ as number) ?? 0,
-            unitPrice: (i?.unitPrice as number) ?? 0,
+          create: items.map((i) => ({
+            productId: i.productId,
+            name: i.name,
+            material: i.material,
+            color: i.color,
+            quantity: i.quantity,
+            dimX: i.dimX,
+            dimY: i.dimY,
+            dimZ: i.dimZ,
+            unitPrice: i.unitPrice,
           })),
         },
       },
@@ -146,13 +179,7 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get("origin") ?? "http://localhost:3000";
 
-    const lineItems = buildStripeLineItems(
-      items ?? [],
-      tax ?? 0,
-      shippingCost ?? 0,
-      discount,
-      couponCode ?? "",
-    );
+    const lineItems = buildStripeLineItems(items, tax, shippingCost, discount, couponCode ?? "");
 
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "payment",
